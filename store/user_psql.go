@@ -1,7 +1,7 @@
 package store
 
 import (
-	//"database/sql"
+	"database/sql"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"log"
@@ -28,7 +28,7 @@ func GetUsers(db *sqlx.DB) ([]models.User, error) {
 }
 
 func GetUser(db *sqlx.DB, user *models.User) error {
-	err := db.QueryRowx("select * from users where login=$1", user.Login).StructScan(user)
+	err := db.QueryRowx("select * from users where email=$1", user.Email).StructScan(user)
 	if err != nil {
 		logErr(err)
 		return fmt.Errorf("cannot scan user from db: %v", err)
@@ -36,7 +36,7 @@ func GetUser(db *sqlx.DB, user *models.User) error {
 	return nil
 }
 
-func CreateUser(db *sqlx.DB, user *models.User) error {
+func Register(db *sqlx.DB, user *models.User) error {
 	_, err := db.Exec("insert into users (email,firstname, lastname, login ,password) values ($1,$2,$3, $4, $5)",
 		user.Email, user.Firstname, user.Lastname, user.Login, user.Password)
 	if err != nil {
@@ -46,8 +46,8 @@ func CreateUser(db *sqlx.DB, user *models.User) error {
 }
 
 func ChangePassword(db *sqlx.DB, user *models.User, newPassword string) error {
-	res, err := db.Exec("UPDATE users SET password=$1 WHERE login = $2 AND email = $3",
-		newPassword, user.Login, user.Email)
+	res, err := db.Exec("UPDATE users SET password=$1 WHERE email = $2",
+		newPassword, user.Email)
 	if err != nil {
 		return fmt.Errorf("cannot update users in db: %v", err)
 	}
@@ -61,19 +61,18 @@ func ChangePassword(db *sqlx.DB, user *models.User, newPassword string) error {
 	return nil
 }
 
-/*func Signup(db *sqlx.DB, user models.User) int {
-	err := db.QueryRow("insert into teammate (firstname,lastname,password) values ($1,$2,$3) RETURNING id_user;",
-		user.Firstname, user.Lastname, user.Password).Scan(&user.ID)
-	logErr(err)
-	models.AddUser(&user)
-	return user.ID
-}
+// func Register(db *sqlx.DB, user models.User) int {
+// 	err := db.QueryRow("insert into teammate (firstname,lastname,password) values ($1,$2,$3) RETURNING id_user;",
+// 		user.Firstname, user.Lastname, user.Password).Scan(&user.ID)
+// 	logErr(err)
+// 	models.AddUser(&user)
+// 	return user.ID
+// }
 
-func Signin(db *sqlx.DB, userСhecking models.User, userFromBase models.User) (string, error) {
-	err := db.QueryRow("select password from teammate where id_user=$1", userСhecking.ID).Scan(&userFromBase.Password)
+func Login(db *sqlx.DB, userСhecking *models.User, userFromBase *models.User) error {
+	err := db.QueryRow("select password from users where email=$1", userСhecking.Email).Scan(userFromBase.Password)
 	if err == sql.ErrNoRows {
-		return "", err
+		return fmt.Errorf("cannot find such user: %v", err)
 	}
-	logErr(err)
-	return userFromBase.Password, nil
-}*/
+	return nil
+}

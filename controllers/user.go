@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"petbook/models"
 	"petbook/store"
@@ -10,8 +11,8 @@ type UserController struct {
 	DB *sqlx.DB
 }
 
-func (c *UserController) CreateUser(u *models.User) error {
-	err := store.CreateUser(c.DB, u)
+func (c *UserController) Register(u *models.User) error {
+	err := store.Register(c.DB, u)
 	if err != nil {
 		return err
 	}
@@ -33,5 +34,16 @@ func (c *UserController) ChangePassword(u *models.User, newPassword string) erro
 		return err
 	}
 	u.Password = newPassword
+	return nil
+}
+
+func (c *UserController) Login(userChecking *models.User, userFromBase *models.User) error {
+	err := store.Login(c.DB, userChecking, userFromBase)
+	if err != nil {
+		return err
+	}
+	if userChecking.Password != userFromBase.Password {
+		return fmt.Errorf("wrong login data: %v", err)
+	}
 	return nil
 }

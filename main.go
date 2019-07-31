@@ -16,15 +16,6 @@ import (
 	//"petbook/store"
 )
 
-/*type ViewDataUsers struct {
-	Title   string `json:"title"
-	Content []models.User `json:"content"`
-}
-type ViewDataUser struct {
-	Title   string `json:"title"`
-	Content models.User   `json:"content"`
-}*/
-
 func logErr(err error) {
 	if err != nil {
 		log.Println(err)
@@ -45,7 +36,12 @@ func main() {
 	}
 	controllerUser := controllers.UserController{DB: db}
 	//controllerUser.DB = db
-	err := controllerUser.ChangePassword(user, "99999999999999")
+	err := controllerUser.Login(user, user)
+	if err == nil {
+		fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
+		return
+	}
+	fmt.Println("SMERT'")
 	//_____________________________________________________
 	// user := &models.User{}
 	// err := GetUser(user, db, "user")
