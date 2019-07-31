@@ -2,7 +2,7 @@ package main
 
 import (
 	//"database/sql"
-	"fmt"
+	//"fmt"
 	_ "github.com/gorilla/handlers"
 	_ "github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
@@ -24,29 +24,21 @@ func logErr(err error) {
 
 func main() {
 	var db *sqlx.DB
-	//controller := controllers.Controller{}
 	db = driver.ConnectDB()
 
 	user := &models.User{
-		Email:     "newEMAIL@gmail.co213132m",
-		Login:     "myLOGINnew",
-		Password:  "333124124124141241241",
+		Email:     "asdsad@gmail.com",
+		Login:     "mylogin",
+		Password:  "123123",
 		Firstname: "name",
 		Lastname:  "surname",
 	}
 	controllerUser := controllers.UserController{DB: db}
-	//controllerUser.DB = db
-	err := controllerUser.Login(user, user)
-	if err == nil {
-		fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
+	err := controllerUser.Login(user)
+	if err != nil {
+		log.Println(err)
 		return
 	}
-	fmt.Println("SMERT'")
-	//_____________________________________________________
-	// user := &models.User{}
-	// err := GetUser(user, db, "user")
-	// logErr(err)
-	// err = ChangePassword(user, db, "1111111")
-	logErr(err)
-	fmt.Println(user)
+	log.Println("user logged in")
+
 }

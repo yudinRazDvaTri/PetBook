@@ -69,10 +69,14 @@ func ChangePassword(db *sqlx.DB, user *models.User, newPassword string) error {
 // 	return user.ID
 // }
 
-func Login(db *sqlx.DB, userСhecking *models.User, userFromBase *models.User) error {
-	err := db.QueryRow("select password from users where email=$1", userСhecking.Email).Scan(userFromBase.Password)
-	if err == sql.ErrNoRows {
-		return fmt.Errorf("cannot find such user: %v", err)
+func Login(db *sqlx.DB, userСhecking *models.User) error {
+	var passwordFromBase string
+	err := db.QueryRow("select password from users where email=$1", userСhecking.Email).Scan(&passwordFromBase)
+	if userСhecking.Password != passwordFromBase || err == sql.ErrNoRows {
+		return fmt.Errorf("wrong login data")
+	}
+	if err != nil {
+		return fmt.Errorf("cannot login this user: %v", err)
 	}
 	return nil
 }
