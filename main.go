@@ -3,17 +3,17 @@ package main
 import (
 	//"database/sql"
 	//"fmt"
-	_ "github.com/gorilla/handlers"
-	_ "github.com/gorilla/mux"
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	//"github.com/lib/pq"
+	"PetBook/controllers"
+	"PetBook/driver"
 	"log"
-	//"net/http"
-	//"os"
-	"petbook/controllers"
-	"petbook/driver"
-	"petbook/models"
-	//"petbook/store"
+	"net/http"
+	"os"
+	//"PetBook/models"
+	"PetBook/store"
 )
 
 func logErr(err error) {
@@ -26,19 +26,27 @@ func main() {
 	var db *sqlx.DB
 	db = driver.ConnectDB()
 
-	user := &models.User{
-		Email:     "asdsad@gmail.com",
-		Login:     "mylogin",
-		Password:  "123123",
-		Firstname: "name",
-		Lastname:  "surname",
-	}
-	controllerUser := controllers.UserController{DB: db}
-	err := controllerUser.Login(user)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	log.Println("user logged in")
+	router := mux.NewRouter()
 
+	storeUser := store.UserStore{DB: db}
+	controller := controllers.Controller{US: &storeUser}
+
+	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
+	router.HandleFunc("/register", controller.RegisterGetHandler()).Methods("GET")
+
+	router.HandleFunc("/login", controller.LoginPostHandler()).Methods("POST")
+	router.HandleFunc("/login", controller.LoginGetHandler()).Methods("GET")
+
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
+		http.FileServer(http.Dir("./web/static/"))))
+
+	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
+	log.Fatal(http.ListenAndServe(":8181", loggedRouter))
+
+	//err := storeUser.Login(user)
+	// if err != nil {
+	// 	log.Println(err)
+	// 	return
+	// }
+	// log.Println("user logged in")
 }

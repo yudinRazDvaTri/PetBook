@@ -14,9 +14,9 @@ func init() {
 	gotenv.Load()
 }
 
-func logFatal(err error) {
+func logErr(err error) {
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }
 
@@ -32,10 +32,10 @@ func ConnectDB() *sqlx.DB {
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 	db, err = sqlx.Open("postgres", connStr)
-	logFatal(err)
+	logErr(err)
 	err = db.Ping()
 	if err != nil {
-		logFatal(fmt.Errorf("can't ping, err: %s", err.Error()))
+		logErr(fmt.Errorf("can't ping, err: %s", err.Error()))
 	}
 	return db
 }
