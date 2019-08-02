@@ -1,8 +1,9 @@
 package store
 
 import (
-	"PetBook/models"
 	"database/sql"
+	"test/models"
+
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"log"
@@ -84,4 +85,27 @@ func (c *UserStore) Login(userСhecking *models.User) error {
 		return fmt.Errorf("cannot login this user: %v", err)
 	}
 	return nil
+}
+
+func (c *UserStore) GetPet(user *models.User) (models.Pet, error) {
+	pet := models.Pet{}
+	err := c.DB.QueryRowx(
+		`SELECT user_id,name,animal_type, breed, age, weight, gender 
+		FROM pets p, users u 
+		WHERE p.user_id = u.id  
+		AND u.email = $1 `, user.Email).StructScan(&pet)
+	if err != nil {
+		return pet, err
+	}
+	return pet, nil
+}
+
+type Pet struct {
+	ID      int     `db:"user_id"`
+	Name    string  `db:"name"`
+	PetType string  `db:"animal_type"`
+	Breed   string  `db:"breed"`
+	Age     int     `db:"age"`
+	Weight  float32 `db: "weight"`
+	Gender  string  `db:"gender"`
 }

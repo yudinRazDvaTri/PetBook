@@ -1,0 +1,5 @@
+development:
+  dialect: postgres
+  datasource: dbname=pet_book sslmode=disable user=postgres password=190117
+  dir: migrations
+

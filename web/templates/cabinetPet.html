@@ -1,0 +1,38 @@
+{{ define "layout" }}
+
+<!DOCTYPE html>
+<html >
+<head>
+    <meta charset="UTF-8">
+    <title>Pet</title>
+</head>
+<body>
+<form method="POST">
+    <label>Pet nickname</label><br>
+    <input type="text" name="nickname" /><br><br>
+    <label>Animal type</label>
+    <select name="pet-type">
+        <option name="cat">Cat</option>
+        <option name="dog">Dog</option>
+        <option name="fish">Fish</option>
+        <option name="pig">Guinea pig</option>
+    </select><br><br>
+    <label>Pet breed</label><br>
+    <input type="text" name="breed" /><br><br>
+    <label>Pet age</label><br>
+    <input type="number" name="age" /><br><br>
+    <label>Pet weight</label><br>
+    <input type="number" name="weight" /><br><br>
+    <label>Pet gender</label>
+    <select name="gender">
+        <option name="male">Male</option>
+        <option name="female">Female</option>
+    </select><br><br>
+    <label>Pet description</label><br>
+    <input type="text" name="description" /><br><br>
+    <input type="submit" value="Send" />
+</form>
+</body>
+</html>
+
+{{ end }}

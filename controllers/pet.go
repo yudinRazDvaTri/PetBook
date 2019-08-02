@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"PetBook/models"
+	"test/models"
+	"test/pkg/utils"
+
 	//"PetBook/pkg/utils"
-	"PetBook/store"
 	//"fmt"
 	//"github.com/dgrijalva/jwt-go"
 	"log"
@@ -21,8 +22,8 @@ func (c *Controller) CreatePetHandler() http.HandlerFunc {
 			pet.Name = r.FormValue("nickname")
 			pet.PetType = r.FormValue("pet-type")
 			pet.Breed = r.FormValue("breed")
-			pet.Age = r.FormValue("age")
-			pet.Weight = r.FormValue("weight")
+			//pet.Age = r.FormValue("age")
+			//pet.Weight = r.FormValue("weight")
 			pet.Gender = r.FormValue("gender")
 			//petpetDescription := r.FormValue("description")
 			err = c.PetStore.RegisterPet(pet)
@@ -31,7 +32,7 @@ func (c *Controller) CreatePetHandler() http.HandlerFunc {
 			}
 			http.Redirect(w, r, "/main", 301)
 		} else {
-			http.ServeFile(w, r, "web/cabinetPet.html")
+			utils.GenerateHTML(w, nil, "cabinetPet")
 		}
 	}
 }

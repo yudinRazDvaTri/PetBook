@@ -1,0 +1,2 @@
+ERROR 2019/08/02 08:09:41 utils.go:23: html/template: "layout" is undefined
+ERROR 2019/08/02 08:09:42 utils.go:23: html/template: "layout" is undefined

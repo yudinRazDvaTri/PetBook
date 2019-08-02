@@ -4,6 +4,8 @@ import (
 	"crypto/rsa"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/context"
+
 	//"github.com/dgrijalva/jwt-go/request"
 	_ "github.com/lib/pq"
 	"html/template"
@@ -24,7 +26,7 @@ func Error(args ...interface{}) {
 }
 
 type Claims struct {
-	Username string `json:"username"`
+	Email string `json:"email"`
 	jwt.StandardClaims
 }
 
@@ -72,6 +74,7 @@ func ValidateTokenMiddleware(w http.ResponseWriter, r *http.Request, next http.H
 
 	if err == nil {
 		if token.Valid {
+			context.Set(r, "email", claims.Email)
 			next(w, r)
 		} else {
 			w.WriteHeader(http.StatusUnauthorized)

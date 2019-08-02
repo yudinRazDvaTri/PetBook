@@ -1,19 +1,23 @@
 package main
 
 import (
+	_ "test/init"
+	"test/pkg/utils"
 	//"database/sql"
 	//"fmt"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/jmoiron/sqlx"
+	//"github.com/jmoiron/sqlx"
+	"github.com/urfave/negroni"
+	"test/gomigrations"
 	//"github.com/lib/pq"
-	"PetBook/controllers"
-	"PetBook/driver"
 	"log"
 	"net/http"
 	"os"
+	"test/controllers"
+	"test/driver"
 	//"PetBook/models"
-	"PetBook/store"
+	"test/store"
 )
 
 func logErr(err error) {
@@ -23,13 +27,18 @@ func logErr(err error) {
 }
 
 func main() {
-	var db *sqlx.DB
-	db = driver.ConnectDB()
+
+	//	var db *sqlx.DB
+	db := driver.ConnectDB()
+	err := gomigrations.Migrate(db)
+	if err != nil {
+		log.Fatal("Migration failed.")
+	}
 
 	router := mux.NewRouter()
 
 	storeUser := store.UserStore{DB: db}
-	controller := controllers.Controller{US: &storeUser}
+	controller := controllers.Controller{UserStore: &storeUser}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
 	router.HandleFunc("/register", controller.RegisterGetHandler()).Methods("GET")
@@ -40,8 +49,23 @@ func main() {
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
 		http.FileServer(http.Dir("./web/static/"))))
 
+	router.Handle("/cabinetPet", negroni.New(
+		negroni.HandlerFunc(utils.ValidateTokenMiddleware),
+		negroni.Wrap(http.HandlerFunc(controller.CreatePetHandler())),
+	))
+
+	router.Handle("/mypage", negroni.New(
+		negroni.HandlerFunc(utils.ValidateTokenMiddleware),
+		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
+	))
+
+	router.Handle("/", negroni.New(
+		negroni.HandlerFunc(utils.ValidateTokenMiddleware),
+		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
+	))
+
 	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
-	log.Fatal(http.ListenAndServe(":8181", loggedRouter))
+	log.Fatal(http.ListenAndServe(":8080", loggedRouter))
 
 	//err := storeUser.Login(user)
 	// if err != nil {

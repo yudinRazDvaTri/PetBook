@@ -1,7 +1,7 @@
 package store
 
 import (
-	"PetBook/models"
+	"test/models"
 	//	"database/sql"
 	"fmt"
 	"github.com/jmoiron/sqlx"

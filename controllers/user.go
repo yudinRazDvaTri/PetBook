@@ -1,14 +1,14 @@
 package controllers
 
 import (
-	"PetBook/models"
-	"PetBook/pkg/utils"
-	"PetBook/store"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"log"
 	"net/http"
 	"regexp"
+	"test/models"
+	"test/pkg/utils"
+	"test/store"
 	"time"
 	//"github.com/gorilla/mux"
 	//"github.com/gorilla/sessions"
@@ -55,11 +55,11 @@ func (c *Controller) LoginGetHandler() http.HandlerFunc {
 func (c *Controller) LoginPostHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
-		login := r.FormValue("login")
+		email := r.FormValue("email")
 		password := r.FormValue("password")
 
 		user := models.User{
-			Login:    login,
+			Email:    email,
 			Password: password,
 		}
 
@@ -73,7 +73,7 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 		expirationTime := time.Now().Add(30 * time.Minute)
 
 		claims := &utils.Claims{
-			Username: login,
+			Email: email,
 			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: expirationTime.Unix(),
 			},
