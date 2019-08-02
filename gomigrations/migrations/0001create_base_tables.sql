@@ -5,17 +5,17 @@ CREATE type kind_of_animal AS ENUM('dog','cat','fish','bird','rodent');
 CREATE TABLE IF NOT EXISTS users(
 id serial not null PRIMARY KEY,
 email text not null unique,
-first_name text not null,
-last_name text not null ,
+firstname text not null,
+lastname text not null ,
 login text unique not null ,
-pet_or_vet role not null ,
+pet_or_vet role ,
 password text not null
 );
 
 CREATE table if not exists pets(
 user_id integer not null primary key,
 name text not null,
-ade integer not null,
+age integer not null,
 animal_type kind_of_animal not null,
 breed text not null,
 description text default 'There is no description yet',

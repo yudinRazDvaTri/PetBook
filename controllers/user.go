@@ -95,7 +95,11 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 			Value:   tokenString,
 			Expires: expirationTime,
 		})
-
+		pet, err := c.UserStore.GetPet(user)
+		if err != nil {
+			http.Redirect(w, r, "/petcabinet", http.StatusFound)
+			return
+		}
 		http.Redirect(w, r, "/mypage", http.StatusFound)
 	}
 }
@@ -180,7 +184,6 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 			Lastname:  lastName,
 			Password:  password,
 		}
-
 		if err := c.UserStore.Register(&user); err != nil {
 			utils.Error(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
