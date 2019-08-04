@@ -1,10 +1,10 @@
 package controllers
 
 import (
+	"PetBook/pkg/utils"
 	"fmt"
 	"github.com/gorilla/context"
 	"net/http"
-	"test/pkg/utils"
 )
 
 func (c *Controller) MyPageGetHandler() http.HandlerFunc {

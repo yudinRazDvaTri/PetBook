@@ -4,7 +4,7 @@ import (
 	//"database/sql"
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
+	// "github.com/lib/pq"
 	"github.com/subosito/gotenv"
 	"log"
 	"os"

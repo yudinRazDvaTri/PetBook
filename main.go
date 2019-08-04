@@ -1,23 +1,23 @@
 package main
 
 import (
-	_ "test/init"
-	"test/pkg/utils"
+	_ "PetBook/init"
+	"PetBook/pkg/utils"
 	//"database/sql"
 	//"fmt"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	//"github.com/jmoiron/sqlx"
+	"PetBook/gomigrations"
 	"github.com/urfave/negroni"
-	"test/gomigrations"
 	//"github.com/lib/pq"
+	"PetBook/controllers"
+	"PetBook/driver"
 	"log"
 	"net/http"
 	"os"
-	"test/controllers"
-	"test/driver"
 	//"PetBook/models"
-	"test/store"
+	"PetBook/store"
 )
 
 func logErr(err error) {

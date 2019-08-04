@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"test/models"
-	"test/pkg/utils"
+	"PetBook/models"
+	"PetBook/pkg/utils"
 
 	//"PetBook/pkg/utils"
 	//"fmt"

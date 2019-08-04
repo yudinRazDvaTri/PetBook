@@ -1,14 +1,14 @@
 package controllers
 
 import (
+	"PetBook/models"
+	"PetBook/pkg/utils"
+	"PetBook/store"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"log"
 	"net/http"
 	"regexp"
-	"test/models"
-	"test/pkg/utils"
-	"test/store"
 	"time"
 	//"github.com/gorilla/mux"
 	//"github.com/gorilla/sessions"
@@ -95,7 +95,7 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 			Value:   tokenString,
 			Expires: expirationTime,
 		})
-		pet, err := c.UserStore.GetPet(user)
+		_, err = c.UserStore.GetPet(&user)
 		if err != nil {
 			http.Redirect(w, r, "/petcabinet", http.StatusFound)
 			return

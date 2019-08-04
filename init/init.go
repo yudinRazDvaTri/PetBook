@@ -1,11 +1,11 @@
 package init
 
 import (
+	"PetBook/pkg/utils"
 	"github.com/dgrijalva/jwt-go"
 	"io/ioutil"
 	"log"
 	"os"
-	"test/pkg/utils"
 )
 
 const (
