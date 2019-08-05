@@ -1,19 +1,23 @@
 package main
 
 import (
+	_ "PetBook/init"
+	"PetBook/pkg/utils"
 	//"database/sql"
-	"fmt"
-	_ "github.com/gorilla/handlers"
-	_ "github.com/gorilla/mux"
-	"github.com/jmoiron/sqlx"
+	//"fmt"
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+	//"github.com/jmoiron/sqlx"
+	"PetBook/gomigrations"
+	"github.com/urfave/negroni"
 	//"github.com/lib/pq"
+	"PetBook/controllers"
+	"PetBook/driver"
 	"log"
-	//"net/http"
-	//"os"
-	"petbook/controllers"
-	"petbook/driver"
-	"petbook/models"
-	//"petbook/store"
+	"net/http"
+	"os"
+	//"PetBook/models"
+	"PetBook/store"
 )
 
 func logErr(err error) {
@@ -23,30 +27,50 @@ func logErr(err error) {
 }
 
 func main() {
-	var db *sqlx.DB
-	//controller := controllers.Controller{}
-	db = driver.ConnectDB()
 
-	user := &models.User{
-		Email:     "newEMAIL@gmail.co213132m",
-		Login:     "myLOGINnew",
-		Password:  "333124124124141241241",
-		Firstname: "name",
-		Lastname:  "surname",
+	//	var db *sqlx.DB
+	db := driver.ConnectDB()
+	err := gomigrations.Migrate(db)
+	if err != nil {
+		log.Fatal("Migration failed.")
 	}
-	controllerUser := controllers.UserController{DB: db}
-	//controllerUser.DB = db
-	err := controllerUser.Login(user, user)
-	if err == nil {
-		fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
-		return
-	}
-	fmt.Println("SMERT'")
-	//_____________________________________________________
-	// user := &models.User{}
-	// err := GetUser(user, db, "user")
-	// logErr(err)
-	// err = ChangePassword(user, db, "1111111")
-	logErr(err)
-	fmt.Println(user)
+
+	router := mux.NewRouter()
+
+	storeUser := store.UserStore{DB: db}
+	controller := controllers.Controller{UserStore: &storeUser}
+
+	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
+	router.HandleFunc("/register", controller.RegisterGetHandler()).Methods("GET")
+
+	router.HandleFunc("/login", controller.LoginPostHandler()).Methods("POST")
+	router.HandleFunc("/login", controller.LoginGetHandler()).Methods("GET")
+
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
+		http.FileServer(http.Dir("./web/static/"))))
+
+	router.Handle("/cabinetPet", negroni.New(
+		negroni.HandlerFunc(utils.ValidateTokenMiddleware),
+		negroni.Wrap(http.HandlerFunc(controller.CreatePetHandler())),
+	))
+
+	router.Handle("/mypage", negroni.New(
+		negroni.HandlerFunc(utils.ValidateTokenMiddleware),
+		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
+	))
+
+	router.Handle("/", negroni.New(
+		negroni.HandlerFunc(utils.ValidateTokenMiddleware),
+		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
+	))
+
+	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
+	log.Fatal(http.ListenAndServe(":8080", loggedRouter))
+
+	//err := storeUser.Login(user)
+	// if err != nil {
+	// 	log.Println(err)
+	// 	return
+	// }
+	// log.Println("user logged in")
 }
