@@ -17,8 +17,8 @@ import (
 )
 
 type Controller struct {
-	UserStore *store.UserStore
-	PetStore  *store.PetStore
+	UserStore store.UserStorer
+	PetStore  store.PetStorer
 }
 
 // func (c Controller) LoginHandler() http.HandlerFunc {
