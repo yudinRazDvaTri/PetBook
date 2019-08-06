@@ -15,6 +15,15 @@ func logErr(err error) {
 	}
 }
 
+type UserStorer interface {
+	GetUsers() ([]models.User, error)
+	GetUser(user *models.User) error
+	Register(user *models.User) error
+	ChangePassword(user *models.User, newPassword string) error
+	Login(userСhecking *models.User) error
+	GetPet(user *models.User) (models.Pet, error)
+}
+
 type UserStore struct {
 	DB *sqlx.DB
 }

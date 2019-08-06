@@ -12,6 +12,11 @@ type PetStore struct {
 	DB *sqlx.DB
 }
 
+type PetStorer interface {
+	GetPet(pet *models.Pet) error
+	RegisterPet(pet *models.Pet) error
+}
+
 // func (c *UserStore) GetU() ([]models.User, error) {
 // 	rows, err := c.DB.Query("select * from users")
 // 	logErr(err)
