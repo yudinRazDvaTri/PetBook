@@ -1,11 +1,9 @@
 package controllers
 
 import (
-	"github.com/Khudienko/PetBook/pkg/models"
-	//	"database/sql"
 	"fmt"
+	"github.com/dpgolang/PetBook/pkg/models"
 	"github.com/jmoiron/sqlx"
-	//"log"
 )
 
 type PetStore struct {

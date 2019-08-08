@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/Khudienko/PetBook/gomigrations"
-	"github.com/Khudienko/PetBook/pkg/controllers"
-	"github.com/Khudienko/PetBook/pkg/driver"
-	"github.com/Khudienko/PetBook/pkg/handler"
-	_ "github.com/Khudienko/PetBook/pkg/logger"
-	"github.com/Khudienko/PetBook/pkg/authentication"
+	"github.com/dpgolang/PetBook/gomigrations"
+	"github.com/dpgolang/PetBook/pkg/authentication"
+	"github.com/dpgolang/PetBook/pkg/controllers"
+	"github.com/dpgolang/PetBook/pkg/driver"
+	"github.com/dpgolang/PetBook/pkg/handler"
+	_ "github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"

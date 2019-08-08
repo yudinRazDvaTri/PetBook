@@ -2,7 +2,7 @@ package view
 
 import (
 	"fmt"
-	"github.com/Khudienko/PetBook/pkg/logger"
+	"github.com/dpgolang/PetBook/pkg/logger"
 	"html/template"
 	"net/http"
 )

@@ -1,10 +1,8 @@
 package driver
 
 import (
-	//"database/sql"
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	// "github.com/lib/pq"
 	"github.com/subosito/gotenv"
 	"log"
 	"os"

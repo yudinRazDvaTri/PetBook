@@ -2,7 +2,7 @@ package handler
 
 import (
 	"fmt"
-	"github.com/Khudienko/PetBook/pkg/view"
+	"github.com/dpgolang/PetBook/pkg/view"
 	"github.com/gorilla/context"
 	"net/http"
 )

@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"github.com/Khudienko/PetBook/pkg/authentication"
-	"github.com/Khudienko/PetBook/pkg/controllers"
-	"github.com/Khudienko/PetBook/pkg/logger"
-	"github.com/Khudienko/PetBook/pkg/models"
-	"github.com/Khudienko/PetBook/pkg/view"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/dpgolang/PetBook/pkg/authentication"
+	"github.com/dpgolang/PetBook/pkg/controllers"
+	"github.com/dpgolang/PetBook/pkg/logger"
+	"github.com/dpgolang/PetBook/pkg/models"
+	"github.com/dpgolang/PetBook/pkg/view"
 	"net/http"
 	"regexp"
 	"time"

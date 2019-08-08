@@ -3,7 +3,7 @@ package authentication
 import (
 	"crypto/rand"
 	"crypto/rsa"
-	"github.com/Khudienko/PetBook/pkg/logger"
+	"github.com/dpgolang/PetBook/pkg/logger"
 )
 
 type keys struct {

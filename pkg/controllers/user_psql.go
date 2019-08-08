@@ -2,9 +2,8 @@ package controllers
 
 import (
 	"database/sql"
-	"github.com/Khudienko/PetBook/pkg/models"
-
 	"fmt"
+	"github.com/dpgolang/PetBook/pkg/models"
 	"github.com/jmoiron/sqlx"
 	"log"
 )

@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/Khudienko/PetBook/pkg/models"
-	"github.com/Khudienko/PetBook/pkg/view"
+	"github.com/dpgolang/PetBook/pkg/models"
+	"github.com/dpgolang/PetBook/pkg/view"
 	"log"
 	"net/http"
 )
