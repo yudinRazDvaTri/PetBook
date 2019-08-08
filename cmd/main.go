@@ -5,10 +5,12 @@ import (
 	"github.com/Khudienko/PetBook/pkg/controllers"
 	"github.com/Khudienko/PetBook/pkg/driver"
 	"github.com/Khudienko/PetBook/pkg/handler"
-	"github.com/Khudienko/PetBook/pkg/tokens"
+	_ "github.com/Khudienko/PetBook/pkg/logger"
+	"github.com/Khudienko/PetBook/pkg/authentication"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
+
 	"log"
 	"net/http"
 	"os"
@@ -41,7 +43,7 @@ func main() {
 
 
 	router.Handle("/mypage", negroni.New(
-		negroni.HandlerFunc(tokens.ValidateTokenMiddleware),
+		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
 		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
 	))
 
@@ -49,7 +51,7 @@ func main() {
 	router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/",
 		http.FileServer(http.Dir("./web/assets/"))))
 	router.Handle("/", negroni.New(
-		negroni.HandlerFunc(tokens.ValidateTokenMiddleware),
+		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
 		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
 	))
 	loggedRouter := handlers.LoggingHandler(os.Stdout, router)

@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"fmt"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/Khudienko/PetBook/pkg/authentication"
 	"github.com/Khudienko/PetBook/pkg/controllers"
+	"github.com/Khudienko/PetBook/pkg/logger"
 	"github.com/Khudienko/PetBook/pkg/models"
-	"github.com/Khudienko/PetBook/pkg/tokens"
-	"log"
+	"github.com/Khudienko/PetBook/pkg/view"
+	"github.com/dgrijalva/jwt-go"
 	"net/http"
 	"regexp"
 	"time"
@@ -49,7 +49,7 @@ const (
 
 func (c *Controller) LoginGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		tokens.GenerateHTML(w, nil, "login")
+		view.GenerateHTML(w, nil, "login")
 	}
 }
 func (c *Controller) LoginPostHandler() http.HandlerFunc {
@@ -63,6 +63,7 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 			Password: password,
 		}
 
+		// TODO: output whether wrong credentials were input or server error happened
 		if err := c.UserStore.Login(&user); err != nil {
 			//utils.Error(err)
 			//http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -72,7 +73,7 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 
 		expirationTime := time.Now().Add(30 * time.Minute)
 
-		claims := &tokens.Claims{
+		claims := &authentication.Claims{
 			Email: email,
 			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: expirationTime.Unix(),
@@ -81,12 +82,11 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 
 		token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 
-		tokenString, err := token.SignedString(tokens.SignKey)
+		tokenString, err := token.SignedString(authentication.Keys.SignKey)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintln(w, "Error while signing the token")
-			log.Printf("Error signing token: %v\n", err)
+			logger.Error(err, "Error occurred while trying to sign token.\n")
 			return
 		}
 
@@ -108,7 +108,7 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 // TODO: do not log duplicate value error
 func (c *Controller) RegisterGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		tokens.GenerateHTML(w, nil, "register")
+		view.GenerateHTML(w, nil, "register")
 	}
 }
 func (c *Controller) RegisterPostHandler() http.HandlerFunc {
@@ -124,7 +124,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 
 		if matched, err := regexp.Match(patternAnyChar, []byte(login)); !matched || err != nil {
 			if err != nil {
-				tokens.Error(err, "Error occured while trying to match login.\n")
+				logger.Error(err, "Error occured while trying to match login.\n")
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -134,7 +134,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 
 		if matched, err := regexp.Match(patternEmail, []byte(email)); !matched || err != nil {
 			if err != nil {
-				tokens.Error(err, "Error occured while trying to match email.\n")
+				logger.Error(err, "Error occured while trying to match email.\n")
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -144,7 +144,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 
 		if matched, err := regexp.Match(patternAnyChar, []byte(firstName)); !matched || err != nil {
 			if err != nil {
-				tokens.Error(err, "Error occured while trying to match first name.\n")
+				logger.Error(err, "Error occured while trying to match first name.\n")
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -154,7 +154,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 
 		if matched, err := regexp.Match(patternAnyChar, []byte(lastName)); !matched || err != nil {
 			if err != nil {
-				tokens.Error(err, "Error occured while trying to match last name.\n")
+				logger.Error(err, "Error occured while trying to match last name.\n")
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -164,7 +164,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 
 		if matched, err := regexp.Match(patternPassword, []byte(password)); !matched || err != nil {
 			if err != nil {
-				tokens.Error(err, "Error occured while trying to match password.\n")
+				logger.Error(err, "Error occured while trying to match password.\n")
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -185,7 +185,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 			Password:  password,
 		}
 		if err := c.UserStore.Register(&user); err != nil {
-			tokens.Error(err)
+			logger.Error(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

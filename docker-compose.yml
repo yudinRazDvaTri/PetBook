@@ -5,6 +5,6 @@ services:
     ports:
       - "5434:5432"
     volumes:
-      - ./pgData:/var/lib/psotgresql/data
+      - ./pgData:/var/lib/postgre/data
     env_file:
       - .env

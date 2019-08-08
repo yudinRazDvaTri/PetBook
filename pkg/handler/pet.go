@@ -2,7 +2,7 @@ package handler
 
 import (
 	"github.com/Khudienko/PetBook/pkg/models"
-	"github.com/Khudienko/PetBook/pkg/tokens"
+	"github.com/Khudienko/PetBook/pkg/view"
 	"log"
 	"net/http"
 )
@@ -30,6 +30,6 @@ func (c *Controller) CreatePetPostHandler() http.HandlerFunc {
 }
 func (c *Controller) CreatePetGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		tokens.GenerateHTML(w, nil, "cabinetPet")
+		view.GenerateHTML(w, nil, "cabinetPet")
 	}
 }
