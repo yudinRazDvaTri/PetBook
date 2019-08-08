@@ -5,8 +5,8 @@ import (
 	"github.com/dpgolang/PetBook/pkg/authentication"
 	"github.com/dpgolang/PetBook/pkg/controllers"
 	"github.com/dpgolang/PetBook/pkg/driver"
-	"github.com/dpgolang/PetBook/pkg/handler"
 	_ "github.com/dpgolang/PetBook/pkg/logger"
+	"github.com/dpgolang/PetBook/pkg/models"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
@@ -15,7 +15,6 @@ import (
 	"net/http"
 	"os"
 )
-
 
 func main() {
 
@@ -27,10 +26,10 @@ func main() {
 
 	router := mux.NewRouter()
 
-	storeUser := controllers.UserStore{DB: db}
-	controller := handler.Controller{UserStore: &storeUser}
-	storePet:=controllers.PetStore{DB:db}
-	controllerPet:=handler.Controller{PetStore:&storePet}
+	storeUser := models.UserStore{DB: db}
+	controller := controllers.Controller{UserStore: &storeUser}
+	storePet := models.PetStore{DB: db}
+	controllerPet := controllers.Controller{PetStore: &storePet}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
 	router.HandleFunc("/register", controller.RegisterGetHandler()).Methods("GET")
@@ -41,12 +40,10 @@ func main() {
 	router.HandleFunc("/petcabinet", controllerPet.CreatePetPostHandler()).Methods("POST")
 	router.HandleFunc("/petcabinet", controllerPet.CreatePetGetHandler()).Methods("GET")
 
-
 	router.Handle("/mypage", negroni.New(
 		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
 		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
 	))
-
 
 	router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/",
 		http.FileServer(http.Dir("./web/assets/"))))

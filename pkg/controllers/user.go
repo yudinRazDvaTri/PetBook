@@ -1,9 +1,8 @@
-package handler
+package controllers
 
 import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dpgolang/PetBook/pkg/authentication"
-	"github.com/dpgolang/PetBook/pkg/controllers"
 	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/models"
 	"github.com/dpgolang/PetBook/pkg/view"
@@ -17,29 +16,9 @@ import (
 )
 
 type Controller struct {
-	UserStore controllers.UserStorer
-	PetStore  controllers.PetStorer
+	UserStore models.UserStorer
+	PetStore  models.PetStorer
 }
-
-// func (c Controller) LoginHandler() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		user := &models.User{
-// 			Email:     "asdsad@gmail.com",
-// 			Login:     "mylogin",
-// 			Password:  "123123",
-// 			Firstname: "name",
-// 			Lastname:  "surname",
-// 		}
-// 		err := c.UserStore.Login(user)
-// 		if err != nil {
-// 			log.Println(err)
-// 			//json.NewEncoder(w).Encode("There is no such user!")
-// 			//w.WriteHeader(http.StatusNotFound)
-// 		}
-// 		log.Println(user)
-// 		//json.NewEncoder(w).Encode(user)
-// 	}
-// }
 
 const (
 	patternEmail    = `^\w+@\w+\.\w+$`

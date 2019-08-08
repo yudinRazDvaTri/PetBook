@@ -1,4 +1,4 @@
-package handler
+package controllers
 
 import (
 	"github.com/dpgolang/PetBook/pkg/models"
