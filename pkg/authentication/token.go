@@ -1,7 +1,6 @@
 package authentication
 
 import (
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/context"
 	_ "github.com/lib/pq"
@@ -47,12 +46,9 @@ func ValidateTokenMiddleware(w http.ResponseWriter, r *http.Request, next http.H
 		} else {
 			w.WriteHeader(http.StatusUnauthorized)
 			http.Redirect(w, r, "/login", http.StatusFound)
-			fmt.Fprint(w, "Token is not valid. Need to refresh.")
 		}
 	} else {
 		w.WriteHeader(http.StatusUnauthorized)
 		http.Redirect(w, r, "/login", http.StatusFound)
-		fmt.Fprint(w, "Unauthorised access to this resource")
 	}
-
 }

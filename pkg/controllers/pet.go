@@ -1,31 +1,41 @@
 package controllers
 
 import (
+	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/models"
 	"github.com/dpgolang/PetBook/pkg/view"
-	"log"
+	"github.com/gorilla/context"
 	"net/http"
 )
 
-func (c *Controller) CreatePetPostHandler() http.HandlerFunc {
+func (c *Controller) PetPutHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
-		if err != nil {
-			log.Println(err)
+		user := &models.User{
+			Email: context.Get(r, "email").(string),
 		}
-		pet := &models.Pet{}
-		pet.Name = r.FormValue("nickname")
-		pet.PetType = r.FormValue("pet-type")
-		pet.Breed = r.FormValue("breed")
-		pet.Age = r.FormValue("age")
-		pet.Weight = r.FormValue("weight")
-		pet.Gender = r.FormValue("gender")
-		pet.Description = r.FormValue("description")
+
+		err = c.UserStore.ReadUserID(user)
+		if err != nil {
+			logger.Error(err, "Error ocurred while trying to register pet.\n")
+			http.Redirect(w, r, "/mypage", http.StatusSeeOther)
+			return
+		}
+		pet := &models.Pet{
+			Name:        r.FormValue("nickname"),
+			PetType:     r.FormValue("pet-type"),
+			Breed:       r.FormValue("breed"),
+			Age:         r.FormValue("age"),
+			Weight:      r.FormValue("weight"),
+			Gender:      r.FormValue("gender"),
+			Description: r.FormValue("description"),
+		}
+
 		err = c.PetStore.RegisterPet(pet)
 		if err != nil {
-			log.Println(err)
+			logger.Error(err, "Error ocurred while trying to register pet.\n")
 		}
-		http.Redirect(w, r, "/main", 301)
+		http.Redirect(w, r, "/mypage", http.StatusSeeOther)
 	}
 }
 func (c *Controller) CreatePetGetHandler() http.HandlerFunc {

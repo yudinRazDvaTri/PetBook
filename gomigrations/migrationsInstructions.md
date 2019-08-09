@@ -1,7 +1,7 @@
 1. Installation
    To install the library and command line program, use the following:
    
-   go get -v github.com/rubenv/sql-migrate/...
+   go get -v github.com/rubenv/sql-migrate/...				
 2. Available commands are:
 
        down      Undo a database migration

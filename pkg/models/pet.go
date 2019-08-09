@@ -1,6 +1,7 @@
 package models
 
 import (
+	//"github.com/dpgolang/PetBook/pkg/logger"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 )
@@ -28,12 +29,12 @@ type PetStorer interface {
 func (c *PetStore) GetPet(pet *Pet) error {
 	err := c.DB.QueryRowx("select * from pets where user_id=$1", pet.ID).StructScan(pet)
 	if err != nil {
-		logErr(err)
 		return fmt.Errorf("cannot scan pet from db: %v", err)
 	}
 	return nil
 }
 
+// TODO: rewrite to update into
 func (c *PetStore) RegisterPet(pet *Pet) error {
 	_, err := c.DB.Exec("insert into pets (user_id, name, animal_type,breed,age,weight, gender) values ($1, $2, $3, $4, $5, $6, $7)",
 		pet.ID, pet.Name, pet.PetType, pet.Breed, pet.Age, pet.Weight, pet.Gender)

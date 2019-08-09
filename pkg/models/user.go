@@ -30,6 +30,7 @@ type UserStorer interface {
 	ChangePassword(user *User, newPassword string) error
 	Login(userСhecking *User) error
 	GetPet(user *User) (Pet, error)
+	ReadUserID(user *User) error
 }
 
 type UserStore struct {
@@ -52,8 +53,15 @@ func (c *UserStore) GetUsers() ([]User, error) {
 func (c *UserStore) GetUser(user *User) error {
 	err := c.DB.QueryRowx("select * from users where email=$1", user.Email).StructScan(user)
 	if err != nil {
-		logErr(err)
 		return fmt.Errorf("cannot scan user from db: %v", err)
+	}
+	return nil
+}
+
+func (c *UserStore) ReadUserID(user *User) error {
+	err := c.DB.QueryRow("select id from users where email=$1", user.Email).Scan(user.ID)
+	if err != nil {
+		return fmt.Errorf("cannot scan userID from db: %v", err)
 	}
 	return nil
 }
@@ -84,6 +92,7 @@ func (c *UserStore) ChangePassword(user *User, newPassword string) error {
 	return nil
 }
 
+//TODO: create custom error
 func (c *UserStore) Login(userСhecking *User) error {
 	var passwordFromBase string
 	err := c.DB.QueryRow("select password from users where email=$1", userСhecking.Email).Scan(&passwordFromBase)

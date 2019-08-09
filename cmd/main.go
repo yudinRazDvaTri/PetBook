@@ -27,9 +27,11 @@ func main() {
 	router := mux.NewRouter()
 
 	storeUser := models.UserStore{DB: db}
-	controller := controllers.Controller{UserStore: &storeUser}
 	storePet := models.PetStore{DB: db}
-	controllerPet := controllers.Controller{PetStore: &storePet}
+	controller := controllers.Controller{
+		PetStore:  &storePet,
+		UserStore: &storeUser,
+	}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
 	router.HandleFunc("/register", controller.RegisterGetHandler()).Methods("GET")
@@ -37,13 +39,17 @@ func main() {
 	router.HandleFunc("/login", controller.LoginPostHandler()).Methods("POST")
 	router.HandleFunc("/login", controller.LoginGetHandler()).Methods("GET")
 
-	router.HandleFunc("/petcabinet", controllerPet.CreatePetPostHandler()).Methods("POST")
-	router.HandleFunc("/petcabinet", controllerPet.CreatePetGetHandler()).Methods("GET")
+	router.HandleFunc("/petcabinet", controller.CreatePetGetHandler()).Methods("GET")
 
 	router.Handle("/mypage", negroni.New(
 		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
 		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
-	))
+	)).Methods("GET")
+
+	router.Handle("/petcabinet", negroni.New(
+		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
+		negroni.Wrap(http.HandlerFunc(controller.PetPutHandler())),
+	)).Methods("PUT")
 
 	router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/",
 		http.FileServer(http.Dir("./web/assets/"))))
