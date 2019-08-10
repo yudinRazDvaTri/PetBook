@@ -15,9 +15,9 @@ func (c *Controller) PetPutHandler() http.HandlerFunc {
 			Email: context.Get(r, "email").(string),
 		}
 
-		err = c.UserStore.ReadUserID(user)
+		err = c.UserStore.GetUser(user)
 		if err != nil {
-			logger.Error(err, "Error ocurred while trying to register pet.\n")
+			logger.Error(err, "Error occurred while trying to register pet.\n")
 			http.Redirect(w, r, "/mypage", http.StatusSeeOther)
 			return
 		}
@@ -33,7 +33,7 @@ func (c *Controller) PetPutHandler() http.HandlerFunc {
 
 		err = c.PetStore.RegisterPet(pet)
 		if err != nil {
-			logger.Error(err, "Error ocurred while trying to register pet.\n")
+			logger.Error(err, "Error ocurrred while trying to register pet.\n")
 		}
 		http.Redirect(w, r, "/mypage", http.StatusSeeOther)
 	}

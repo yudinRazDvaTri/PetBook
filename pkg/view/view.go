@@ -16,7 +16,7 @@ func GenerateHTML(writer http.ResponseWriter, data interface{}, filenames ...str
 	templates := template.Must(template.ParseFiles(files...))
 	err := templates.ExecuteTemplate(writer, "layout", data)
 	if err != nil {
-		logger.Error(err)
+		logger.Error(err, "Error occurred while trying to generate html view.\n")
 		return
 	}
 }

@@ -5,13 +5,13 @@ import (
 	"github.com/dpgolang/PetBook/pkg/authentication"
 	"github.com/dpgolang/PetBook/pkg/controllers"
 	"github.com/dpgolang/PetBook/pkg/driver"
+	"github.com/dpgolang/PetBook/pkg/logger"
 	_ "github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/models"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
 
-	"log"
 	"net/http"
 	"os"
 )
@@ -21,7 +21,7 @@ func main() {
 	db := driver.ConnectDB()
 	err := gomigrations.Migrate(db)
 	if err != nil {
-		log.Fatal("Migration failed.")
+		logger.FatalError(err, "Migration failed.\n")
 	}
 
 	router := mux.NewRouter()
@@ -39,8 +39,6 @@ func main() {
 	router.HandleFunc("/login", controller.LoginPostHandler()).Methods("POST")
 	router.HandleFunc("/login", controller.LoginGetHandler()).Methods("GET")
 
-	router.HandleFunc("/petcabinet", controller.CreatePetGetHandler()).Methods("GET")
-
 	router.Handle("/mypage", negroni.New(
 		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
 		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
@@ -51,13 +49,24 @@ func main() {
 		negroni.Wrap(http.HandlerFunc(controller.PetPutHandler())),
 	)).Methods("PUT")
 
-	router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/",
-		http.FileServer(http.Dir("./web/assets/"))))
+	router.Handle("/petcabinet", negroni.New(
+		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
+		negroni.Wrap(http.HandlerFunc(controller.PetPutHandler())),
+	)).Methods("GET")
+
+
 	router.Handle("/", negroni.New(
 		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
 		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
 	))
-	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
-	log.Fatal(http.ListenAndServe(":8080", loggedRouter))
 
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
+		http.FileServer(http.Dir("./web/static/"))))
+
+	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
+
+	// Is it proper way to handle ListenAndServe() error?
+	if err:= http.ListenAndServe(":8080", loggedRouter); err !=nil {
+		logger.FatalError(err, "Error occurred, while trying to listen and serve a server")
+	}
 }

@@ -1,11 +1,14 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dpgolang/PetBook/pkg/authentication"
 	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/models"
+	"github.com/dpgolang/PetBook/pkg/utilerr"
 	"github.com/dpgolang/PetBook/pkg/view"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"regexp"
 	"time"
@@ -39,15 +42,26 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 
 		user := models.User{
 			Email:    email,
-			Password: password,
+			Password: []byte(password),
 		}
 
-		// TODO: output whether wrong credentials were input or server error happened
 		if err := c.UserStore.Login(&user); err != nil {
-			//utils.Error(err)
-			//http.Error(w, err.Error(), http.StatusInternalServerError)
-			http.Redirect(w, r, "/login", http.StatusFound)
-			return
+			switch e := err.(type) {
+			case *utilerr.WrongEmail:
+				// TODO: display flash-message
+				fmt.Fprint(w, e.Error())
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				return
+			case *utilerr.WrongPassword:
+				// TODO: display flash-message
+				fmt.Fprint(w, e.Error())
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				return
+			default:
+				logger.Error(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 		}
 
 		expirationTime := time.Now().Add(30 * time.Minute)
@@ -83,13 +97,14 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 	}
 }
 
-// TODO: reduce repeating code?
-// TODO: do not log duplicate value error
+
 func (c *Controller) RegisterGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		view.GenerateHTML(w, nil, "register")
 	}
 }
+
+// TODO: reduce repeating code
 func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
@@ -103,7 +118,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 
 		if matched, err := regexp.Match(patternAnyChar, []byte(login)); !matched || err != nil {
 			if err != nil {
-				logger.Error(err, "Error occured while trying to match login.\n")
+				logger.Error(err, "Error occurred while trying to match login.\n")
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -113,7 +128,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 
 		if matched, err := regexp.Match(patternEmail, []byte(email)); !matched || err != nil {
 			if err != nil {
-				logger.Error(err, "Error occured while trying to match email.\n")
+				logger.Error(err, "Error occurred while trying to match email.\n")
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -123,7 +138,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 
 		if matched, err := regexp.Match(patternAnyChar, []byte(firstName)); !matched || err != nil {
 			if err != nil {
-				logger.Error(err, "Error occured while trying to match first name.\n")
+				logger.Error(err, "Error occurred while trying to match first name.\n")
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -133,7 +148,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 
 		if matched, err := regexp.Match(patternAnyChar, []byte(lastName)); !matched || err != nil {
 			if err != nil {
-				logger.Error(err, "Error occured while trying to match last name.\n")
+				logger.Error(err, "Error occurred while trying to match last name.\n")
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -143,7 +158,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 
 		if matched, err := regexp.Match(patternPassword, []byte(password)); !matched || err != nil {
 			if err != nil {
-				logger.Error(err, "Error occured while trying to match password.\n")
+				logger.Error(err, "Error occurred while trying to match password.\n")
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -156,17 +171,33 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 			return
 		}
 
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 8)
+		if err != nil {
+			logger.Error(err, "Error occurred while trying to hash password.\n")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		user := models.User{
 			Email:     email,
 			Login:     login,
 			Firstname: firstName,
 			Lastname:  lastName,
-			Password:  password,
+			Password:  hashedPassword,
 		}
+
 		if err := c.UserStore.Register(&user); err != nil {
-			logger.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			switch e := err.(type) {
+			case *utilerr.UniqueTaken:
+				// TODO: display flash-message
+				fmt.Fprint(w, e.Error())
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				return
+			default:
+				logger.Error(e)
+				http.Error(w, e.Error(), http.StatusInternalServerError)
+				return
+			}
 		}
 		http.Redirect(w, r, "/login", http.StatusFound)
 	}
