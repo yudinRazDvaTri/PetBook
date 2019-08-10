@@ -1,12 +1,12 @@
-hash: c2263b12758ec3fe5ca54ced4759535f40b7f4d280d7c0c67bb79031b41b5f4f
-updated: 2019-08-04T12:08:11.653635545+03:00
+hash: fd528d8e22e4dc1ec7f7002489942414f098039a4d59286be33edc0fe71eb633
+updated: 2019-08-09T11:58:43.659123+03:00
 imports:
 - name: github.com/dgrijalva/jwt-go
-  version: 5e25c22bd5d6de03265bbe5462dcd162f85046f6
+  version: 06ea1031745cb8b3dab3f6a236daf2b0aa468b7e
 - name: github.com/gorilla/context
-  version: 8559d4a6b87e4f517ec1846eb90a192b8748cc89
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/handlers
-  version: 415c4810185c26aa35ca0315470d77697000794b
+  version: 8a3748addc242fc560bd6d4ff28b0374c010b1b4
 - name: github.com/gorilla/mux
   version: 00bdffe0f3c77e27d2cf6f5c70232a2d3e4d9c15
 - name: github.com/jmoiron/sqlx
@@ -14,7 +14,7 @@ imports:
   subpackages:
   - reflectx
 - name: github.com/joho/godotenv
-  version: 5c0e6c6ab1a0a9ef0a8822cba3a05d62f7dad941
+  version: 23d116af351c84513e1946b527c88823e476be13
 - name: github.com/lib/pq
   version: 3427c32cb71afc948325f299f040e53c1dd78979
   subpackages:
@@ -25,9 +25,9 @@ imports:
   subpackages:
   - sqlparse
 - name: github.com/subosito/gotenv
-  version: 69b5b6104433beb2cb9c3ce00bdadf3c7c2d3f34
+  version: 2ef7124db659d49edac6aa459693a15ae36c671a
 - name: github.com/urfave/negroni
-  version: 8e3bbcee9957b257484f237fc5acac6e573c5b37
+  version: c6a59be0ce122566695fbd5e48a77f8f10c8a63a
 - name: gopkg.in/gorp.v1
   version: 6a667da9c028871f98598d85413e3fc4c6daa52e
 testImports: []

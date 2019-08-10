@@ -1,12 +1,12 @@
 
 -- +migrate Up
 create table if not exists comments (
-    id integer not null primary key,
-    topic_id integer not null,
-    creator_id integer not null,
-    created timestamp not null,
-    edited timestamp,
-    content text not null
+    comment_id serial not null,
+    topic_id integer not null references topics(topic_id),
+    user_id integer not null references users(id),
+    created_time TIMESTAMP not null default CURRENT_TIMESTAMP,
+    content text not null,
+    primary key(comment_id)
 );
 -- +migrate Down
 drop table comments;

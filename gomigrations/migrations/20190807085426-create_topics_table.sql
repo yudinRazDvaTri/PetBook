@@ -1,11 +1,13 @@
 
 -- +migrate Up
 create table if not exists topics (
-    id integer not null primary key,
-    creator_id integer not null,
-    created timestamp not null,
+    topic_id serial not null,
+    user_id integer not null references users(id),
+    answer_id integer,
+    created_time TIMESTAMP not null default CURRENT_TIMESTAMP,
     title text not null,
-    description text
+    description text,
+    primary key(topic_id)
 );
 -- +migrate Down
 drop table topics;
