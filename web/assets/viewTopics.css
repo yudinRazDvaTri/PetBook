@@ -1,0 +1,20 @@
+body{
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    background-image: url("background.jpg");
+    background-size: 100%;
+}
+
+.box{
+    width: 300px;
+    padding: 40px;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    background: #ffffff;
+    text-align: center;
+    border-radius: 10px;
+    border: 2px solid #bfd9ff;
+}

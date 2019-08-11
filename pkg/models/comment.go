@@ -17,4 +17,3 @@ type Comment struct {
 type CommentStore struct {
 	DB *sqlx.DB
 }
-

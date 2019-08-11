@@ -1,14 +1,15 @@
 package controllers
 
 import (
+	"net/http"
+	"regexp"
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dpgolang/PetBook/pkg/authentication"
 	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/models"
 	"github.com/dpgolang/PetBook/pkg/view"
-	"net/http"
-	"regexp"
-	"time"
 	//"github.com/gorilla/mux"
 	//"github.com/gorilla/sessions"
 	//"github.com/jmoiron/sqlx"
@@ -16,8 +17,9 @@ import (
 )
 
 type Controller struct {
-	UserStore models.UserStorer
-	PetStore  models.PetStorer
+	UserStore  models.UserStorer
+	PetStore   models.PetStorer
+	TopicStore models.TopicStorer
 }
 
 const (

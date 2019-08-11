@@ -28,9 +28,12 @@ func main() {
 
 	storeUser := models.UserStore{DB: db}
 	storePet := models.PetStore{DB: db}
+	storeTopic := models.TopicStore{DB: db}
+
 	controller := controllers.Controller{
 		PetStore:  &storePet,
 		UserStore: &storeUser,
+		TopicStore: &storeTopic,
 	}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
@@ -40,6 +43,11 @@ func main() {
 	router.HandleFunc("/login", controller.LoginGetHandler()).Methods("GET")
 
 	router.HandleFunc("/petcabinet", controller.CreatePetGetHandler()).Methods("GET")
+
+	router.HandleFunc("/forum", controller.ViewTopicsHandler()).Methods("GET")
+	router.HandleFunc("/forum/new_topic", controller.NewTopicHandler())
+
+
 
 	router.Handle("/mypage", negroni.New(
 		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
