@@ -1,4 +1,3 @@
-
 -- +migrate Up
 create table if not exists comments (
     comment_id serial not null,

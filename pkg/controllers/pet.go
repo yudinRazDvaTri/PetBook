@@ -8,20 +8,13 @@ import (
 	"net/http"
 )
 
-func (c *Controller) PetPutHandler() http.HandlerFunc {
+func (c *Controller) PetPostHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
-		user := &models.User{
-			Email: context.Get(r, "email").(string),
-		}
+		id := context.Get(r, "id").(int)
 
-		err = c.UserStore.ReadUserID(user)
-		if err != nil {
-			logger.Error(err, "Error ocurred while trying to register pet.\n")
-			http.Redirect(w, r, "/mypage", http.StatusSeeOther)
-			return
-		}
 		pet := &models.Pet{
+			ID:          id,
 			Name:        r.FormValue("nickname"),
 			PetType:     r.FormValue("pet-type"),
 			Breed:       r.FormValue("breed"),
@@ -33,12 +26,12 @@ func (c *Controller) PetPutHandler() http.HandlerFunc {
 
 		err = c.PetStore.RegisterPet(pet)
 		if err != nil {
-			logger.Error(err, "Error ocurred while trying to register pet.\n")
+			logger.Error(err, "Error occurred while trying to register pet.\n")
 		}
 		http.Redirect(w, r, "/mypage", http.StatusSeeOther)
 	}
 }
-func (c *Controller) CreatePetGetHandler() http.HandlerFunc {
+func (c *Controller) PetGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		view.GenerateHTML(w, nil, "cabinetPet")
 	}

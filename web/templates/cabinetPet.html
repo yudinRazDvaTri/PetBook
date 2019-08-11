@@ -5,11 +5,11 @@
     <head>
         <meta charset="UTF-8">
         <title>Pet</title>
-        <link rel="stylesheet" href="../assets/registerAndLogin.css">
+        <link rel="stylesheet" href="../static/registerAndLogin.css">
     </head>
     <body>
     <div class="box">
-        <form method="POST">
+        <form method="POST" action="/petcabinet">
             <h1>Pet Registration</h1>
             <input type="text" name="nickname" placeholder="Pet nickname"/>
             <label>Animal type</label>
@@ -19,8 +19,8 @@
                 <option name="fish">fish</option>
             </select>
             <input type="text" name="breed" placeholder="Pet breed"/>
-            <input type="number" name="age" placeholder="Pet age"/>
-            <input type="number" name="weight" placeholder="Pet weight"/>
+            <input type="text" name="age" placeholder="Pet age"/>
+            <input type="text" name="weight" placeholder="Pet weight"/>
             <label>Pet gender</label>
             <select name="gender" >
                 <option name="male">male</option>

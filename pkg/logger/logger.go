@@ -6,25 +6,25 @@ import (
 	"os"
 )
 
-var Logger *log.Logger
+var logger *log.Logger
 
 func init() {
 	file, err := os.OpenFile("petbook.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
-		log.Fatalln("Failed to open log file", err)
+		FatalError(err, "Error occurred while trying to open .log file.\n")
 	}
-	Logger = log.New(file, "INFO ", log.Ldate|log.Ltime|log.Lshortfile)
+	logger = log.New(file, "INFO ", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
 func Error(args ...interface{}) {
-	fmt.Println(args...)
-	Logger.SetPrefix("ERROR ")
-	Logger.Println(args...)
+	fmt.Println("ERROR ", args)
+	logger.SetPrefix("ERROR ")
+	logger.Println(args...)
 }
 
 func FatalError(args ...interface{}) {
-	fmt.Println(args...)
-	Logger.SetPrefix("FATAL ERROR ")
-	Logger.Println(args...)
-	os.Exit(3)
+	fmt.Println("FATAL ERROR ", args)
+	logger.SetPrefix("FATAL ERROR ")
+	logger.Println(args...)
+	os.Exit(1)
 }

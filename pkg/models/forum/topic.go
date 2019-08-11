@@ -1,4 +1,4 @@
-package models
+package forum
 
 import (
 	"fmt"
@@ -15,17 +15,8 @@ type Topic struct {
 	Description string    `json:"description" db:"description"`
 }
 
-type TopicStorer interface {
-	GetAllTopics() (topics []*Topic, err error)
-	CreateNewTopic(topic *Topic) (err error)
-}
-
-type TopicStore struct {
-	DB *sqlx.DB
-}
-
-func (t *TopicStore) GetAllTopics() (topics []*Topic, err error) {
-	rows, err := t.DB.Query("select * from topics order by created_time DESC")
+func (f *ForumStore) GetAllTopics() (topics []*Topic, err error) {
+	rows, err := f.DB.Query("select * from topics order by created_time DESC")
 	if err != nil {
 		err = fmt.Errorf("Can't read topics-rows from db: %v", err)
 		return
@@ -35,16 +26,15 @@ func (t *TopicStore) GetAllTopics() (topics []*Topic, err error) {
 	if err != nil {
 		err = fmt.Errorf("Can't scan topics-rows from db: %v", err)
 	}
-	fmt.Println(topics)
 	return
 }
 
-func (t *TopicStore) CreateNewTopic(topic *Topic) (err error) {
-	_, err = t.DB.Exec(
+func (f *ForumStore) CreateNewTopic(topic *Topic) (err error) {
+	_, err = f.DB.Exec(
 		`insert into topics (user_id, title, description) values ($1, $2, $3)`,
 		topic.UserID, topic.Title, topic.Description)
 	if err != nil {
-		return fmt.Errorf("cannot affect rows in pets in db: %v", err)
+		return fmt.Errorf("cannot affect rows in topics table of db: %v", err)
 	}
 	return
 }

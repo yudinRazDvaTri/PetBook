@@ -1,4 +1,3 @@
-
 -- +migrate Up
 create table if not exists topics (
     topic_id serial not null,

@@ -1,5 +1,5 @@
 hash: fd528d8e22e4dc1ec7f7002489942414f098039a4d59286be33edc0fe71eb633
-updated: 2019-08-09T11:58:43.659123+03:00
+updated: 2019-08-11T18:22:54.077883+03:00
 imports:
 - name: github.com/dgrijalva/jwt-go
   version: 06ea1031745cb8b3dab3f6a236daf2b0aa468b7e
@@ -28,6 +28,11 @@ imports:
   version: 2ef7124db659d49edac6aa459693a15ae36c671a
 - name: github.com/urfave/negroni
   version: c6a59be0ce122566695fbd5e48a77f8f10c8a63a
+- name: golang.org/x/crypto
+  version: 4def268fd1a49955bfb3dda92fe3db4f924f2285
+  subpackages:
+  - bcrypt
+  - blowfish
 - name: gopkg.in/gorp.v1
   version: 6a667da9c028871f98598d85413e3fc4c6daa52e
 testImports: []

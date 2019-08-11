@@ -5,14 +5,14 @@
     <head>
         <meta charset="UTF-8">
         <title>Title</title>
-        <link rel="stylesheet" href="../assets/viewTopics.css">
+        <link rel="stylesheet" href="../static/viewTopics.css">
     </head>
     <body>
     <ul>
         {{ range . }}
-           <div class="box">
-               {{ .Title }} <br> {{ .Description }} <br> {{ .CreatedTime }}
-           </div>
+            <div class="box">
+                {{ .Title }} <br> {{ .Description }} <br> {{ .CreatedTime }}
+            </div>
         {{ else }}
             <li> Nothing to show </li>
         {{ end}}
@@ -20,4 +20,4 @@
     </body>
     </html>
 
-{{ end }}
+{{ end }} 

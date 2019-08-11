@@ -4,6 +4,7 @@ import (
 	//"database/sql"
 	//"os"
 	"fmt"
+	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -21,12 +22,12 @@ func Migrate(db *sqlx.DB) (err error) {
 	migrations := getMigrations()
 	n, err := migrate.Exec(db.DB, "postgres", migrations, migrate.Up)
 	if err != nil {
-		log.Printf("can't work gomigrations:%v", err)
+		logger.FatalError(err, "Error occurred while trying to exec migrations.\n")
 	}
 	fmt.Printf("Applied %d gomigrations!\n", n)
 	err = db.Ping()
 	if err != nil {
-		log.Printf("can't ping:%v", err)
+		logger.FatalError(err, "Error occurred while trying to ping server.\n")
 	}
 	return
 }

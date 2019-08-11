@@ -2,19 +2,16 @@ package driver
 
 import (
 	"fmt"
+	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/jmoiron/sqlx"
 	"github.com/subosito/gotenv"
-	"log"
 	"os"
 )
 
 func init() {
-	gotenv.Load()
-}
-
-func logErr(err error) {
+	err := gotenv.Load()
 	if err != nil {
-		log.Println(err)
+		logger.FatalError(err, "Error occurred while trying to open .env file.\n")
 	}
 }
 
@@ -29,11 +26,16 @@ func ConnectDB() *sqlx.DB {
 	connStr := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
+
 	db, err = sqlx.Open("postgres", connStr)
-	logErr(err)
+	if err != nil {
+		logger.FatalError(err, "Error occurred while trying to open connection.\n")
+	}
+
 	err = db.Ping()
 	if err != nil {
-		logErr(fmt.Errorf("can't ping, err: %s", err.Error()))
+		logger.FatalError(err, "Error occurred while trying to ping server.\n")
 	}
+	fmt.Println("Server started.")
 	return db
 }

@@ -2,14 +2,15 @@ package controllers
 
 import (
 	"github.com/dpgolang/PetBook/pkg/logger"
-	"github.com/dpgolang/PetBook/pkg/models"
+	"github.com/dpgolang/PetBook/pkg/models/forum"
 	"github.com/dpgolang/PetBook/pkg/view"
+	"github.com/gorilla/context"
 	"net/http"
 )
 
 func (c *Controller) ViewTopicsHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		topics, err := c.TopicStore.GetAllTopics()
+		topics, err := c.ForumStore.GetAllTopics()
 		if err != nil {
 			logger.Error(err)
 		}
@@ -28,12 +29,14 @@ func (c *Controller) NewTopicHandler() http.HandlerFunc {
 			r.ParseForm()
 			title := r.FormValue("title")
 			description := r.FormValue("description")
-			topic := models.Topic{
-				UserID:      2,
+			uid := context.Get(r, "id").(int)
+
+			topic := &forum.Topic{
+				UserID:      uid,
 				Title:       title,
 				Description: description,
 			}
-			if err := c.TopicStore.CreateNewTopic(&topic); err != nil {
+			if err := c.ForumStore.CreateNewTopic(topic); err != nil {
 				logger.Error(err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return

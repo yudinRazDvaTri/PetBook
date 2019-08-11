@@ -1,4 +1,3 @@
-
 -- +migrate Up
 ALTER TABLE pets
     ADD constraint users_fk
