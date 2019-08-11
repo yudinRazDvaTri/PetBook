@@ -68,10 +68,6 @@ func main() {
 		negroni.Wrap(http.HandlerFunc(controller.NewTopicHandler())),
 	))
 
-	//router.HandleFunc("/forum", controller.ViewTopicsHandler()).Methods("GET")
-	//router.HandleFunc("/forum/new_topic", controller.NewTopicHandler())
-
-
 	router.Handle("/", negroni.New(
 		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
 		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
