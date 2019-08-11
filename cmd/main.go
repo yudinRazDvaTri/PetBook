@@ -51,7 +51,7 @@ func main() {
 
 	router.Handle("/petcabinet", negroni.New(
 		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
-		negroni.Wrap(http.HandlerFunc(controller.PetPutHandler())),
+		negroni.Wrap(http.HandlerFunc(controller.PetGetHandler())),
 	)).Methods("GET")
 
 

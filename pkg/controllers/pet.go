@@ -38,7 +38,7 @@ func (c *Controller) PetPutHandler() http.HandlerFunc {
 		http.Redirect(w, r, "/mypage", http.StatusSeeOther)
 	}
 }
-func (c *Controller) CreatePetGetHandler() http.HandlerFunc {
+func (c *Controller) PetGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		view.GenerateHTML(w, nil, "cabinetPet")
 	}

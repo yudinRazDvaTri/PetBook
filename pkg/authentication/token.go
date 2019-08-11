@@ -44,11 +44,9 @@ func ValidateTokenMiddleware(w http.ResponseWriter, r *http.Request, next http.H
 			context.Set(r, "email", claims.Email)
 			next(w, r)
 		} else {
-			w.WriteHeader(http.StatusUnauthorized)
-			http.Redirect(w, r, "/login", http.StatusFound)
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
 		}
 	} else {
-		w.WriteHeader(http.StatusUnauthorized)
-		http.Redirect(w, r, "/login", http.StatusFound)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	}
 }
