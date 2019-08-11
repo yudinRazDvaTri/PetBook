@@ -19,8 +19,9 @@ import (
 )
 
 type Controller struct {
-	UserStore models.UserStorer
-	PetStore  models.PetStorer
+	UserStore  models.UserStorer
+	PetStore   models.PetStorer
+	TopicStore models.TopicStorer
 }
 
 const (
@@ -67,7 +68,7 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 		expirationTime := time.Now().Add(30 * time.Minute)
 
 		claims := &authentication.Claims{
-			Email: email,
+			Id: user.ID,
 			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: expirationTime.Unix(),
 			},
@@ -96,7 +97,6 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 		http.Redirect(w, r, "/mypage", http.StatusFound)
 	}
 }
-
 
 func (c *Controller) RegisterGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

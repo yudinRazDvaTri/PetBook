@@ -1,0 +1,23 @@
+{{ define "layout"}}
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+        <link rel="stylesheet" href="../assets/viewTopics.css">
+    </head>
+    <body>
+    <ul>
+        {{ range . }}
+            <div class="box">
+                {{ .Title }} <br> {{ .Description }} <br> {{ .CreatedTime }}
+            </div>
+        {{ else }}
+            <li> Nothing to show </li>
+        {{ end}}
+    </ul>
+    </body>
+    </html>
+
+{{ end }} 

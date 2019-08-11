@@ -66,7 +66,7 @@ func (c *UserStore) Register(user *User) error {
 
 	if err != nil {
 		if _, ok := err.(*pq.Error); ok {
-			return &utilerr.UniqueTaken{Description: "Email or login has already been taken!"}
+			return &utilerr.UniqueTaken{Description: "Id or login has already been taken!"}
 		}
 		return fmt.Errorf("Error occurred while trying to add new user: %v.\n", err)
 	}
@@ -96,7 +96,8 @@ func (c *UserStore) ChangePassword(user *User, newPassword string) error {
 
 func (c *UserStore) Login(user *User) error {
 	var passwordFromBase string
-	err := c.DB.QueryRow("select password from users where email=$1", user.Email).Scan(&passwordFromBase)
+	var idFromBase int
+	err := c.DB.QueryRow("select password, id from users where email=$1", user.Email).Scan(&passwordFromBase, &idFromBase)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -108,7 +109,7 @@ func (c *UserStore) Login(user *User) error {
 	if err = bcrypt.CompareHashAndPassword([]byte(passwordFromBase), user.Password); err != nil {
 		return &utilerr.WrongPassword{Description: "Invalid password."}
 	}
-
+	user.ID = idFromBase
 	return nil
 }
 
@@ -118,7 +119,7 @@ func (c *UserStore) GetPet(user *User) (Pet, error) {
 		`SELECT user_id,name,animal_type, breed, age, weight, gender 
 		FROM pets p, users u 
 		WHERE p.user_id = u.id  
-		AND u.email = $1 `, user.Email).StructScan(&pet)
+		AND u.id = $1 `, user.ID).StructScan(&pet)
 
 	if err != nil {
 		return pet, err

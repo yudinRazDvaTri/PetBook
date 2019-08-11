@@ -10,7 +10,7 @@ import (
 func (c *Controller) MyPageGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user := models.User{
-			Email: context.Get(r,"email").(string),
+			ID: context.Get(r, "id").(int),
 		}
 		_, err := c.UserStore.GetPet(&user)
 		if err != nil {

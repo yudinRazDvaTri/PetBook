@@ -28,9 +28,12 @@ func main() {
 
 	storeUser := models.UserStore{DB: db}
 	storePet := models.PetStore{DB: db}
+	storeTopic := models.TopicStore{DB: db}
+
 	controller := controllers.Controller{
 		PetStore:  &storePet,
 		UserStore: &storeUser,
+		TopicStore: &storeTopic,
 	}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
@@ -46,13 +49,17 @@ func main() {
 
 	router.Handle("/petcabinet", negroni.New(
 		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
-		negroni.Wrap(http.HandlerFunc(controller.PetPutHandler())),
-	)).Methods("PUT")
+		negroni.Wrap(http.HandlerFunc(controller.PetPostHandler())),
+	)).Methods("POST")
 
 	router.Handle("/petcabinet", negroni.New(
 		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
 		negroni.Wrap(http.HandlerFunc(controller.PetGetHandler())),
 	)).Methods("GET")
+
+	// TODO: wrap in middleware
+	router.HandleFunc("/forum", controller.ViewTopicsHandler()).Methods("GET")
+	router.HandleFunc("/forum/new_topic", controller.NewTopicHandler())
 
 
 	router.Handle("/", negroni.New(
