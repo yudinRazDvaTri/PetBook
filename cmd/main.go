@@ -50,8 +50,8 @@ func main() {
 	subrouter.HandleFunc("/petcabinet", controller.PetPostHandler()).Methods("POST")
 	subrouter.HandleFunc("/petcabinet", controller.PetGetHandler()).Methods("GET")
 	subrouter.HandleFunc("/forum", controller.ViewTopicsHandler()).Methods("GET")
-	subrouter.HandleFunc("/forum/new_topic", controller.NewTopicHandler()).Methods("POST")
-
+	subrouter.HandleFunc("/forum/submit", controller.NewTopicHandler()).Methods("POST")
+	subrouter.HandleFunc("/forum/submit", controller.NewTopicHandler()).Methods("GET")
 
 	router.Handle("/", negroni.New(
 		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),

@@ -41,7 +41,7 @@ func (c *Controller) NewTopicHandler() http.HandlerFunc {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			http.Redirect(w, r, "/forum/new_topic", http.StatusFound)
+			http.Redirect(w, r, "/forum/submit", http.StatusFound)
 		}
 	}
 }
