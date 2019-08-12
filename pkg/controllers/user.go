@@ -29,6 +29,7 @@ const (
 	patternEmail    = `^\w+@\w+\.\w+$`
 	patternPassword = `^.{6,}$`
 	patternAnyChar  = `.*\S.*`
+	patternOnlyNum = `^[0-9]*$`
 )
 
 func (c *Controller) LoginGetHandler() http.HandlerFunc {

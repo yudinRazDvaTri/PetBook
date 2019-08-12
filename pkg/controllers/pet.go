@@ -6,12 +6,25 @@ import (
 	"github.com/dpgolang/PetBook/pkg/view"
 	"github.com/gorilla/context"
 	"net/http"
+	"regexp"
 )
 
+// TODO: check input values
 func (c *Controller) PetPostHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		id := context.Get(r, "id").(int)
+
+		if matched, err := regexp.Match(patternOnlyNum, []byte(r.FormValue("age"))); !matched || err != nil {
+			if err != nil {
+				logger.Error(err, "Error occurred while trying to match login.\n")
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
+			return
+		}
 
 		pet := &models.Pet{
 			ID:          id,

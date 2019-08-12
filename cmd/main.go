@@ -43,30 +43,15 @@ func main() {
 	router.HandleFunc("/login", controller.LoginPostHandler()).Methods("POST")
 	router.HandleFunc("/login", controller.LoginGetHandler()).Methods("GET")
 
-	router.Handle("/mypage", negroni.New(
-		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
-		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
-	)).Methods("GET")
+	subrouter := router.PathPrefix("/").Subrouter()
+	subrouter.Use(mux.MiddlewareFunc(authentication.Content))
 
-	router.Handle("/petcabinet", negroni.New(
-		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
-		negroni.Wrap(http.HandlerFunc(controller.PetPostHandler())),
-	)).Methods("POST")
+	subrouter.HandleFunc("/mypage", controller.MyPageGetHandler()).Methods("GET")
+	subrouter.HandleFunc("/petcabinet", controller.PetPostHandler()).Methods("POST")
+	subrouter.HandleFunc("/petcabinet", controller.PetGetHandler()).Methods("GET")
+	subrouter.HandleFunc("/forum", controller.ViewTopicsHandler()).Methods("GET")
+	subrouter.HandleFunc("/forum/new_topic", controller.NewTopicHandler()).Methods("POST")
 
-	router.Handle("/petcabinet", negroni.New(
-		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
-		negroni.Wrap(http.HandlerFunc(controller.PetGetHandler())),
-	)).Methods("GET")
-
-	router.Handle("/forum", negroni.New(
-		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
-		negroni.Wrap(http.HandlerFunc(controller.ViewTopicsHandler())),
-	)).Methods("GET")
-
-	router.Handle("/forum/new_topic", negroni.New(
-		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
-		negroni.Wrap(http.HandlerFunc(controller.NewTopicHandler())),
-	))
 
 	router.Handle("/", negroni.New(
 		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
