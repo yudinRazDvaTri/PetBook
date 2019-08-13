@@ -1,0 +1,31 @@
+{{ define "layout"}}
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+        <link rel="stylesheet" href="../static/viewTopics.css">
+    </head>
+    <body>
+    <h1>Search</h1>
+    <div class="box">
+        <form action="/search" method="POST">
+            <input type="text" name="search" id="search">
+            <input type="submit" value="Send">
+        </form>
+    </div>
+    <ul>
+        {{ if .Name }}
+            <div class="box">
+                {{ .Name }} <br> {{ .Description }}
+            </div>
+        {{ else }}
+        <div class="box"> The search returned no results </div>
+        {{ end}}
+        
+    </ul>
+    </body>
+    </html>
+
+{{ end }} 
