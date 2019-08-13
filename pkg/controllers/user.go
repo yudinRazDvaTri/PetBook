@@ -21,9 +21,9 @@ import (
 )
 
 type Controller struct {
-	UserStore  models.UserStorer
-	PetStore   models.PetStorer
-	ForumStore forum.ForumStorer
+	UserStore   models.UserStorer
+	PetStore    models.PetStorer
+	ForumStore  forum.ForumStorer
 	SearchStore search.SearchStorer
 }
 
@@ -31,7 +31,7 @@ const (
 	patternEmail    = `^\w+@\w+\.\w+$`
 	patternPassword = `^.{6,}$`
 	patternAnyChar  = `.*\S.*`
-	patternOnlyNum = `^[0-9]*$`
+	patternOnlyNum  = `^[0-9]*$`
 )
 
 func (c *Controller) LoginGetHandler() http.HandlerFunc {
@@ -44,13 +44,9 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 		r.ParseForm()
 		email := r.FormValue("email")
 		password := r.FormValue("password")
-
-		user := models.User{
-			Email:    email,
-			Password: []byte(password),
-		}
-
-		if err := c.UserStore.Login(&user); err != nil {
+		var userID int
+		var err error
+		if userID, err = c.UserStore.Login(email, password); err != nil {
 			switch e := err.(type) {
 			case *utilerr.WrongEmail:
 				// TODO: display flash-message
@@ -72,7 +68,7 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 		expirationTime := time.Now().Add(30 * time.Minute)
 
 		claims := &authentication.Claims{
-			Id: user.ID,
+			Id: userID,
 			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: expirationTime.Unix(),
 			},
@@ -93,7 +89,8 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 			Value:   tokenString,
 			Expires: expirationTime,
 		})
-		_, err = c.UserStore.GetPet(&user)
+
+		_, err = c.UserStore.GetPet(userID)
 		if err != nil {
 			http.Redirect(w, r, "/petcabinet", http.StatusFound)
 			return
@@ -187,7 +184,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 			Login:     login,
 			Firstname: firstName,
 			Lastname:  lastName,
-			Password:  hashedPassword,
+			Password:  string(hashedPassword),
 		}
 
 		if err := c.UserStore.Register(&user); err != nil {

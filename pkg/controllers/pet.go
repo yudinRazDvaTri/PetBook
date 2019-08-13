@@ -13,8 +13,11 @@ import (
 func (c *Controller) PetPostHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
+		if context.Get(r, "id") == nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
 		id := context.Get(r, "id").(int)
-
 		if matched, err := regexp.Match(patternOnlyNum, []byte(r.FormValue("age"))); !matched || err != nil {
 			if err != nil {
 				logger.Error(err, "Error occurred while trying to match login.\n")
@@ -36,7 +39,6 @@ func (c *Controller) PetPostHandler() http.HandlerFunc {
 			Gender:      r.FormValue("gender"),
 			Description: r.FormValue("description"),
 		}
-
 		err = c.PetStore.RegisterPet(pet)
 		if err != nil {
 			logger.Error(err, "Error occurred while trying to register pet.\n")
