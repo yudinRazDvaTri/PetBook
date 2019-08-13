@@ -54,17 +54,9 @@ func main() {
 	subrouter.HandleFunc("/forum", controller.ViewTopicsHandler()).Methods("GET")
 	subrouter.HandleFunc("/forum/submit", controller.NewTopicHandler()).Methods("POST")
 	subrouter.HandleFunc("/forum/submit", controller.NewTopicHandler()).Methods("GET")
-
-	router.Handle("/search", negroni.New(
-		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
-		negroni.Wrap(http.HandlerFunc(controller.ViewSearchHandler())),
-	)).Methods("GET")
-	//
-	router.Handle("/search", negroni.New(
-		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
-		negroni.Wrap(http.HandlerFunc(controller.SearchHandler())),
-	)).Methods("POST")
-
+	subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
+	subrouter.HandleFunc("/search", controller.SearchHandler()).Methods("POST")
+	
 	router.Handle("/", negroni.New(
 		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
 		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
