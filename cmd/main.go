@@ -9,6 +9,7 @@ import (
 	_ "github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/models"
 	"github.com/dpgolang/PetBook/pkg/models/forum"
+	"github.com/dpgolang/PetBook/pkg/models/search"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
@@ -30,11 +31,12 @@ func main() {
 	storeUser := models.UserStore{DB: db}
 	storePet := models.PetStore{DB: db}
 	storeForum := forum.ForumStore{DB: db}
-
+	storeSearch := search.SearchStore{DB:db}
 	controller := controllers.Controller{
 		PetStore:  &storePet,
 		UserStore: &storeUser,
 		ForumStore: &storeForum,
+		SearchStore: &storeSearch,
 	}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
@@ -52,6 +54,16 @@ func main() {
 	subrouter.HandleFunc("/forum", controller.ViewTopicsHandler()).Methods("GET")
 	subrouter.HandleFunc("/forum/submit", controller.NewTopicHandler()).Methods("POST")
 	subrouter.HandleFunc("/forum/submit", controller.NewTopicHandler()).Methods("GET")
+
+	router.Handle("/search", negroni.New(
+		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
+		negroni.Wrap(http.HandlerFunc(controller.ViewSearchHandler())),
+	)).Methods("GET")
+	//
+	router.Handle("/search", negroni.New(
+		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
+		negroni.Wrap(http.HandlerFunc(controller.SearchHandler())),
+	)).Methods("POST")
 
 	router.Handle("/", negroni.New(
 		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),

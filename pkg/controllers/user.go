@@ -7,6 +7,7 @@ import (
 	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/models"
 	"github.com/dpgolang/PetBook/pkg/models/forum"
+	"github.com/dpgolang/PetBook/pkg/models/search"
 	"github.com/dpgolang/PetBook/pkg/utilerr"
 	"github.com/dpgolang/PetBook/pkg/view"
 	"golang.org/x/crypto/bcrypt"
@@ -23,6 +24,7 @@ type Controller struct {
 	UserStore  models.UserStorer
 	PetStore   models.PetStorer
 	ForumStore forum.ForumStorer
+	SearchStore search.SearchStorer
 }
 
 const (
