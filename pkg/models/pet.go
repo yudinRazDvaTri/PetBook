@@ -22,22 +22,13 @@ type PetStore struct {
 }
 
 type PetStorer interface {
-	GetPet(pet *Pet) error
 	RegisterPet(pet *Pet) error
-}
-
-func (c *PetStore) GetPet(pet *Pet) error {
-	err := c.DB.QueryRowx("select * from pets where user_id=$1", pet.ID).StructScan(pet)
-	if err != nil {
-		return fmt.Errorf("cannot scan pet from db: %v", err)
-	}
-	return nil
 }
 
 // TODO: rewrite to update into
 func (c *PetStore) RegisterPet(pet *Pet) error {
-	_, err := c.DB.Exec("insert into pets (user_id, name, animal_type, breed,  age, weight, gender) values ($1, $2, $3, $4, $5, $6, $7)",
-		pet.ID, pet.Name, pet.PetType, pet.Breed, pet.Age, pet.Weight, pet.Gender)
+	_, err := c.DB.Exec("insert into pets (user_id, name, animal_type, breed, age, weight, gender, description) values ($1, $2, $3, $4, $5, $6, $7, $8)",
+		pet.ID, pet.Name, pet.PetType, pet.Breed, pet.Age, pet.Weight, pet.Gender, pet.Description)
 	if err != nil {
 		return fmt.Errorf("cannot affect rows in pets in db: %v", err)
 	}
