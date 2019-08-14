@@ -88,7 +88,7 @@ func (c *UserStore) ChangePassword(user *User, newPassword string) error {
 	}
 
 	if num != 1 {
-		return &utilerr.WrongEmail{Email: user.Email}
+		return &utilerr.WrongCredentials{Description: "Wrong email or password."}
 	}
 
 	user.Password = newPassword
@@ -102,13 +102,13 @@ func (c *UserStore) Login(email, userPassword string) (int, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return 0, &utilerr.WrongEmail{email}
+			return 0, &utilerr.WrongCredentials{Description: "Wrong email or password."}
 		}
 		return 0, fmt.Errorf("Error occurred while trying to login user: %v.\n", err)
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(passwordFromBase), []byte(userPassword)); err != nil {
-		return 0, &utilerr.WrongPassword{Description: "Invalid password."}
+		return 0, &utilerr.WrongCredentials{Description: "Wrong email or password."}
 	}
 	return idFromBase, nil
 }
