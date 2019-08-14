@@ -11,7 +11,7 @@
     <ul>
         {{ range . }}
             <div class="box">
-                {{ .Title }} <br> {{ .Description }} <br> {{ .CreatedTime }}
+                {{ .Title }} <br> {{ .Description }} <br> {{ .CreatedTime | fdate}}
             </div>
         {{ else }}
             <li> Nothing to show </li>
