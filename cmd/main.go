@@ -51,9 +51,11 @@ func main() {
 	subrouter.HandleFunc("/mypage", controller.MyPageGetHandler()).Methods("GET")
 	subrouter.HandleFunc("/petcabinet", controller.PetPostHandler()).Methods("POST")
 	subrouter.HandleFunc("/petcabinet", controller.PetGetHandler()).Methods("GET")
-	subrouter.HandleFunc("/forum", controller.ViewTopicsHandler()).Methods("GET")
-	subrouter.HandleFunc("/forum/submit", controller.NewTopicHandler()).Methods("POST")
-	subrouter.HandleFunc("/forum/submit", controller.NewTopicHandler()).Methods("GET")
+
+	subrouter.HandleFunc("/forum/topics", controller.ViewTopicsHandler()).Methods("GET")
+	subrouter.HandleFunc("/forum/topics/new", controller.NewTopicHandler()).Methods("POST")
+	subrouter.HandleFunc("/forum/topics/new", controller.NewTopicHandler()).Methods("GET")
+
 	subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
 	subrouter.HandleFunc("/search", controller.SearchHandler()).Methods("POST")
 	

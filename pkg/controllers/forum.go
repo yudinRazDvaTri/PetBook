@@ -15,7 +15,7 @@ func (c *Controller) ViewTopicsHandler() http.HandlerFunc {
 			logger.Error(err)
 		}
 
-		view.GenerateHTML(w, topics, "viewTopics")
+		view.GenerateTimeHTML(w, topics, "viewTopics")
 	}
 }
 
@@ -41,7 +41,7 @@ func (c *Controller) NewTopicHandler() http.HandlerFunc {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			http.Redirect(w, r, "/forum/submit", http.StatusFound)
+			http.Redirect(w, r, "/forum/topics/new", http.StatusFound)
 		}
 	}
 }
