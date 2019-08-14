@@ -12,8 +12,6 @@ import (
 	"github.com/dpgolang/PetBook/pkg/models/search"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/urfave/negroni"
-
 	"net/http"
 	"os"
 )
@@ -30,13 +28,17 @@ func main() {
 
 	storeUser := models.UserStore{DB: db}
 	storePet := models.PetStore{DB: db}
+	storeRefreshToken := models.RefreshTokenStore{DB: db}
 	storeForum := forum.ForumStore{DB: db}
-	storeSearch := search.SearchStore{DB:db}
+	storeSearch := search.SearchStore{DB: db}
+
+
 	controller := controllers.Controller{
 		PetStore:  &storePet,
 		UserStore: &storeUser,
 		ForumStore: &storeForum,
 		SearchStore: &storeSearch,
+		RefreshTokenStore: &storeRefreshToken,
 	}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
@@ -46,7 +48,7 @@ func main() {
 	router.HandleFunc("/login", controller.LoginGetHandler()).Methods("GET")
 
 	subrouter := router.PathPrefix("/").Subrouter()
-	subrouter.Use(mux.MiddlewareFunc(authentication.Content))
+	subrouter.Use(authentication.ValidateTokenMiddleware(&storeRefreshToken))
 
 	subrouter.HandleFunc("/mypage", controller.MyPageGetHandler()).Methods("GET")
 	subrouter.HandleFunc("/petcabinet", controller.PetPostHandler()).Methods("POST")
@@ -56,11 +58,7 @@ func main() {
 	subrouter.HandleFunc("/forum/submit", controller.NewTopicHandler()).Methods("GET")
 	subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
 	subrouter.HandleFunc("/search", controller.SearchHandler()).Methods("POST")
-	
-	router.Handle("/", negroni.New(
-		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
-		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
-	))
+	subrouter.HandleFunc("/", controller.MyPageGetHandler())
 
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
 		http.FileServer(http.Dir("./web/static/"))))

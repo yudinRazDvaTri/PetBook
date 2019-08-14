@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/dpgolang/PetBook/pkg/authentication"
 	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/models"
@@ -13,7 +12,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"regexp"
-	"time"
 	//"github.com/gorilla/mux"
 	//"github.com/gorilla/sessions"
 	//"github.com/jmoiron/sqlx"
@@ -21,10 +19,11 @@ import (
 )
 
 type Controller struct {
-	UserStore   models.UserStorer
-	PetStore    models.PetStorer
-	ForumStore  forum.ForumStorer
-	SearchStore search.SearchStorer
+	UserStore         models.UserStorer
+	PetStore          models.PetStorer
+	RefreshTokenStore models.RefreshTokenStorer
+	ForumStore        forum.ForumStorer
+	SearchStore       search.SearchStorer
 }
 
 const (
@@ -48,12 +47,7 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 		var err error
 		if userID, err = c.UserStore.Login(email, password); err != nil {
 			switch e := err.(type) {
-			case *utilerr.WrongEmail:
-				// TODO: display flash-message
-				fmt.Fprint(w, e.Error())
-				http.Redirect(w, r, "/login", http.StatusSeeOther)
-				return
-			case *utilerr.WrongPassword:
+			case *utilerr.WrongCredentials:
 				// TODO: display flash-message
 				fmt.Fprint(w, e.Error())
 				http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -65,29 +59,31 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 			}
 		}
 
-		expirationTime := time.Now().Add(30 * time.Minute)
-
-		claims := &authentication.Claims{
-			Id: userID,
-			StandardClaims: jwt.StandardClaims{
-				ExpiresAt: expirationTime.Unix(),
-			},
-		}
-
-		token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
-
-		tokenString, err := token.SignedString(authentication.Keys.SignKey)
+		var tokens authentication.Tokens
+		tokens, err = authentication.GenerateTokenPair(userID)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			logger.Error(err, "Error occurred while trying to sign token.\n")
+			logger.Error(err)
 			return
 		}
 
 		http.SetCookie(w, &http.Cookie{
-			Name:    "token",
-			Value:   tokenString,
-			Expires: expirationTime,
+			Name:    "accessToken",
+			Value:   tokens.AccessTokenValue,
+			Expires: tokens.AccessExpirationTime,
+		})
+
+		if err := c.RefreshTokenStore.UpdateRefreshToken(userID, tokens.RefreshTokenValue, tokens.RefreshExpirationTime); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			logger.Error(err)
+			return
+		}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:    "refreshToken",
+			Value:   tokens.RefreshTokenValue,
+			Expires: tokens.RefreshExpirationTime,
 		})
 
 		_, err = c.UserStore.GetPet(userID)
