@@ -1,16 +1,14 @@
 package utilerr
 
-import "fmt"
-
 type UniqueTaken struct {
 	Description string
 }
 
-type WrongEmail struct {
-	Email string
+type WrongCredentials struct {
+	Description string
 }
 
-type WrongPassword struct {
+type TokenDoesNotExist struct {
 	Description string
 }
 
@@ -18,10 +16,10 @@ func (e *UniqueTaken) Error() string {
 	return e.Description
 }
 
-func (e *WrongEmail) Error() string {
-	return fmt.Sprintf("Account with email '%s' not found.", e.Email)
+func (e *WrongCredentials) Error() string {
+	return e.Description
 }
 
-func (e *WrongPassword) Error() string {
+func (e *TokenDoesNotExist) Error() string {
 	return e.Description
 }
