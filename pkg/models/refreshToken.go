@@ -36,7 +36,7 @@ func (c *RefreshTokenStore) UpdateRefreshToken(userId int, token string, lastUpd
 
 func (c *RefreshTokenStore) RefreshTokenExists(userId int, token string) error {
 	var exists bool
-	err := c.DB.QueryRow( `SELECT EXISTS
+	err := c.DB.QueryRow(`SELECT EXISTS
 								(SELECT 1 
 								FROM refresh_tokens
 								WHERE token_string = $1 

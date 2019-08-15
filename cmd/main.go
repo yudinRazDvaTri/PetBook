@@ -33,14 +33,13 @@ func main() {
 	storeSearch := search.SearchStore{DB: db}
 	storeBlog := models.BlogStore{DB: db}
 
-
 	controller := controllers.Controller{
-		PetStore:  &storePet,
-		UserStore: &storeUser,
-		ForumStore: &storeForum,
-		SearchStore: &storeSearch,
+		PetStore:          &storePet,
+		UserStore:         &storeUser,
+		ForumStore:        &storeForum,
+		SearchStore:       &storeSearch,
 		RefreshTokenStore: &storeRefreshToken,
-		BlogStore: &storeBlog,
+		BlogStore:         &storeBlog,
 	}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
@@ -56,20 +55,17 @@ func main() {
 	subrouter.HandleFunc("/petcabinet", controller.PetPostHandler()).Methods("POST")
 	subrouter.HandleFunc("/petcabinet", controller.PetGetHandler()).Methods("GET")
 
-	subrouter.HandleFunc("/forum/topics", controller.ViewTopicsHandler()).Methods("GET")
-	subrouter.HandleFunc("/forum/topics/new", controller.NewTopicHandler()).Methods("POST")
-	subrouter.HandleFunc("/forum/topics/new", controller.NewTopicHandler()).Methods("GET")
+	subrouter.HandleFunc("/forum/topics", controller.TopicsHandler()).Methods("GET")
+	subrouter.HandleFunc("/forum/topics", controller.TopicsHandler()).Methods("POST")
 
 	subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
 	subrouter.HandleFunc("/search", controller.SearchHandler()).Methods("POST")
 	subrouter.HandleFunc("/", controller.MyPageGetHandler())
 
-	subrouter.HandleFunc("/",controller.GetBlogHandler)
-	subrouter.HandleFunc("/process",controller.CreateBlogHandler)
-	subrouter.HandleFunc("/delete",controller.DeleteBlogHandler)
-	router.HandleFunc("/upload",controllers.UploadFile)
-
-
+	subrouter.HandleFunc("/", controller.GetBlogHandler)
+	subrouter.HandleFunc("/process", controller.CreateBlogHandler)
+	subrouter.HandleFunc("/delete", controller.DeleteBlogHandler)
+	router.HandleFunc("/upload", controllers.UploadFile)
 
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
 		http.FileServer(http.Dir("./web/static/"))))
@@ -77,7 +73,7 @@ func main() {
 	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
 
 	// Is it proper way to handle ListenAndServe() error?
-	if err:= http.ListenAndServe(":8080", loggedRouter); err !=nil {
+	if err := http.ListenAndServe(":8080", loggedRouter); err != nil {
 		logger.FatalError(err, "Error occurred, while trying to listen and serve a server")
 	}
 }

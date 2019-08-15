@@ -8,21 +8,15 @@ import (
 	"net/http"
 )
 
-func (c *Controller) ViewTopicsHandler() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		topics, err := c.ForumStore.GetAllTopics()
-		if err != nil {
-			logger.Error(err)
-		}
+func (c *Controller) TopicsHandler() http.HandlerFunc {
 
-		view.GenerateTimeHTML(w, topics, "viewTopics")
-	}
-}
-
-func (c *Controller) NewTopicHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
-			view.GenerateHTML(w, nil, "newTopic")
+			topics, err := c.ForumStore.GetAllTopics()
+			if err != nil {
+				logger.Error(err)
+			}
+			view.GenerateTimeHTML(w, topics, "topics")
 		}
 
 		if r.Method == http.MethodPost {
@@ -41,7 +35,7 @@ func (c *Controller) NewTopicHandler() http.HandlerFunc {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			http.Redirect(w, r, "/forum/topics/new", http.StatusFound)
+			http.Redirect(w, r, "/forum/topics", http.StatusFound)
 		}
 	}
 }

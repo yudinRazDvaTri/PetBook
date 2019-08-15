@@ -5,10 +5,24 @@ body{
     background-image: url("background.jpg");
     background-size: 100%;
 }
-.box{
+
+.box-center{
     width: 300px;
     padding: 40px;
     position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    background: #ffffff;
+    text-align: center;
+    border-radius: 10px;
+    border: 2px solid #bfd9ff;
+}
+
+.box{
+    width: 300px;
+    padding: 40px;
+    position: relative;
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
@@ -86,4 +100,16 @@ a {
 
     border-radius: 10px;
     transition: 0.25s;
+}
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 300px;
+    padding: 40px;
+    background: #ffffff;
+    text-align: center;
+    border-radius: 10px;
+    border: 2px solid #bfd9ff;
 }
