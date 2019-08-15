@@ -20,6 +20,7 @@ type RefreshTokenStore struct {
 type RefreshTokenStorer interface {
 	RefreshTokenExists(userId int, token string) error
 	UpdateRefreshToken(userId int, token string, lastUpdateAt time.Time) error
+	DeleteRefreshToken(token string) error
 }
 
 func (c *RefreshTokenStore) UpdateRefreshToken(userId int, token string, lastUpdateAt time.Time) error {
@@ -34,6 +35,25 @@ func (c *RefreshTokenStore) UpdateRefreshToken(userId int, token string, lastUpd
 	return nil
 }
 
+func (c *RefreshTokenStore) DeleteRefreshToken(token string) error {
+	res, err := c.DB.Exec(`DELETE FROM refresh_tokens
+								WHERE token_string = $1`, token)
+	if err != nil {
+		return fmt.Errorf("Error occurred while trying to delete refresh token in db: %v.\n", err)
+	}
+
+	num, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("Error occurred while trying to count affected rows in users in db: %v.\n", err)
+	}
+
+	if num == 0 {
+		return &utilerr.TokenDoesNotExist{Description: "Refresh token does not exist!"}
+	}
+
+	return nil
+}
+
 func (c *RefreshTokenStore) RefreshTokenExists(userId int, token string) error {
 	var exists bool
 	err := c.DB.QueryRow(`SELECT EXISTS
@@ -42,7 +62,7 @@ func (c *RefreshTokenStore) RefreshTokenExists(userId int, token string) error {
 								WHERE token_string = $1 
 								AND user_id = $2)`, token, userId).Scan(&exists)
 	if err != nil {
-		return fmt.Errorf("Error occurred while trying to select refresh token in db: %v.\n", err)
+		return fmt.Errorf("Error occurred while trying to delete refresh token in db: %v.\n", err)
 	}
 
 	if !exists {

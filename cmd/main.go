@@ -47,6 +47,7 @@ func main() {
 
 	router.HandleFunc("/login", controller.LoginPostHandler()).Methods("POST")
 	router.HandleFunc("/login", controller.LoginGetHandler()).Methods("GET")
+	router.HandleFunc("/logout", controller.LogoutGetHandler()).Methods("GET")
 
 	subrouter := router.PathPrefix("/").Subrouter()
 	subrouter.Use(authentication.ValidateTokenMiddleware(&storeRefreshToken))
@@ -72,7 +73,6 @@ func main() {
 
 	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
 
-	// Is it proper way to handle ListenAndServe() error?
 	if err := http.ListenAndServe(":8080", loggedRouter); err != nil {
 		logger.FatalError(err, "Error occurred, while trying to listen and serve a server")
 	}
