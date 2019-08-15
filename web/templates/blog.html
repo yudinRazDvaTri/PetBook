@@ -1,0 +1,48 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html >
+<head>
+    <meta charset="UTF-8">
+    <title>Result product</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script>
+        function ConfirmDelete(){
+            return confirm("Do you want to remove this post?");
+        }
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <h2>Show Product data</h2>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th width="5%">Id</th>
+            <th width="60%">Message</th>
+            <th width="5%">Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {{range . }}
+            <tr>
+                <td>{{.Id}}</td>
+                <td>{{ .Message }}</td>
+                <td><a href="/delete?recordid={{.Id}}" class="btn btn-danger" onclick="return ConfirmDelete();">Delete</a></td>
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
+    <form action="/process" method="post">
+        <label for="message">Create your post here!</label>
+        <input type="text" id="message" name="something">
+        <input type="submit">
+    </form>
+</div>
+</body>
+</html>
+{{end}}
