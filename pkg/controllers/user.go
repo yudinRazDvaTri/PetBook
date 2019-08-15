@@ -24,6 +24,7 @@ type Controller struct {
 	RefreshTokenStore models.RefreshTokenStorer
 	ForumStore        forum.ForumStorer
 	SearchStore       search.SearchStorer
+	BlogStore   models.BlogStorer
 }
 
 const (

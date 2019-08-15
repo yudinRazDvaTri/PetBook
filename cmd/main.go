@@ -31,6 +31,7 @@ func main() {
 	storeRefreshToken := models.RefreshTokenStore{DB: db}
 	storeForum := forum.ForumStore{DB: db}
 	storeSearch := search.SearchStore{DB: db}
+	storeBlog := models.BlogStore{DB: db}
 
 
 	controller := controllers.Controller{
@@ -39,6 +40,7 @@ func main() {
 		ForumStore: &storeForum,
 		SearchStore: &storeSearch,
 		RefreshTokenStore: &storeRefreshToken,
+		BlogStore: &storeBlog,
 	}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
@@ -61,6 +63,13 @@ func main() {
 	subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
 	subrouter.HandleFunc("/search", controller.SearchHandler()).Methods("POST")
 	subrouter.HandleFunc("/", controller.MyPageGetHandler())
+
+	subrouter.HandleFunc("/",controller.GetBlogHandler)
+	subrouter.HandleFunc("/process",controller.CreateBlogHandler)
+	subrouter.HandleFunc("/delete",controller.DeleteBlogHandler)
+	router.HandleFunc("/upload",controllers.UploadFile)
+
+
 
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
 		http.FileServer(http.Dir("./web/static/"))))
