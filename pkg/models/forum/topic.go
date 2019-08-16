@@ -29,10 +29,10 @@ func (f *ForumStore) GetAllTopics() (topics []*Topic, err error) {
 	return
 }
 
-func (f *ForumStore) CreateNewTopic(topic *Topic) (err error) {
+func (f *ForumStore) CreateNewTopic(userID int, title, description string) (err error) {
 	_, err = f.DB.Exec(
 		`insert into topics (user_id, title, description) values ($1, $2, $3)`,
-		topic.UserID, topic.Title, topic.Description)
+		userID, title, description)
 	if err != nil {
 		return fmt.Errorf("cannot affect rows in topics table of db: %v", err)
 	}
