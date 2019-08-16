@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/models/forum"
 	"github.com/dpgolang/PetBook/pkg/view"
@@ -8,7 +9,7 @@ import (
 	"net/http"
 )
 
-func (c *Controller) TopicsHandler() http.HandlerFunc {
+func (c *Controller) ForumHandler() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
@@ -16,7 +17,15 @@ func (c *Controller) TopicsHandler() http.HandlerFunc {
 			if err != nil {
 				logger.Error(err)
 			}
-			view.GenerateTimeHTML(w, topics, "topics")
+			uid := context.Get(r, "id").(int)
+			name, err := c.PetStore.DisplayName(uid)
+			if err != nil {
+				logger.Error(err)
+			}
+
+			fmt.Println(name)
+			view.GenerateTimeHTML(w, "Forum", "navbar")
+			view.GenerateTimeHTML(w, topics, "forum")
 		}
 
 		if r.Method == http.MethodPost {
@@ -35,7 +44,7 @@ func (c *Controller) TopicsHandler() http.HandlerFunc {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			http.Redirect(w, r, "/forum/topics", http.StatusFound)
+			http.Redirect(w, r, "/forum", http.StatusFound)
 		}
 	}
 }
