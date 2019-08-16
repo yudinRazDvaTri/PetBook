@@ -27,7 +27,7 @@ func GenerateTimeHTML(writer http.ResponseWriter, data interface{}, filenames ..
 	for _, file := range filenames {
 		files = append(files, fmt.Sprintf("./web/templates/%s.html", file))
 	}
-	funcMap := template.FuncMap { "fdate": formatDate }
+	funcMap := template.FuncMap{"fdate": formatDate}
 	t := template.New("tmpl.html").Funcs(funcMap)
 
 	templates := template.Must(t.ParseFiles(files...))
@@ -41,5 +41,3 @@ func GenerateTimeHTML(writer http.ResponseWriter, data interface{}, filenames ..
 func formatDate(t time.Time) string {
 	return t.Format("Created: 2006-01-02 at 15:04:05")
 }
-
-

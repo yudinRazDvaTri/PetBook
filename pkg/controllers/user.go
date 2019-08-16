@@ -12,6 +12,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"regexp"
+	"time"
+
 	//"github.com/gorilla/mux"
 	//"github.com/gorilla/sessions"
 	//"github.com/jmoiron/sqlx"
@@ -24,7 +26,7 @@ type Controller struct {
 	RefreshTokenStore models.RefreshTokenStorer
 	ForumStore        forum.ForumStorer
 	SearchStore       search.SearchStorer
-	BlogStore   models.BlogStorer
+	BlogStore         models.BlogStorer
 }
 
 const (
@@ -198,5 +200,41 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 			}
 		}
 		http.Redirect(w, r, "/login", http.StatusFound)
+	}
+}
+
+func (c *Controller) LogoutGetHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		refreshToken, err := r.Cookie("refreshToken")
+		if err != nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		refreshTokenString := refreshToken.Value
+
+		if err = c.RefreshTokenStore.DeleteRefreshToken(refreshTokenString); err != nil {
+			switch e := err.(type) {
+			case *utilerr.TokenDoesNotExist:
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				return
+			default:
+				logger.Error(e)
+				http.Error(w, e.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:     "accessToken",
+			Expires: time.Unix(0, 0),
+		})
+
+		http.SetCookie(w, &http.Cookie{
+			Name:     "refreshToken",
+			Expires: time.Unix(0, 0),
+		})
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	}
 }

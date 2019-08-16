@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/models/forum"
 	"github.com/dpgolang/PetBook/pkg/view"
@@ -8,21 +9,23 @@ import (
 	"net/http"
 )
 
-func (c *Controller) ViewTopicsHandler() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		topics, err := c.ForumStore.GetAllTopics()
-		if err != nil {
-			logger.Error(err)
-		}
+func (c *Controller) ForumHandler() http.HandlerFunc {
 
-		view.GenerateTimeHTML(w, topics, "viewTopics")
-	}
-}
-
-func (c *Controller) NewTopicHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
-			view.GenerateHTML(w, nil, "newTopic")
+			topics, err := c.ForumStore.GetAllTopics()
+			if err != nil {
+				logger.Error(err)
+			}
+			uid := context.Get(r, "id").(int)
+			name, err := c.PetStore.DisplayName(uid)
+			if err != nil {
+				logger.Error(err)
+			}
+
+			fmt.Println(name)
+			view.GenerateTimeHTML(w, "Forum", "navbar")
+			view.GenerateTimeHTML(w, topics, "forum")
 		}
 
 		if r.Method == http.MethodPost {
@@ -41,7 +44,7 @@ func (c *Controller) NewTopicHandler() http.HandlerFunc {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			http.Redirect(w, r, "/forum/topics/new", http.StatusFound)
+			http.Redirect(w, r, "/forum", http.StatusFound)
 		}
 	}
 }

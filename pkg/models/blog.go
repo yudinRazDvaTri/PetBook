@@ -12,7 +12,7 @@ type Blog struct{
 	UserId string
 	PetName string
 	Message string
-	Date time.Time
+	Date    time.Time
 }
 
 type BlogStore struct {
@@ -36,7 +36,7 @@ func (b *BlogStore) GetBlog(userID int) []Blog{
 	if err != nil{
 		logFatal(err)
 	}
-	tRes:=Blog{}
+	tRes := Blog{}
 	var results []Blog
 	for rows.Next(){
 		var blogid int
@@ -78,12 +78,11 @@ func (b *BlogStore) GetBlog(userID int) []Blog{
 //}
 
 func (b *BlogStore) CreateBlog (form string,idUser int){
-
-	result, err:= b.DB.Exec("insert into blog (content,user_id) values ($1,$2);",form,idUser)
+	result, err := b.DB.Exec("insert into blog (content,user_id) values ($1,$2);", form, idUser)
 	if err != nil {
 		log.Fatal(err)
 	}
-	_,err = result.RowsAffected()
+	_, err = result.RowsAffected()
 	if err != nil {
 		log.Println(err)
 		return
@@ -101,6 +100,5 @@ func (b *BlogStore) DeleteBlog (blogid string){
 		log.Println("didn't delete ",501)
 		return
 	}
-	fmt.Println("rows affected - ",n)
+	fmt.Println("rows affected - ", n)
 }
-

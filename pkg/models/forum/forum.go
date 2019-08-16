@@ -10,4 +10,3 @@ type ForumStorer interface {
 type ForumStore struct {
 	DB *sqlx.DB
 }
-
