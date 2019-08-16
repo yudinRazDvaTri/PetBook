@@ -7,7 +7,8 @@ import (
 )
 
 func (c *Controller) GetBlogHandler(w http.ResponseWriter,r *http.Request){
-	results:= c.BlogStore.GetBlog()
+	userID := context.Get(r, "id").(int)
+	results:= c.BlogStore.GetBlog(userID)
 	tmpl, _ := template.ParseFiles("./web/templates/blog.html")
 	tmpl.Execute(w, results)
 }
@@ -29,10 +30,10 @@ func (c *Controller) CreateBlogHandler (w http.ResponseWriter, r *http.Request){
 
 func (c *Controller) DeleteBlogHandler(w http.ResponseWriter, r *http.Request){
 	if r.Method != http.MethodGet{
-		http.Redirect(w,r,"/",http.StatusFound)
+		http.Redirect(w,r,"/",501)
 		return
 	}
 	blogid := r.FormValue("recordid")
 	c.BlogStore.DeleteBlog(blogid)
-	http.Redirect(w,r,"/mypage",301)
+	http.Redirect(w,r,"/",301)
 }
