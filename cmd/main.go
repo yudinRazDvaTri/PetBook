@@ -50,7 +50,7 @@ func main() {
 	router.HandleFunc("/logout", controller.LogoutGetHandler()).Methods("GET")
 
 	subrouter := router.PathPrefix("/").Subrouter()
-	subrouter.Use(authentication.ValidateTokenMiddleware(&storeRefreshToken))
+	subrouter.Use(authentication.ValidateTokenMiddleware(&storeRefreshToken, &storeUser))
 
 	subrouter.HandleFunc("/mypage", controller.MyPageGetHandler()).Methods("GET")
 	subrouter.HandleFunc("/petcabinet", controller.PetPostHandler()).Methods("POST")

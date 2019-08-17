@@ -24,7 +24,7 @@ type Tokens struct {
 	RefreshExpirationTime time.Time
 }
 
-func ValidateTokenMiddleware(storeRefreshToken *models.RefreshTokenStore) (mw func(http.Handler) http.Handler) {
+func ValidateTokenMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *models.UserStore) (mw func(http.Handler) http.Handler) {
 	mw = func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			accessToken, err := r.Cookie("accessToken")
@@ -84,7 +84,17 @@ func ValidateTokenMiddleware(storeRefreshToken *models.RefreshTokenStore) (mw fu
 							Value:   tokens.RefreshTokenValue,
 							Expires: tokens.RefreshExpirationTime,
 						})
+
 						context.Set(r, "id", claims.Id)
+
+						_, err = storeUser.GetPet(claims.Id)
+
+						if err != nil {
+							context.Set(r, "pet", false)
+						} else {
+							context.Set(r, "pet", true)
+						}
+
 					} else {
 						http.Redirect(w, r, "/login", http.StatusSeeOther)
 						return
@@ -106,6 +116,15 @@ func ValidateTokenMiddleware(storeRefreshToken *models.RefreshTokenStore) (mw fu
 				if err == nil {
 					if token.Valid {
 						context.Set(r, "id", claims.Id)
+
+						_, err = storeUser.GetPet(claims.Id)
+
+						if err != nil {
+							context.Set(r, "pet", false)
+						} else {
+							context.Set(r, "pet", true)
+						}
+						
 					} else {
 						http.Redirect(w, r, "/login", http.StatusSeeOther)
 						return
