@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"github.com/dpgolang/PetBook/pkg/models/forum"
 	"net/http"
 	"strconv"
+
+	"github.com/dpgolang/PetBook/pkg/models/forum"
 
 	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/view"
@@ -20,8 +21,18 @@ func (c *Controller) TopicsHandler() http.HandlerFunc {
 				logger.Error(err)
 			}
 
+			var viewTopics []forum.ViewTopic
+
+			for _, topic := range topics {
+				userName, err := c.PetStore.DisplayName(topic.UserID)
+				if err != nil {
+					logger.Error(err)
+				}
+				viewTopics = append(viewTopics, forum.ViewTopic{userName, topic})
+			}
+
 			view.GenerateTimeHTML(w, "Forum", "navbar")
-			view.GenerateTimeHTML(w, topics, "topics")
+			view.GenerateTimeHTML(w, viewTopics, "topics")
 		}
 
 		if r.Method == http.MethodPost {
@@ -55,13 +66,28 @@ func (c *Controller) CommentsHandler() http.HandlerFunc {
 			if err != nil {
 				logger.Error(err)
 			}
+			topicName, err := c.ForumStore.TopicNameByID(topicID)
+			if err != nil {
+				logger.Error(err)
+			}
+			var viewComments []forum.ViewComment
 
-			ViewData := struct{
-				ID int
-				Comments []forum.Comment
+			for _, comment := range comments {
+				userName, err := c.PetStore.DisplayName(comment.UserID)
+				if err != nil {
+					logger.Error(err)
+				}
+				viewComments = append(viewComments, forum.ViewComment{userName, comment})
+			}
+
+			ViewData := struct {
+				ID        int
+				TopicName string
+				ViewComments []forum.ViewComment
 			}{
 				topicID,
-				comments,
+				topicName,
+				viewComments,
 			}
 
 			view.GenerateTimeHTML(w, "Topic", "navbar")

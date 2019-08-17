@@ -14,17 +14,28 @@ type Comment struct {
 	Content     string    `json:"content" db:"content"`
 }
 
+type ViewComment struct {
+	UserName string
+	Comment
+}
+
 func (f *ForumStore) AddNewComment(topicID, userID int, content string) (err error) {
 	_, err = f.DB.Exec(
-		`insert into comments (topic_id, user_id, content) values ($1, $2, $3)`,topicID, userID, content)
+		`insert into comments (topic_id, user_id, content) values ($1, $2, $3);`,
+				topicID, userID, content)
 	if err != nil {
-		return fmt.Errorf("cannot affect rows in comments table of db: %v", err)
+		err = fmt.Errorf("cannot affect rows in comments table of db: %v", err)
+	}
+	_, err = f.DB.Exec(`UPDATE topics SET comments_number = comments_number + 1 WHERE topic_id = $1;`,
+				topicID)
+	if err != nil {
+		err = fmt.Errorf("cannot affect comments_number field in topics table of db: %v", err)
 	}
 	return
 }
 
 func (f *ForumStore) GetTopicComments(topicID int) (comments []Comment, err error) {
-	rows, err := f.DB.Query("select * from comments where topic_id = $1 order by created_time DESC", topicID)
+	rows, err := f.DB.Query("select * from comments where topic_id = $1 order by created_time ASC", topicID)
 	if err != nil {
 		err = fmt.Errorf("Can't read comment-rows from db: %v", err)
 		return
@@ -36,3 +47,4 @@ func (f *ForumStore) GetTopicComments(topicID int) (comments []Comment, err erro
 	}
 	return
 }
+
