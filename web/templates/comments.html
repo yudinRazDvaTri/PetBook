@@ -20,7 +20,8 @@
         </form
         ></div>
     <div class="page-header" style="text-align: center">
-        <h1>{{.TopicName}}</h1>
+        <h1>{{.Topic.Title}}</h1>
+        <h6>{{.Topic.Description}}</h6>
     </div>
     <div style="margin-top: 10%">
             {{ range .ViewComments }}

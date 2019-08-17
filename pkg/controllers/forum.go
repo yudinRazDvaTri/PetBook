@@ -66,7 +66,7 @@ func (c *Controller) CommentsHandler() http.HandlerFunc {
 			if err != nil {
 				logger.Error(err)
 			}
-			topicName, err := c.ForumStore.TopicNameByID(topicID)
+			topic, err := c.ForumStore.GetTopicByID(topicID)
 			if err != nil {
 				logger.Error(err)
 			}
@@ -82,11 +82,11 @@ func (c *Controller) CommentsHandler() http.HandlerFunc {
 
 			ViewData := struct {
 				ID        int
-				TopicName string
+				Topic forum.Topic
 				ViewComments []forum.ViewComment
 			}{
 				topicID,
-				topicName,
+				topic,
 				viewComments,
 			}
 

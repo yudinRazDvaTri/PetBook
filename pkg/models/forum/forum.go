@@ -7,7 +7,7 @@ type ForumStorer interface {
 	CreateNewTopic(userID int, title, description string) (err error)
 	AddNewComment(topicID, userID int, content string) (err error)
 	GetTopicComments(topicID int) (comments []Comment, err error)
-	TopicNameByID (topicID int) (name string, err error)
+	GetTopicByID(topicID int) (topic Topic, err error)
 }
 
 type ForumStore struct {

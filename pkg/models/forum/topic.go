@@ -45,11 +45,20 @@ func (f *ForumStore) CreateNewTopic(userID int, title, description string) (err 
 	return
 }
 
-func (f *ForumStore) TopicNameByID(topicID int) (name string, err error) {
-	err = f.DB.QueryRow(
-		`SELECT title FROM topics WHERE topic_id = $1`, topicID).Scan(&name)
+//func (f *ForumStore) TopicNameByID(topicID int) (name string, err error) {
+//	err = f.DB.QueryRow(
+//		`SELECT title FROM topics WHERE topic_id = $1`, topicID).Scan(&name)
+//	if err != nil {
+//		err = fmt.Errorf("Error occurred while trying read title of topic with $d id: %v.\n", topicID, err)
+//	}
+//	return
+//}
+
+func (f *ForumStore) GetTopicByID(topicID int) (topic Topic, err error) {
+	err = f.DB.QueryRowx(
+		`SELECT * FROM topics WHERE topic_id = $1`, topicID).StructScan(&topic)
 	if err != nil {
-		err = fmt.Errorf("Error occurred while trying read title of topic with $d id: %v.\n", topicID, err)
+		err = fmt.Errorf("Error occurred while trying read topic with $d id from DB: %v.\n", topicID, err)
 	}
 	return
 }
