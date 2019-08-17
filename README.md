@@ -25,7 +25,4 @@ Get user_id in your handlers like this:
 Get user_id in your handlers like this:
 `context.Get(r, "pet").(bool)`
 
-### You have to check the value of `pet` in your `GET` and `POST` handlers! Users who didn't fill information about their pets
-can't create new topics or leave comments but they still can look at existing topics, comments etc.
-For example, you can pass value of `pet` from `GET` handler to template and check it there. According to value display needed content.
-In `POST` handlers, which work with user's pet, you have to return from function if `pet` value is false.
+### You have to check the value of `pet` in your `GET` and `POST` handlers! Users who didn't fill information about their pets can't create new topics or leave comments but they still can look at existing topics, comments etc. For example, you can pass value of `pet` from `GET` handler to template and check it there. According to value display needed content. In `POST` handlers, which work with user's pet, you have to return from function if `pet` value is false.
