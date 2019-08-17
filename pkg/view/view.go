@@ -39,5 +39,5 @@ func GenerateTimeHTML(writer http.ResponseWriter, data interface{}, filenames ..
 }
 
 func formatDate(t time.Time) string {
-	return t.Format("Created: 2006-01-02 at 15:04:05")
+	return t.Format("2006-01-02 15:04:05")
 }
