@@ -22,10 +22,12 @@ type Message struct {
 	CreatedAt time.Time `db:"created_at"`
 	Read      bool      `db:"read"`
 }
+
 type Client struct {
 	UserID     int
 	Connection *websocket.Conn
 }
+
 type Chat struct {
 	Companion User
 	Messages  []Message
