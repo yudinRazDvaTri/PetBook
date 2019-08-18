@@ -7,7 +7,7 @@ import (
 )
 
 type Comment struct {
-	CommendID   int       `json:"comment_id" db:"comment_id"`
+	CommentID   int       `json:"comment_id" db:"comment_id"`
 	TopicID     int       `json:"topic_id" db:"topic_id"`
 	UserID      int       `json:"user_id" db:"user_id"`
 	CreatedTime time.Time `json:"created_time" db:"created_time"`
@@ -22,14 +22,9 @@ type ViewComment struct {
 func (f *ForumStore) AddNewComment(topicID, userID int, content string) (err error) {
 	_, err = f.DB.Exec(
 		`insert into comments (topic_id, user_id, content) values ($1, $2, $3);`,
-				topicID, userID, content)
+		topicID, userID, content)
 	if err != nil {
 		err = fmt.Errorf("cannot affect rows in comments table of db: %v", err)
-	}
-	_, err = f.DB.Exec(`UPDATE topics SET comments_number = comments_number + 1 WHERE topic_id = $1;`,
-				topicID)
-	if err != nil {
-		err = fmt.Errorf("cannot affect comments_number field in topics table of db: %v", err)
 	}
 	return
 }
@@ -48,3 +43,14 @@ func (f *ForumStore) GetTopicComments(topicID int) (comments []Comment, err erro
 	return
 }
 
+func (f *ForumStore) SetNumberOfComments(topicID int) (err error) {
+	_, err = f.DB.Exec(
+		`UPDATE topics SET comments_number = 
+				(SELECT count(*) FROM comments WHERE topic_id = $1)
+				WHERE topic_id = $1;`, topicID)
+	if err != nil {
+		err = fmt.Errorf("Can't number of comments in topic %d from DB: %v",
+			topicID, err)
+	}
+	return
+}

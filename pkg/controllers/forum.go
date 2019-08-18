@@ -81,8 +81,8 @@ func (c *Controller) CommentsHandler() http.HandlerFunc {
 			}
 
 			ViewData := struct {
-				ID        int
-				Topic forum.Topic
+				ID           int
+				Topic        forum.Topic
 				ViewComments []forum.ViewComment
 			}{
 				topicID,
@@ -107,5 +107,6 @@ func (c *Controller) CommentsHandler() http.HandlerFunc {
 			id := strconv.Itoa(topicID)
 			http.Redirect(w, r, "/forum/topic/"+id+"/comments", http.StatusFound)
 		}
+
 	}
 }

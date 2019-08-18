@@ -13,7 +13,6 @@ import (
 	"net/http"
 	"regexp"
 	"time"
-
 	//"github.com/gorilla/mux"
 	//"github.com/gorilla/sessions"
 	//"github.com/jmoiron/sqlx"
@@ -227,12 +226,12 @@ func (c *Controller) LogoutGetHandler() http.HandlerFunc {
 		}
 
 		http.SetCookie(w, &http.Cookie{
-			Name:     "accessToken",
+			Name:    "accessToken",
 			Expires: time.Unix(0, 0),
 		})
 
 		http.SetCookie(w, &http.Cookie{
-			Name:     "refreshToken",
+			Name:    "refreshToken",
 			Expires: time.Unix(0, 0),
 		})
 		http.Redirect(w, r, "/login", http.StatusSeeOther)

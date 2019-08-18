@@ -124,7 +124,7 @@ func ValidateTokenMiddleware(storeRefreshToken *models.RefreshTokenStore, storeU
 						} else {
 							context.Set(r, "pet", true)
 						}
-						
+
 					} else {
 						http.Redirect(w, r, "/login", http.StatusSeeOther)
 						return

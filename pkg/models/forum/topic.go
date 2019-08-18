@@ -2,6 +2,7 @@ package forum
 
 import (
 	"fmt"
+	"github.com/dpgolang/PetBook/pkg/logger"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -17,7 +18,7 @@ type Topic struct {
 }
 
 type ViewTopic struct {
-	UserName       string
+	UserName string
 	Topic
 }
 
@@ -32,6 +33,12 @@ func (f *ForumStore) GetAllTopics() (topics []Topic, err error) {
 	if err != nil {
 		err = fmt.Errorf("Can't scan topics-rows from db: %v", err)
 	}
+	for i := range topics {
+		err = f.SetNumberOfComments(topics[i].TopicID)
+		if err != nil {
+			logger.Error(err)
+		}
+	}
 	return
 }
 
@@ -45,16 +52,11 @@ func (f *ForumStore) CreateNewTopic(userID int, title, description string) (err 
 	return
 }
 
-//func (f *ForumStore) TopicNameByID(topicID int) (name string, err error) {
-//	err = f.DB.QueryRow(
-//		`SELECT title FROM topics WHERE topic_id = $1`, topicID).Scan(&name)
-//	if err != nil {
-//		err = fmt.Errorf("Error occurred while trying read title of topic with $d id: %v.\n", topicID, err)
-//	}
-//	return
-//}
-
 func (f *ForumStore) GetTopicByID(topicID int) (topic Topic, err error) {
+	err = f.SetNumberOfComments(topicID)
+	if err != nil {
+		logger.Error(err)
+	}
 	err = f.DB.QueryRowx(
 		`SELECT * FROM topics WHERE topic_id = $1`, topicID).StructScan(&topic)
 	if err != nil {

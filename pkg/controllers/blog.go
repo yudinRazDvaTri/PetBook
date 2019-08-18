@@ -6,9 +6,9 @@ import (
 	"net/http"
 )
 
-func (c *Controller) GetBlogHandler(w http.ResponseWriter,r *http.Request){
+func (c *Controller) GetBlogHandler(w http.ResponseWriter, r *http.Request) {
 	userID := context.Get(r, "id").(int)
-	results:= c.BlogStore.GetBlog(userID)
+	results := c.BlogStore.GetBlog(userID)
 	tmpl, _ := template.ParseFiles("./web/templates/blog.html")
 	tmpl.Execute(w, results)
 }
@@ -28,12 +28,12 @@ func (c *Controller) CreateBlogHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/mypage", 301)
 }
 
-func (c *Controller) DeleteBlogHandler(w http.ResponseWriter, r *http.Request){
-	if r.Method != http.MethodGet{
-		http.Redirect(w,r,"/",501)
+func (c *Controller) DeleteBlogHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Redirect(w, r, "/", 501)
 		return
 	}
 	blogid := r.FormValue("recordid")
 	c.BlogStore.DeleteBlog(blogid)
-	http.Redirect(w,r,"/",301)
+	http.Redirect(w, r, "/", 301)
 }
