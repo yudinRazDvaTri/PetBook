@@ -31,12 +31,14 @@ func main() {
 	storeUser := models.UserStore{DB: db}
 	storePet := models.PetStore{DB: db}
 	storeForum := forum.ForumStore{DB: db}
-	storeSearch := search.SearchStore{DB:db}
+	storeSearch := search.SearchStore{DB: db}
+	storeChat := models.ChatStore{DB: db}
 	controller := controllers.Controller{
-		PetStore:  &storePet,
-		UserStore: &storeUser,
-		ForumStore: &storeForum,
+		PetStore:    &storePet,
+		UserStore:   &storeUser,
+		ForumStore:  &storeForum,
 		SearchStore: &storeSearch,
+		ChatStore:   &storeChat,
 	}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
@@ -56,7 +58,10 @@ func main() {
 	subrouter.HandleFunc("/forum/submit", controller.NewTopicHandler()).Methods("GET")
 	subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
 	subrouter.HandleFunc("/search", controller.SearchHandler()).Methods("POST")
-	
+	subrouter.HandleFunc("/chats/{id}", controller.HandleChatConnectionGET()).Methods("GET")
+	subrouter.HandleFunc("/ws", controller.HandleChatConnection())
+	go controller.HandleMessages()
+
 	router.Handle("/", negroni.New(
 		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
 		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
@@ -68,7 +73,7 @@ func main() {
 	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
 
 	// Is it proper way to handle ListenAndServe() error?
-	if err:= http.ListenAndServe(":8080", loggedRouter); err !=nil {
+	if err := http.ListenAndServe(":8080", loggedRouter); err != nil {
 		logger.FatalError(err, "Error occurred, while trying to listen and serve a server")
 	}
 }

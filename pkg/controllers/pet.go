@@ -13,10 +13,6 @@ import (
 func (c *Controller) PetPostHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
-		if context.Get(r, "id") == nil {
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
-			return
-		}
 		id := context.Get(r, "id").(int)
 		if matched, err := regexp.Match(patternOnlyNum, []byte(r.FormValue("age"))); !matched || err != nil {
 			if err != nil {
