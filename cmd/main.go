@@ -56,17 +56,9 @@ func main() {
 	subrouter.HandleFunc("/petcabinet", controller.PetPostHandler()).Methods("POST")
 	subrouter.HandleFunc("/petcabinet", controller.PetGetHandler()).Methods("GET")
 
-	subrouter.HandleFunc("/forum", controller.ViewTopicsHandler()).Methods("GET")
-	subrouter.HandleFunc("/forum/submit", controller.NewTopicHandler()).Methods("POST")
-	subrouter.HandleFunc("/forum/submit", controller.NewTopicHandler()).Methods("GET")
+
 	subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Queries("section","{section}").Methods("GET")
 	
-	router.Handle("/", negroni.New(
-		negroni.HandlerFunc(authentication.ValidateTokenMiddleware),
-		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
-	))
-
-
 	subrouter.HandleFunc("/forum", controller.TopicsHandler()).Methods("GET")
 	subrouter.HandleFunc("/forum", controller.TopicsHandler()).Methods("POST")
 	subrouter.HandleFunc("/forum/topic/{id}/comments", controller.CommentsHandler()).Methods("GET")
