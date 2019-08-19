@@ -2,7 +2,7 @@ package forum
 
 import (
 	"fmt"
-	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"time"
 )
 
@@ -16,6 +16,7 @@ type Comment struct {
 
 type ViewComment struct {
 	UserName string
+	Rating int
 	Comment
 }
 
@@ -29,28 +30,32 @@ func (f *ForumStore) AddNewComment(topicID, userID int, content string) (err err
 	return
 }
 
-func (f *ForumStore) GetTopicComments(topicID int) (comments []Comment, err error) {
-	rows, err := f.DB.Query("select * from comments where topic_id = $1 order by created_time ASC", topicID)
+func (f *ForumStore) RateComment(commentID, userID int) (bool, error) {
+	rateOk := true
+
+	_, err := f.DB.Exec(
+		`insert into ratings (comment_id, user_id) values ($1, $2);`,
+		commentID, userID)
 	if err != nil {
-		err = fmt.Errorf("Can't read comment-rows from db: %v", err)
-		return
+		if pgerr, ok := err.(*pq.Error); ok {
+			if pgerr.Code == "23505" {
+				err = fmt.Errorf("User %d already liked comment %d: %v",
+					userID, commentID, err)
+			}
+		}
+
+		err = fmt.Errorf("Error while trying to rate %d comment by %d user in DB: %v",
+			userID, commentID, err)
 	}
-	defer rows.Close()
-	err = sqlx.StructScan(rows, &comments)
-	if err != nil {
-		err = fmt.Errorf("Can't scan comment-rows from db: %v", err)
-	}
-	return
+	return rateOk, err
 }
 
-func (f *ForumStore) SetNumberOfComments(topicID int) (err error) {
-	_, err = f.DB.Exec(
-		`UPDATE topics SET comments_number = 
-				(SELECT count(*) FROM comments WHERE topic_id = $1)
-				WHERE topic_id = $1;`, topicID)
+func (f *ForumStore) GetCommentRating(commentID int) (rating int, err error) {
+	err = f.DB.QueryRowx(
+		`SELECT COUNT(*) FROM ratings WHERE comment_id = $1;`, commentID).Scan(&rating)
 	if err != nil {
-		err = fmt.Errorf("Can't number of comments in topic %d from DB: %v",
-			topicID, err)
+		err = fmt.Errorf("Can't count rating of comment with %d id from DB: %v.\n",
+			commentID, err)
 	}
 	return
 }

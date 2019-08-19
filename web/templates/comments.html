@@ -26,10 +26,14 @@
         <div style="margin-top: 10%">
                 {{ range .ViewComments }}
                         <div class="container">
-                            <h6>{{ .Content }}</h6>
-                            <small>{{ .UserName}}</small>
-                            <br>
-                            <small>{{ .CreatedTime | fdate}}</small>
+                            <form action="/forum/topic/{{.TopicID}}/comments/{{.CommentID}}/ratings" method="POST">
+                                <h6>{{ .Content }}</h6>
+                                <small>{{ .UserName}}</small>
+                                <br>
+                                <small>{{ .CreatedTime | fdate}}</small>
+                                <small>Rating: {{ .Rating}}</small>
+                                <input type="submit" value="Like">
+                            </form>
                         </div>
                     <br>
                     <br>

@@ -12,10 +12,10 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func (c *Controller) TopicsHandler() http.HandlerFunc {
+// Returns a Page with List of Topics
+func (c *Controller) TopicsGetHandler() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodGet {
 			topics, err := c.ForumStore.GetAllTopics()
 			if err != nil {
 				logger.Error(err)
@@ -33,80 +33,123 @@ func (c *Controller) TopicsHandler() http.HandlerFunc {
 
 			view.GenerateTimeHTML(w, "Forum", "navbar")
 			view.GenerateTimeHTML(w, viewTopics, "topics")
-		}
-
-		if r.Method == http.MethodPost {
-			r.ParseForm()
-			title := r.FormValue("title")
-			description := r.FormValue("description")
-			uid := context.Get(r, "id").(int)
-
-			if err := c.ForumStore.CreateNewTopic(uid, title, description); err != nil {
-				logger.Error(err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			http.Redirect(w, r, "/forum", http.StatusFound)
-		}
 	}
 }
 
-func (c *Controller) CommentsHandler() http.HandlerFunc {
+// Process adding new Topic
+func (c *Controller) TopicsPostHandler() http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		title := r.FormValue("title")
+		description := r.FormValue("description")
+		userID := context.Get(r, "id").(int)
+
+		if err := c.ForumStore.CreateNewTopic(userID, title, description); err != nil {
+			logger.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, "/forum", http.StatusFound)
+	}
+}
+
+// Returns a Page with Topic's Comments
+func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
-		idStr := vars["id"]
-		topicID, err := strconv.Atoi(idStr)
+		topicIdStr := vars["topicID"]
+		topicID, err := strconv.Atoi(topicIdStr)
 		if err != nil {
 			logger.Error(err)
 		}
 
-		if r.Method == http.MethodGet {
-			comments, err := c.ForumStore.GetTopicComments(topicID)
+		comments, err := c.ForumStore.GetTopicComments(topicID)
+		if err != nil {
+			logger.Error(err)
+		}
+		topic, err := c.ForumStore.GetTopicByID(topicID)
+		if err != nil {
+			logger.Error(err)
+		}
+		var viewComments []forum.ViewComment
+
+		for _, comment := range comments {
+			userName, err := c.PetStore.DisplayName(comment.UserID)
 			if err != nil {
 				logger.Error(err)
 			}
-			topic, err := c.ForumStore.GetTopicByID(topicID)
+			rating, err := c.ForumStore.GetCommentRating(comment.CommentID)
 			if err != nil {
 				logger.Error(err)
 			}
-			var viewComments []forum.ViewComment
-
-			for _, comment := range comments {
-				userName, err := c.PetStore.DisplayName(comment.UserID)
-				if err != nil {
-					logger.Error(err)
-				}
-				viewComments = append(viewComments, forum.ViewComment{userName, comment})
-			}
-
-			ViewData := struct {
-				ID           int
-				Topic        forum.Topic
-				ViewComments []forum.ViewComment
-			}{
-				topicID,
-				topic,
-				viewComments,
-			}
-
-			view.GenerateTimeHTML(w, "Topic", "navbar")
-			view.GenerateTimeHTML(w, ViewData, "comments")
+			viewComments = append(viewComments, forum.ViewComment{userName, rating, comment})
 		}
 
-		if r.Method == http.MethodPost {
-			r.ParseForm()
-			content := r.FormValue("content")
-			uid := context.Get(r, "id").(int)
-
-			if err := c.ForumStore.AddNewComment(topicID, uid, content); err != nil {
-				logger.Error(err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			id := strconv.Itoa(topicID)
-			http.Redirect(w, r, "/forum/topic/"+id+"/comments", http.StatusFound)
+		ViewData := struct {
+			ID           int
+			Topic        forum.Topic
+			ViewComments []forum.ViewComment
+		}{
+			topicID,
+			topic,
+			viewComments,
 		}
 
+		view.GenerateTimeHTML(w, "Topic", "navbar")
+		view.GenerateTimeHTML(w, ViewData, "comments")
+	}
+}
+
+// Process adding new Comment
+func (c *Controller) CommentsPostHandler() http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		topicIdStr := vars["topicID"]
+		topicID, err := strconv.Atoi(topicIdStr)
+		if err != nil {
+			logger.Error(err)
+		}
+
+		r.ParseForm()
+		content := r.FormValue("content")
+		userID := context.Get(r, "id").(int)
+
+		if err := c.ForumStore.AddNewComment(topicID, userID, content); err != nil {
+			logger.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		http.Redirect(w, r, "/forum/topic/" + topicIdStr + "/comments", http.StatusFound)
+	}
+}
+
+// Process Like-action on Comment
+func (c *Controller) CommentsRatingsHandler() http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		topicIdStr := vars["topicID"]
+		commentIdStr := vars["commentID"]
+
+		commentID, err := strconv.Atoi(commentIdStr)
+		if err != nil {
+			logger.Error(err)
+		}
+
+		userID := context.Get(r, "id").(int)
+
+		rateOk, err := c.ForumStore.RateComment(commentID, userID)
+		if err != nil {
+			logger.Error(err)
+		}
+		if !rateOk {
+			http.Redirect(w, r, "/forum/topic/" + topicIdStr + "/comments", http.StatusFound)
+		}
+
+		http.Redirect(w, r, "/forum/topic/" + topicIdStr + "/comments", http.StatusFound)
 	}
 }
