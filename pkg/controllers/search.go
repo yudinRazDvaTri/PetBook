@@ -1,11 +1,15 @@
 package controllers
 
 import (
+<<<<<<< HEAD
 
+=======
+>>>>>>> 33da165b570923ea35adf2a6e39c20edf1aeb2b9
 	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/view"
 	"net/http"
 )
+
 func (c *Controller) ViewSearchHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		section := r.URL.Query().Get("section")
@@ -28,6 +32,7 @@ func (c *Controller) ViewSearchHandler() http.HandlerFunc {
 				view.GenerateHTML(w, pets, "search_by_user")
 			}
 
+<<<<<<< HEAD
 		}
 		if section=="animal"{
 			view.GenerateHTML(w, "Forum", "navbar")
@@ -72,6 +77,8 @@ func (c *Controller) ViewSearchHandler() http.HandlerFunc {
 		}
 		if section=="forum"{
 
-		}
+=======
+		view.GenerateHTML(w, pets, "searchAnimals")
 	}
 }
+

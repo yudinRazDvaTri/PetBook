@@ -5,9 +5,9 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func (f *SearchStore) GetByUser(email string) (*DispPet,error) {
+func (f *SearchStore) GetByUser(email string) (*DispPet, error) {
 	var pet DispPet
-	err := f.DB.QueryRowx(`select name, description from pets p join users u on p.user_id=u.id where u.email=$1 `,email).StructScan(&pet)
+	err := f.DB.QueryRowx(`select name, description from pets p join users u on p.user_id=u.id where u.email=$1 `, email).StructScan(&pet)
 	if err != nil {
 		return &pet, err
 	}
@@ -27,5 +27,3 @@ func (f *SearchStore) GetAllPets() (pets []*DispPet, err error) {
 	}
 	return
 }
-
-

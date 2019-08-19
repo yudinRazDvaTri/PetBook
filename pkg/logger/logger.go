@@ -11,7 +11,7 @@ var logger *log.Logger
 func init() {
 	file, err := os.OpenFile("petbook.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
-		FatalError(err, "Error occurred while trying to open .log file.\n")
+		Error(err, "Error occurred while trying to open .log file.\n")
 	}
 	logger = log.New(file, "INFO ", log.Ldate|log.Ltime|log.Lshortfile)
 }

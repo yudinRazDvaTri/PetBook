@@ -12,8 +12,6 @@ import (
 	"github.com/dpgolang/PetBook/pkg/models/search"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/urfave/negroni"
-
 	"net/http"
 	"os"
 )
@@ -30,13 +28,18 @@ func main() {
 
 	storeUser := models.UserStore{DB: db}
 	storePet := models.PetStore{DB: db}
+	storeRefreshToken := models.RefreshTokenStore{DB: db}
 	storeForum := forum.ForumStore{DB: db}
-	storeSearch := search.SearchStore{DB:db}
+	storeSearch := search.SearchStore{DB: db}
+	storeBlog := models.BlogStore{DB: db}
+
 	controller := controllers.Controller{
-		PetStore:  &storePet,
-		UserStore: &storeUser,
-		ForumStore: &storeForum,
-		SearchStore: &storeSearch,
+		PetStore:          &storePet,
+		UserStore:         &storeUser,
+		ForumStore:        &storeForum,
+		SearchStore:       &storeSearch,
+		RefreshTokenStore: &storeRefreshToken,
+		BlogStore:         &storeBlog,
 	}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
@@ -44,13 +47,15 @@ func main() {
 
 	router.HandleFunc("/login", controller.LoginPostHandler()).Methods("POST")
 	router.HandleFunc("/login", controller.LoginGetHandler()).Methods("GET")
+	router.HandleFunc("/logout", controller.LogoutGetHandler()).Methods("GET")
 
 	subrouter := router.PathPrefix("/").Subrouter()
-	subrouter.Use(mux.MiddlewareFunc(authentication.Content))
+	subrouter.Use(authentication.ValidateTokenMiddleware(&storeRefreshToken, &storeUser))
 
 	subrouter.HandleFunc("/mypage", controller.MyPageGetHandler()).Methods("GET")
 	subrouter.HandleFunc("/petcabinet", controller.PetPostHandler()).Methods("POST")
 	subrouter.HandleFunc("/petcabinet", controller.PetGetHandler()).Methods("GET")
+
 	subrouter.HandleFunc("/forum", controller.ViewTopicsHandler()).Methods("GET")
 	subrouter.HandleFunc("/forum/submit", controller.NewTopicHandler()).Methods("POST")
 	subrouter.HandleFunc("/forum/submit", controller.NewTopicHandler()).Methods("GET")
@@ -61,13 +66,27 @@ func main() {
 		negroni.Wrap(http.HandlerFunc(controller.MyPageGetHandler())),
 	))
 
+
+	subrouter.HandleFunc("/forum", controller.TopicsHandler()).Methods("GET")
+	subrouter.HandleFunc("/forum", controller.TopicsHandler()).Methods("POST")
+	subrouter.HandleFunc("/forum/topic/{id}/comments", controller.CommentsHandler()).Methods("GET")
+	subrouter.HandleFunc("/forum/topic/{id}/comments", controller.CommentsHandler()).Methods("POST")
+
+	subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
+	subrouter.HandleFunc("/", controller.MyPageGetHandler())
+
+	subrouter.HandleFunc("/", controller.GetBlogHandler)
+	subrouter.HandleFunc("/process", controller.CreateBlogHandler)
+	subrouter.HandleFunc("/delete", controller.DeleteBlogHandler)
+	router.HandleFunc("/upload", controllers.UploadFile)
+
+
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
 		http.FileServer(http.Dir("./web/static/"))))
 
 	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
 
-	// Is it proper way to handle ListenAndServe() error?
-	if err:= http.ListenAndServe(":8080", loggedRouter); err !=nil {
+	if err := http.ListenAndServe(":8080", loggedRouter); err != nil {
 		logger.FatalError(err, "Error occurred, while trying to listen and serve a server")
 	}
 }

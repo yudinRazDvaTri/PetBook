@@ -1,0 +1,31 @@
+
+.box{
+    display:inline-block;
+    margin-left: 15%;
+    margin-right: 85%;
+}
+.box input[type = "text"]{
+    border:0;
+    color: #3a3537;
+    font-size: 16px;
+    background: none;
+    display: block;
+    margin: 20px auto;
+    text-align: center;
+    border: solid black;
+    background: #ccffff;
+    padding: 14px 10px;
+    width: 800px;
+    outline: none;
+    border-radius: 10px;
+    transition: 0.25s;
+}
+.box input[type = "submit"]{
+    margin-left: 70%;
+    margin-top: -3%;
+    width: 100px;
+    height: 35px;
+    border: solid black;
+    background: #99FFCC;
+    border-radius: 10%;
+}

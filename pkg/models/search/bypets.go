@@ -55,3 +55,4 @@ func (f *SearchStore) GetFilterPets(m map[string]string) (pets []*DispPet, err e
 	}
 	return
 }
+

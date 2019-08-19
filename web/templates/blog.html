@@ -1,0 +1,53 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html >
+<head>
+    <meta charset="UTF-8">
+    <title>Result product</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/blog.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script>
+        function ConfirmDelete(){
+            return confirm("Do you want to remove this post?");
+        }
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <h2>Blog</h2>
+    <div class="box">
+    <form action="/process" method="post">
+        <input type="text" id="message" name="something">
+        <input type="submit">
+    </form>
+    </div>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th width="5%"></th>
+            <th width="5%"></th>
+            <th width="55%"></th>
+            <th width="5%"></th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {{range . }}
+            <tr>
+                <td>{{.PetName}}</td>
+                <td>{{.Date | fdate}}</td>
+                <td>{{ .Message }}</td>
+                <td><a href="/delete?recordid={{.Id}}" class="btn btn-danger" onclick="return ConfirmDelete();">X</a></td>
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>
+{{end}}
