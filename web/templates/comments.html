@@ -25,7 +25,7 @@
     </div>
         <div style="margin-top: 10%">
                 {{ range .ViewComments }}
-                        <div class="container" >
+                        <div class="container">
                             <h6>{{ .Content }}</h6>
                             <small>{{ .UserName}}</small>
                             <br>
@@ -40,7 +40,7 @@
 
     <div class="container">
         <form method="POST">
-            <textarea rows="4" cols="20" name="content" placeholder="content"></textarea>
+            <textarea rows="4" cols="20" name="content" placeholder="content" required></textarea>
             <input type="submit" value="Comment">
         </form>
     </div>
