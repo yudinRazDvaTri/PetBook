@@ -1,10 +1,6 @@
 package controllers
 
 import (
-<<<<<<< HEAD
-
-=======
->>>>>>> 33da165b570923ea35adf2a6e39c20edf1aeb2b9
 	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/view"
 	"net/http"
@@ -13,18 +9,18 @@ import (
 func (c *Controller) ViewSearchHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		section := r.URL.Query().Get("section")
-		if section=="auto"{
+		if section == "auto" {
 
 		}
-		if section=="user"{
+		if section == "user" {
 			email := r.URL.Query().Get("email")
-			if email!=""{
+			if email != "" {
 				pet, err := c.SearchStore.GetByUser(email)
 				if err != nil {
 					logger.Error(err)
 				}
 				view.GenerateHTML(w, pet, "view_animal")
-			}else{
+			} else {
 				pets, err := c.SearchStore.GetAllPets()
 				if err != nil {
 					logger.Error(err)
@@ -32,42 +28,41 @@ func (c *Controller) ViewSearchHandler() http.HandlerFunc {
 				view.GenerateHTML(w, pets, "search_by_user")
 			}
 
-<<<<<<< HEAD
 		}
-		if section=="animal"{
+		if section == "animal" {
 			view.GenerateHTML(w, "Forum", "navbar")
-			m:= make(map[string]string)
+			m := make(map[string]string)
 			age := r.URL.Query().Get("age")
 			if age != "" {
-				m["age"]=age
+				m["age"] = age
 			}
 			animalType := r.URL.Query().Get("type")
 			if animalType != "" {
-				m["animal_type"]= animalType
+				m["animal_type"] = animalType
 			}
 			breed := r.URL.Query().Get("breed")
 			if breed != "" {
-				m["breed"]= breed
+				m["breed"] = breed
 			}
 			weight := r.URL.Query().Get("weight")
 			if weight != "" {
-				m["weight"]= weight
+				m["weight"] = weight
 			}
 			gender := r.URL.Query().Get("gender")
 			if gender != "" {
-				m["gender"]= gender
+				m["gender"] = gender
 			}
-			name:=r.URL.Query().Get("name")
-			if name !="" {
+			name := r.URL.Query().Get("name")
+			if name != "" {
 				m["name"] = name
 			}
-			if len(m)==0 {
+			if len(m) == 0 {
 				pets, err := c.SearchStore.GetAllPets()
 				if err != nil {
 					logger.Error(err)
 				}
 				view.GenerateHTML(w, pets, "search_by_animals")
-			} else{
+			} else {
 				filterPets, err := c.SearchStore.GetFilterPets(m)
 				if err != nil {
 					logger.Error(err)
@@ -75,10 +70,9 @@ func (c *Controller) ViewSearchHandler() http.HandlerFunc {
 				view.GenerateHTML(w, filterPets, "search_by_animals")
 			}
 		}
-		if section=="forum"{
+		if section == "forum" {
 
-=======
-		view.GenerateHTML(w, pets, "searchAnimals")
+		}
 	}
 }
 
