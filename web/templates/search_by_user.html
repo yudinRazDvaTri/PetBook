@@ -1,0 +1,53 @@
+{{ define "layout"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../static/search.css">
+</head>
+<body>
+        <h1>Search</h1>
+        <div id="search_menu" class="box">
+
+                <input type="text" name="email" id="search">
+                <input type="submit" id="search_button" value="Send">
+
+        </div>
+        <div class="sections">
+                <a class="menu" href="/search?section=auto"><span>Search by all</span></a>
+                <a class="menu" href="/search?section=user"><span>Search by user</span></a>
+                <a class="menu" href="/search?section=animal"><span>Search by animal</span></a>
+        </div>
+        <ul>
+                {{ range . }}
+                    <div class="result">
+                        {{ .Name }} <br> {{ .Description }}
+                    </div>
+                {{ else }}
+                    <div class="result">
+                        <h2>Nothing to show</h2>
+                    </div>
+                {{ end}}
+            </ul>
+        <script>
+            var url = window.location.href;
+            document.getElementById('search_button').addEventListener("click", function(){
+                let str, newUrl = url;
+                let email = document.getElementById('search').value;
+                let decodeEmail = email.replace(/@/,'%40')
+                if (email!="") {
+                    if(newUrl.match(/email=\S+/)){
+                        str = newUrl.replace(/email=\S+/,"email="+decodeEmail);
+                        newUrl = str;
+                    }else{
+                        newUrl+="&email="+decodeEmail;
+                    };
+                };
+                window.location.replace(newUrl);
+            })
+        </script>
+</body>
+</html>
+
+{{ end }}
