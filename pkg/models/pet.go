@@ -3,8 +3,8 @@ package models
 import (
 	//"github.com/dpgolang/PetBook/pkg/logger"
 	"fmt"
-
 	"github.com/jmoiron/sqlx"
+	"log"
 )
 
 type Pet struct {
@@ -25,6 +25,8 @@ type PetStore struct {
 type PetStorer interface {
 	RegisterPet(pet *Pet) error
 	DisplayName(userID int) (name string, err error)
+	GetPetEnums() []string
+	UpdatePet(pet *Pet)
 }
 
 // TODO: rewrite to update into
@@ -38,9 +40,7 @@ func (c *PetStore) RegisterPet(pet *Pet) error {
 }
 
 func (c *PetStore) DisplayName(userID int) (name string, err error) {
-
 	var email, petName string
-
 	err = c.DB.QueryRow(
 		`SELECT email FROM users WHERE id = $1`, userID).Scan(&email)
 	if err != nil {
@@ -54,4 +54,28 @@ func (c *PetStore) DisplayName(userID int) (name string, err error) {
 	name = email + "/" + petName
 
 	return
+}
+func (p *PetStore) UpdatePet(pet *Pet) {
+	_, err := p.DB.Exec("update pets set name=$1, age=$2,animal_type=$3, breed =$4,weight=$5,gender=$6,description=$7 where user_id = $8",
+		pet.Name, pet.Age, pet.PetType, pet.Breed, pet.Weight, pet.Gender, pet.Description, pet.ID)
+	if err != nil {
+		log.Println(err)
+	}
+}
+func (p *PetStore) GetPetEnums() []string {
+	var petType []string
+	var ptype string
+	rows, err := p.DB.Queryx("SELECT unnest(enum_range(NULL::kind_of_animal))::text")
+	if err != nil {
+		fmt.Println("Error in getting enums")
+	}
+	for rows.Next() {
+		err = rows.Scan(&ptype)
+		if err != nil {
+			logFatal(err)
+		}
+		petType = append(petType, ptype)
+	}
+	fmt.Println(petType)
+	return petType
 }

@@ -1,0 +1,135 @@
+{{ define "layout"}}
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+        <link rel="stylesheet" href="../static/search.css">
+    </head>
+    <body>
+    <h1>Search</h1>
+    <div id="search_menu" class="box">
+        <input type="text" name="email" id="search">
+        <input type="submit" id="search_button" value="Search">
+    </div>
+    <div class="sections">
+        <a class="menu"href="/search?section=auto"><span>Search by all</span></a><br>
+        <a class="menu"href="/search?section=user"><span>Search by user</span></a><br>
+        <a class="menu"href="/search?section=animal"><span>Search by animal</span></a>
+    </div>
+
+    <ul>
+        {{ range . }}
+            <div class="result">
+                {{ .Name }} <br> {{ .Description }}
+            </div>
+        {{ else }}
+            <div class="result">
+                <h2>Nothing to show</h2>
+            </div>
+        {{ end}}
+    </ul>
+    <div class="filters" >
+        <label for="age">Enter pet's age:</label>
+        <input type="number" id="age" name="age" min="0" max="30" step="1"  placeholder="age">
+        <label for="type">Enter animal type:</label>
+        <input id="type" list="animal_type" name="type" /></label>
+        <datalist id="animal_type">
+            <option value="dog">
+            <option value="cat">
+            <option value="fish">
+            <option value="rodent">
+            <option value="bird">
+        </datalist>
+        <label for="breed">Enter animal breed</label>
+        <input type="text" name="breed" id="breed">
+        <label for="weight">Enter pet's weight:</label>
+        <input type="number" id="weight" name="weight" min="0" max="50" step="1" placeholder="weight">
+        <label for="gender">Choose animal gender</label>
+        <input id="gender" list="sex" name="gender">
+        <datalist id="sex">
+            <option value="male">
+            <option value="female">
+        </datalist>
+        <input type="submit" id="apply" value="Apply">
+        <input type="submit" id="reset_parameters" value="Reset parameters" href="/search?section=animal">
+    </div>
+
+    <script>
+        let url = window.location.href;
+        document.getElementById('search_button').addEventListener("click", function(){
+            let str, newUrl = url;
+            let name = document.getElementById('search').value;
+            if (name!="") {
+                if(newUrl.match(/name=\S+/)){
+                    str = newUrl.replace(/name=\S+/,"name="+name);
+                    newUrl = str;
+                }else{
+                    newUrl+="&name="+name;
+                };
+            };
+            window.location.replace(newUrl);
+        });
+        document.getElementById('apply').addEventListener("click", function(){
+            let str
+            let newUrl = url;
+          var age = document.getElementById('age').value;
+          if (age!="") {
+              if(newUrl.match(/age=\d+/)){
+                  str = newUrl.replace(/age=\d+/,"age="+age);
+                  newUrl = str;
+              }else{
+                  newUrl+="&age="+age;
+              };
+          };
+          var type = document.getElementById('type').value;
+          if (type!="") {
+              if(newUrl.match(/type=\w+[^&]/)){
+                  str = newUrl.replace(/type=\w+[^&]/,"type="+type);
+                  newUrl = str;
+              }else{
+                  newUrl+="&type="+type;
+              };
+          };
+          var breed = document.getElementById('breed').value;
+          if (breed!="") {
+              if(newUrl.match(/breed=\w+[^&]/)){
+                  str = newUrl.replace(/breed=\w+[^&]/,"breed="+breed);
+                  newUrl = str;
+              }else{
+                  newUrl+="&breed="+breed;
+              };
+          };
+          var weight = document.getElementById('weight').value;
+          if (weight!="") {
+              if(newUrl.match(/weight=\d+/)){
+                  str = newUrl.replace(/weight=\d+/,"weight="+weight);
+                  newUrl = str;
+              }else{
+                  newUrl+="&weight="+weight;
+              };
+          };
+          var gender = document.getElementById('gender').value;
+           if(gender!=""){
+               if(newUrl.match(/gender=\w+[^&]/)){
+                   str = newUrl.replace(/gender=\w+[^&]/,"gender="+gender);
+                   newUrl = str;
+               }else{
+                   newUrl+="&gender="+gender;
+               };
+           }
+
+          window.location.replace(newUrl);
+        });
+    document.getElementById('reset_parameters').addEventListener("click", function(){
+        url = location.protocol + '//' + location.host + location.pathname + '?section=animal'
+        window.location.replace(url);
+    })
+
+
+    </script>
+    </body>
+    </html>
+
+{{ end }} 

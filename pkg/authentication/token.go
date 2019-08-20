@@ -1,10 +1,15 @@
 package authentication
 
 import (
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/dpgolang/PetBook/pkg/logger"
+	"github.com/dpgolang/PetBook/pkg/models"
+	"github.com/dpgolang/PetBook/pkg/utilerr"
 	"github.com/gorilla/context"
 	_ "github.com/lib/pq"
 	"net/http"
+	"time"
 )
 
 type Claims struct {
@@ -12,81 +17,165 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func ValidateTokenMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	c, err := r.Cookie("token")
-	if err != nil {
-		if err == http.ErrNoCookie {
-			http.Redirect(w, r, "/login", http.StatusFound)
-			return
-		}
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	tokenString := c.Value
-	claims := &Claims{}
-
-	//r.Header.Set("Authorization", "Bearer " + tokenString)
-
-	/*token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor,
-	func(token *jwt.Token) (interface{}, error) {
-		return VerifyKey, nil
-	})
-	*/
-
-	//validate token
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return Keys.VerifyKey, nil
-	})
-
-	if err == nil {
-		if token.Valid {
-			context.Set(r, "id", claims.Id)
-			next(w, r)
-		} else {
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
-		}
-	} else {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-	}
+type Tokens struct {
+	AccessTokenValue      string
+	AccessExpirationTime  time.Time
+	RefreshTokenValue     string
+	RefreshExpirationTime time.Time
 }
-func Content(h http.Handler) http.Handler {
-	return http.HandlerFunc(func (w http.ResponseWriter, r * http.Request) {
-		c, err := r.Cookie("token")
-		if err != nil {
-			if err == http.ErrNoCookie {
-				http.Redirect(w, r, "/login", http.StatusFound)
-				return
-			}
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
 
-		tokenString := c.Value
-		claims := &Claims{}
+func ValidateTokenMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *models.UserStore) (mw func(http.Handler) http.Handler) {
+	mw = func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			accessToken, err := r.Cookie("accessToken")
+			if err != nil {
+				refreshToken, err := r.Cookie("refreshToken")
+				if err != nil {
+					http.Redirect(w, r, "/login", http.StatusFound)
+					return
+				}
 
-		//r.Header.Set("Authorization", "Bearer " + tokenString)
+				refreshTokenString := refreshToken.Value
+				claims := &Claims{}
 
-		/*token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor,
-		func(token *jwt.Token) (interface{}, error) {
-			return VerifyKey, nil
-		})
-		*/
+				//validate refresh token
+				token, err := jwt.ParseWithClaims(refreshTokenString, claims, func(token *jwt.Token) (interface{}, error) {
+					return Keys.VerifyKey, nil
+				})
 
-		//validate token
-		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-			return Keys.VerifyKey, nil
-		})
+				if err == nil {
+					err := storeRefreshToken.RefreshTokenExists(claims.Id, refreshTokenString)
+					if err != nil {
 
-		if err == nil {
-			if token.Valid {
-				context.Set(r, "id", claims.Id)
+						switch e := err.(type) {
+						case *utilerr.TokenDoesNotExist:
+							http.Redirect(w, r, "/login", http.StatusSeeOther)
+							return
+						default:
+							logger.Error(e)
+							http.Error(w, e.Error(), http.StatusInternalServerError)
+							return
+						}
+					}
+
+					if token.Valid {
+						tokens, err := GenerateTokenPair(claims.Id)
+						if err != nil {
+							logger.Error(err)
+							http.Error(w, err.Error(), http.StatusInternalServerError)
+							return
+						}
+
+						http.SetCookie(w, &http.Cookie{
+							Name:    "accessToken",
+							Value:   tokens.AccessTokenValue,
+							Expires: tokens.AccessExpirationTime,
+						})
+
+						err = storeRefreshToken.UpdateRefreshToken(claims.Id, tokens.RefreshTokenValue, tokens.RefreshExpirationTime)
+						if err != nil {
+							logger.Error(err)
+							http.Error(w, err.Error(), http.StatusInternalServerError)
+							return
+						}
+
+						http.SetCookie(w, &http.Cookie{
+							Name:    "refreshToken",
+							Value:   tokens.RefreshTokenValue,
+							Expires: tokens.RefreshExpirationTime,
+						})
+
+						context.Set(r, "id", claims.Id)
+
+						_, err = storeUser.GetPet(claims.Id)
+
+						if err != nil {
+							context.Set(r, "pet", false)
+						} else {
+							context.Set(r, "pet", true)
+						}
+
+					} else {
+						http.Redirect(w, r, "/login", http.StatusSeeOther)
+						return
+					}
+				} else {
+					http.Redirect(w, r, "/login", http.StatusSeeOther)
+					return
+				}
+
 			} else {
-				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				accessTokenString := accessToken.Value
+				claims := &Claims{}
+
+				//validate access token
+				token, err := jwt.ParseWithClaims(accessTokenString, claims, func(token *jwt.Token) (interface{}, error) {
+					return Keys.VerifyKey, nil
+				})
+
+				if err == nil {
+					if token.Valid {
+						context.Set(r, "id", claims.Id)
+
+						_, err = storeUser.GetPet(claims.Id)
+
+						if err != nil {
+							context.Set(r, "pet", false)
+						} else {
+							context.Set(r, "pet", true)
+						}
+
+					} else {
+						http.Redirect(w, r, "/login", http.StatusSeeOther)
+						return
+					}
+				} else {
+					http.Redirect(w, r, "/login", http.StatusSeeOther)
+					return
+				}
 			}
-		} else {
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
-		}
-		h.ServeHTTP(w, r)
-	})
+			h.ServeHTTP(w, r)
+		})
+	}
+	return
+}
+
+// Generating new pair of access and refresh token when user is logging or when tokens expire
+func GenerateTokenPair(userID int) (Tokens, error) {
+	var tokens Tokens
+
+	tokens.AccessExpirationTime = time.Now().Add(1 * time.Minute)
+	accessClaims := &Claims{
+		Id: userID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: tokens.AccessExpirationTime.Unix(),
+		},
+	}
+
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodRS256, accessClaims)
+	accessTokenString, err := accessToken.SignedString(Keys.SignKey)
+
+	if err != nil {
+		return tokens, fmt.Errorf("Error occurred while trying to sign access token: %v.\n", err)
+	}
+	tokens.AccessTokenValue = accessTokenString
+
+	tokens.RefreshExpirationTime = time.Now().Add(60 * 24 * time.Hour)
+	refreshClaims := &Claims{
+		Id: userID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: tokens.RefreshExpirationTime.Unix(),
+		},
+	}
+
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodRS256, refreshClaims)
+	refreshTokenString, err := refreshToken.SignedString(Keys.SignKey)
+
+	if err != nil {
+		return tokens, fmt.Errorf("Error occurred while trying to sign refresh token: %v.\n", err)
+	}
+
+	tokens.RefreshTokenValue = refreshTokenString
+
+	return tokens, nil
 }

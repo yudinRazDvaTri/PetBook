@@ -62,22 +62,44 @@ func (c *UserStore) GetUser(userID int) (User, error) {
 }
 
 func (c *UserStore) Register(user *User) error {
-	_, err := c.DB.Exec("insert into users (email, firstname, lastname, login, password) values ($1,$2,$3, $4, $5)",
-		user.Email, user.Firstname, user.Lastname, user.Login, user.Password)
-
+	tx, err := c.DB.Begin()
 	if err != nil {
-		if _, ok := err.(*pq.Error); ok {
-			return &utilerr.UniqueTaken{Description: "Id or login has already been taken!"}
-		}
-		return fmt.Errorf("Error occurred while trying to add new user: %v.\n", err)
+		return fmt.Errorf("Error occurred while trying to begin transaction: %v.\n", err)
 	}
 
-	return nil
+	{
+
+		err = tx.QueryRow("insert into users (email, firstname, lastname, login) values ($1,$2,$3, $4) returning id",
+			user.Email, user.Firstname, user.Lastname, user.Login).Scan(&user.ID)
+
+		if err != nil {
+			if _, ok := err.(*pq.Error); ok {
+				err = &utilerr.UniqueTaken{Description: "Id or login has already been taken!"}
+			} else {
+				err = fmt.Errorf("Error occurred while trying to add new user: %v.\n", err)
+			}
+			tx.Rollback()
+			return err
+		}
+	}
+
+	{
+		_, err = tx.Exec("insert into passwords (user_id, password_string) values ($1, $2)",
+			user.ID, user.Password)
+
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("Error occurred while trying to set user's passwordL %v.\n", err)
+		}
+	}
+
+	return tx.Commit()
 }
 
 func (c *UserStore) ChangePassword(user *User, newPassword string) error {
-	res, err := c.DB.Exec("UPDATE users SET password=$1 WHERE email = $2",
-		newPassword, user.Email)
+	res, err := c.DB.Exec("UPDATE passwords SET password_string = $1 WHERE user_id = $2",
+		newPassword, user.ID)
+
 	if err != nil {
 		return fmt.Errorf("Error occurred while trying to update user in db: %v.\n", err)
 	}
@@ -88,7 +110,7 @@ func (c *UserStore) ChangePassword(user *User, newPassword string) error {
 	}
 
 	if num != 1 {
-		return &utilerr.WrongEmail{Email: user.Email}
+		return &utilerr.WrongCredentials{Description: "Wrong email or password."}
 	}
 
 	user.Password = newPassword
@@ -98,17 +120,19 @@ func (c *UserStore) ChangePassword(user *User, newPassword string) error {
 func (c *UserStore) Login(email, userPassword string) (int, error) {
 	var passwordFromBase string
 	var idFromBase int
-	err := c.DB.QueryRow("select password, id from users where email=$1", email).Scan(&passwordFromBase, &idFromBase)
+	err := c.DB.QueryRow(`SELECT password_string, user_id FROM passwords, users 
+								WHERE users.email=$1 
+								AND passwords.user_id = users.id`, email).Scan(&passwordFromBase, &idFromBase)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return 0, &utilerr.WrongEmail{email}
+			return 0, &utilerr.WrongCredentials{Description: "Wrong email or password."}
 		}
 		return 0, fmt.Errorf("Error occurred while trying to login user: %v.\n", err)
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(passwordFromBase), []byte(userPassword)); err != nil {
-		return 0, &utilerr.WrongPassword{Description: "Invalid password."}
+		return 0, &utilerr.WrongCredentials{Description: "Wrong email or password."}
 	}
 	return idFromBase, nil
 }

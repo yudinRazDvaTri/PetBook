@@ -1,0 +1,32 @@
+/*body{*/
+/*    margin: 0;*/
+/*    padding: 0;*/
+/*    font-family: sans-serif;*/
+/*    background-image: url("background2CLOSED.jpg");*/
+/*    background-size: 100%;*/
+/*}*/
+
+/*.box{*/
+/*    display:inline-block;*/
+/*    margin-left: 15%;*/
+/*    margin-right: 85%;*/
+/*}*/
+/*.box input[type = "text"]{*/
+/*    border: 1px solid green;*/
+/*    background: #ffffff;*/
+/*    padding: 14px 10px;*/
+/*    width: 600px;*/
+/*    height: 100px;*/
+/*    outline: none;*/
+/*    border-radius: 10px;*/
+/*    transition: 0.25s;*/
+/*}*/
+/*.box input[type = "submit"]{*/
+/*    margin-left: 101%;*/
+/*    margin-top: -15%;*/
+/*    width: 100px;*/
+/*    height: 35px;*/
+/*    border: solid black;*/
+/*    background: #99FFCC;*/
+/*    border-radius: 10%;*/
+/*}*/
