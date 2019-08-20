@@ -76,6 +76,5 @@ func (p *PetStore) GetPetEnums() []string {
 		}
 		petType = append(petType, ptype)
 	}
-	fmt.Println(petType)
 	return petType
 }
