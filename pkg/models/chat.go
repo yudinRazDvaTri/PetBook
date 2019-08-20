@@ -9,22 +9,24 @@ import (
 )
 
 type MessageToView struct {
+	ToID      int    `json:"toid", omitempty`
+	FromID    int    `json:"fromid", omitempty`
 	Username  string `json:"username"`
 	Message   string `json:"message"`
 	CreatedAt string `json:"created_at"`
 }
 
 type Message struct {
-	ID        int       `json:"email", omitemnty db:"id"`
-	ToID      int       `db:"to_id"`
-	FromID    int       `db:"from_id"`
-	Text      string    `db:"text"`
-	CreatedAt time.Time `db:"created_at"`
+	ID        int       `json:"id", omitemnty db:"id"`
+	ToID      int       `json:"toid" db:"to_id"`
+	FromID    int       `json:"fromid" db:"from_id"`
+	Text      string    `json:"text" db:"text"`
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	Read      bool      `db:"read"`
 }
 
 type Client struct {
-	UserID     int
+	ID         int
 	Connection *websocket.Conn
 }
 
