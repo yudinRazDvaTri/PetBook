@@ -32,7 +32,7 @@ func logFatal(err error) {
 }
 
 func (b *BlogStore) GetBlog(userID int) []Blog {
-	rows, err := b.DB.Query("select blog_id,pets.user_id,name,created_time,content from blog,pets where pets.user_id  = $1 ", userID)
+	rows, err := b.DB.Query("select blog_id,pets.user_id,name,created_time,content from blog,pets where pets.user_id  = $1 order by created_time desc ", userID)
 	if err != nil {
 		logFatal(err)
 	}

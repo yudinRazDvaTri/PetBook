@@ -14,16 +14,12 @@ func (c *Controller) MyPageGetHandler() http.HandlerFunc {
 			http.Redirect(w, r, "/petcabinet", http.StatusFound)
 			return
 		}
-		//tmpl, _ := template.ParseFiles("web/templates/mypage.html")
-		//tmpl.Execute(w, pet)
 		blog := c.BlogStore.GetBlog(userID)
-		//tmp2,_:=template.ParseFiles("web/templates/blog.html")
-		//tmp2.Execute(w, blog)
-		//view.GenerateHTML(w, pet, "mypage")
-
 		view.GenerateHTML(w, "MYPAGE", "navbar")
 		view.GenerateHTML(w, pet, "mypage")
 		view.GenerateTimeHTML(w, blog, "blog")
 		view.GenerateHTML(w, nil, "footer")
 	}
+
 }
+

@@ -12,17 +12,22 @@
         <form method="POST" action="/petcabinet">
             <h1>Pet Registration</h1>
             <input type="text" name="nickname" placeholder="Pet nickname"/>
-            <label>Animal type</label>
-            <select name="pet-type">
-                <option name="cat">cat</option>
-                <option name="dog">dog</option>
-                <option name="fish">fish</option>
+{{/*            <label>Animal type</label>*/}}
+
+            <select name="pet-type" class="custom-select">
+                <option selected>Pet type</option>
+                {{range .}}
+                    <option >{{.}}</option>
+                {{end}}
             </select>
+
+
             <input type="text" name="breed" placeholder="Pet breed"/>
-            <input type="text" name="age" placeholder="Pet age"/>
-            <input type="text" name="weight" placeholder="Pet weight"/>
-            <label>Pet gender</label>
-            <select name="gender" >
+            <input type="number"  name="age" placeholder="Pet age"/>
+            <input type="number" step="0.2" name="weight" placeholder="Pet weight"/>
+{{/*            <label>Pet gender</label>*/}}
+            <select name="gender" class="custom-select">
+                <option selected>Gender</option>
                 <option name="male">male</option>
                 <option name="female">female</option>
             </select>

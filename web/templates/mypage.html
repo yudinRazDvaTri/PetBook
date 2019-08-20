@@ -17,17 +17,12 @@
 
     <!--  NAVBAR-->
     <body style="height: 100%; padding-bottom: 80px">
-
-{{/*    {{template "navbar" .}}*/}}
-{{/*{{template "navbar" .}}*/}}
-{{/*{{.navbar}}}*/}}
-
     <div class="container">
-        <h1 style="margin-bottom: 15px">TEST bootstrap</h1>
+        <h1 style="margin-bottom: 15px;color: #337ab7">▍{{.Name}}</h1>
         <div class="row">
 
             <!--   PHOTO CARUSEL-->
-            <div class="col-lg-4 col-md-4 col-sm-12">
+            <div class="col-lg-4 col-md-4 col-sm-12" style="width: 70px;height: 200px">
                 <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
                     <ol class="carousel-indicators">
                         <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
@@ -36,13 +31,13 @@
                     </ol>
                     <div class="carousel-inner">
                         <div class="carousel-item active">
-                            <img class="d-block w-100" src="../storage/1-92-980_11.jpeg" alt="Первый слайд">
+                            <img class="d-block w-100" src="../static/background.jpg" alt="Первый слайд">
                         </div>
                         <div class="carousel-item">
-                            <img class="d-block w-100" src="../storage/1-92-980_12.jpeg" alt="Второй слайд">
+                            <img class="d-block w-100" src="../static/background.jpg" alt="Второй слайд">
                         </div>
                         <div class="carousel-item">
-                            <img class="d-block w-100" src="../storage/1-92-980_14.jpeg" alt="Третий слайд">
+                            <img class="d-block w-100" src="../static/background.jpg" alt="Третий слайд">
                         </div>
                     </div>
                     <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
@@ -54,28 +49,18 @@
                         <span class="sr-only">Next</span>
                     </a>
                 </div>
-                <!-- EDIT IMAGE
-                    <div class="row">
-
-                    <button class="btn btn-outline-secondary">Edit</button>
-                       </div>
-                -->
             </div>
 
 
             <!--   CHARACTERISTICS-->
             <div class="col-lg-8 col-md-8 col-sm-12 desc">
-
-                <h3><font color="#3AC1EF">▍
-
-                        {{.Name}}
-
-                        {{/*                    {{range . }}*/}}
-                        {{/*                        {{.Name}}*/}}
-                        {{/*                    {{end}}*/}}
-                    </font></h3>
+{{/*                <h3><font color="337ab7"*/}}
+{{/*                            color="#3AC1EF"*/}}
+{{/*                    >▍*/}}
+{{/*                        {{.Name}}*/}}
+{{/*                    </font></h3>*/}}
                 <p>
-                <table>
+                <table >
                     <thead><tr><th>Age</th><td>{{.Age}}</td><td></tr>
                     <thead><tr><th>Pet type</th><td>{{.PetType}}</td><td></tr>
                     <thead><tr><th>Breed</th><td>{{.Breed}}</td><td></tr>
@@ -83,68 +68,32 @@
                     <thead><tr><th>Weight</th><td>{{.Weight}}</td><td></tr>
                     <thead><tr><th>Gender</th><td>{{.Gender}}</td><td></tr>
                 </table>
-                {{/*            <table>*/}}
-                {{/*                <thead><tr><th>Age</th>{{range .}}<td>{{.Age}}</td><td></tr>{{end}}*/}}
-                {{/*                <thead><tr><th>Pet type</th>{{range .}}<td>{{.PetType}}</td><td></tr>{{end}}*/}}
-                {{/*                <thead><tr><th>Breed</th>{{range .}}<td>{{.Breed}}</td><td></tr>{{end}}*/}}
-                {{/*                <thead><tr><th>Description</th>{{range .}}<td>{{.Description}}</td><td></tr>{{end}}*/}}
-                {{/*                <thead><tr><th>Weight</th>{{range .}}<td>{{.Weight}}</td><td></tr>{{end}}*/}}
-                {{/*                <thead><tr><th>Gender</th>{{range .}}<td>{{.Gender}}</td><td></tr>{{end}}*/}}
-                {{/*            </table>*/}}
                 </p>
-                <button class="btn btn-outline-secondary">Edit</button>
+{{/*                <button class="btn btn-outline-secondary">Edit</button>*/}}
             </div>
         </div>
 
 
         <!--   BUTTONS-->
         <div class="row" style="margin-top: 5px ">
-            <div class="col-md-12" style="background-color: bisque">
-                <button class="btn btn-outline-secondary">Forum</button>
-                <button class="btn btn-outline-secondary">Friends</button>
-                <button class="btn btn-outline-secondary">Chats</button>
-                <button class="btn btn-outline-secondary">Settings</button>
-                <input type="search" style="float: right; padding: 5px">
-                <input type="button" value="Search" style="float: right; padding: 5px">
+            <div class="col-md-12"
+{{/*                 style="background-color: bisque"*/}}
+            >
+                <form>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                    <button class="btn btn-primary" formaction="/forum">Forum</button>
+                    <button class="btn btn-primary disabled" formaction="/">Friends</button>
+                    <button class="btn btn-primary disabled" formaction="/">Chats</button>
+                    <button class="btn btn-primary" formaction="/edit">Settings</button>
+                    <button class="btn btn-primary" formaction="/search">Search</button>
+                    {{/*                    <input type="search" style="float: right; padding: 5px">*/}}
+{{/*                    <input type="button" value="Search" style="float: right; padding: 5px">*/}}
+
+                    </div>
+                </form>
             </div>
         </div>
-
-
-        {{/*    <!--   ADD POST   -->*/}}
-        {{/*    <div class="row">*/}}
-        {{/*        <div class="col-md-10" style="background-color: coral">*/}}
-        {{/*            <div class="form-group">*/}}
-        {{/*                <label for="exampleFormControlTextarea1">Add some posts</label>*/}}
-        {{/*                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>*/}}
-        {{/*            </div>*/}}
-        {{/*        </div>*/}}
-        {{/*        <div class="col-md-2" style="background-color: coral">*/}}
-        {{/*            <button class="btn btn-outline-secondary">Send</button>*/}}
-        {{/*        </div>*/}}
-        {{/*    </div>*/}}
-
-        {{/*    <!--    VIEW POSTS-->*/}}
-        {{/*    <div class="row">*/}}
-        {{/*        <div class="col-md-10" style="background-color: coral">*/}}
-        {{/*            <div class="jumbotron">*/}}
-        {{/*                <h1 class="display-4">Hello, world!</h1>*/}}
-        {{/*                <p class="lead">Here will be pets posts.</p>*/}}
-        {{/*                <hr class="my-4">*/}}
-        {{/*                <p>To read the whole post - clic button .</p>*/}}
-        {{/*                <p class="lead">*/}}
-        {{/*                    <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>*/}}
-        {{/*                </p>*/}}
-        {{/*            </div>*/}}
-        {{/*        </div>*/}}
-        {{/*        <div class="col-md-2" style="background-color: coral">*/}}
-        {{/*            <img src="stair.jpeg" alt="..." class="rounded" width="75" height="75">*/}}
-        {{/*        </div>*/}}
-        {{/*    </div>*/}}
     </div>
-
-    <!--     FOOTER-->
-{{/*{{template "footer" .}}*/}}
-{{/*    {{.footer}}*/}}
     </body>
     </html>
 

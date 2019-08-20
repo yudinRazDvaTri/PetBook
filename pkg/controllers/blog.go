@@ -30,10 +30,10 @@ func (c *Controller) CreateBlogHandler(w http.ResponseWriter, r *http.Request) {
 
 func (c *Controller) DeleteBlogHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Redirect(w, r, "/", 501)
+		http.Redirect(w, r, "/mypage", 501)
 		return
 	}
 	blogid := r.FormValue("recordid")
 	c.BlogStore.DeleteBlog(blogid)
-	http.Redirect(w, r, "/", 301)
+	http.Redirect(w, r, "/mypage", 301)
 }
