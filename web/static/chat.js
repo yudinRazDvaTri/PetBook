@@ -25,14 +25,14 @@ new Vue({
 
     methods: {
         send: function () {
-            var now = new Date();
-            now = now.toString();
+            // var now = new Date();
+            // now = now.toString();
             if (this.newMsg != '') {
                 this.ws.send(
                     JSON.stringify({
                         username: this.username,
-                        message: $('<p>').html(this.newMsg).text(), // Strip out html
-                        created_at: now
+                        message: $('<p>').html(this.newMsg).text() // Strip out html
+                        //created_at: now
                     }
                 ));
                 this.newMsg = ''; // Reset newMsg
