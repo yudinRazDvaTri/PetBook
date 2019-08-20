@@ -1,3 +1,4 @@
+{{define "layout"}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,8 +13,20 @@
         action="http://localhost:8080/upload"
         method="post"
 >
-    <input type="file" name="myFile" />
+    <input type="file"  name="myFile" />
     <input type="submit" value="upload" />
+
+    <div class="input-group mb-3">
+        <div class="custom-file">
+            <input type="file" class="custom-file-input" id="inputGroupFile02">
+            <label class="custom-file-label" for="inputGroupFile02">Choose file</label>
+        </div>
+        <div class="input-group-append">
+            <span class="input-group-text" id="">Upload</span>
+        </div>
+    </div>
+
 </form>
 </body>
 </html>
+{{end}}

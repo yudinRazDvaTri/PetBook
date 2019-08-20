@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 )
 
 func UploadFile(w http.ResponseWriter, r *http.Request) {
@@ -21,6 +22,9 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("File Size: %+v\n", handler.Size)
 	fmt.Printf("MIME Header: %+v\n", handler.Header)
 
+	if _, err := os.Stat("./web/storage"); os.IsNotExist(err) {
+		os.Mkdir("./web/storage", os.ModeAppend)
+	}
 	tempFile, err := ioutil.TempFile("./web/storage", "*.png")
 	if err != nil {
 		fmt.Println(err)

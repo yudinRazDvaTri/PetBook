@@ -25,7 +25,6 @@ func (c *Controller) PetPostHandler() http.HandlerFunc {
 			http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
 			return
 		}
-
 		pet := &models.Pet{
 			ID:          id,
 			Name:        r.FormValue("nickname"),
@@ -43,8 +42,11 @@ func (c *Controller) PetPostHandler() http.HandlerFunc {
 		http.Redirect(w, r, "/mypage", http.StatusSeeOther)
 	}
 }
+
+
 func (c *Controller) PetGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		view.GenerateHTML(w, nil, "cabinetPet")
+		petType:=c.PetStore.GetPetEnums()
+		view.GenerateHTML(w,petType, "cabinetPet")
 	}
 }

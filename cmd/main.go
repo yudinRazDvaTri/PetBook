@@ -65,13 +65,16 @@ func main() {
 	subrouter.HandleFunc("/forum/topic/{topicID}/comments", controller.CommentsPostHandler()).Methods("POST")
 	subrouter.HandleFunc("/forum/topic/{topicID}/comments/{commentID}/ratings", controller.CommentsRatingsHandler()).Methods("POST")
 
-	subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
-	subrouter.HandleFunc("/", controller.MyPageGetHandler())
+	//subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
+	subrouter.HandleFunc("/", controller.MyPageGetHandler()).Methods("GET")
 
-	subrouter.HandleFunc("/", controller.GetBlogHandler)
-	subrouter.HandleFunc("/process", controller.CreateBlogHandler)
-	subrouter.HandleFunc("/delete", controller.DeleteBlogHandler)
-	router.HandleFunc("/upload", controllers.UploadFile)
+
+	subrouter.HandleFunc("/process",controller.CreateBlogHandler).Methods("Post")
+	subrouter.HandleFunc("/delete",controller.DeleteBlogHandler)
+	subrouter.HandleFunc("/upload",controllers.UploadFile)
+	subrouter.HandleFunc("/edit",controller.EditHandler).Methods("GET")
+	subrouter.HandleFunc("/edit",controller.UpdateHandler).Methods("POST")
+
 
 
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
