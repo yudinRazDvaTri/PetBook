@@ -20,6 +20,19 @@ type ViewComment struct {
 	Comment
 }
 
+type ByRating []ViewComment
+
+// Methods to sort ViewComments by Rating
+func (v ByRating) Len() int {
+	return len(v)
+}
+func (v ByRating) Swap(i, j int) {
+	v[i], v[j] = v[j], v[i]
+}
+func (v ByRating) Less(i, j int) bool {
+	return v[i].Rating < v[j].Rating
+}
+
 func (f *ForumStore) AddNewComment(topicID, userID int, content string) (err error) {
 	_, err = f.DB.Exec(
 		`insert into comments (topic_id, user_id, content) values ($1, $2, $3);`,
@@ -59,3 +72,4 @@ func (f *ForumStore) GetCommentRating(commentID int) (rating int, err error) {
 	}
 	return
 }
+

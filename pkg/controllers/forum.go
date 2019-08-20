@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"sort"
 	"strconv"
 
 	"github.com/dpgolang/PetBook/pkg/models/forum"
@@ -86,6 +87,8 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 			}
 			viewComments = append(viewComments, forum.ViewComment{userName, rating, comment})
 		}
+
+		sort.Sort(sort.Reverse(forum.ByRating(viewComments)))
 
 		ViewData := struct {
 			ID           int
