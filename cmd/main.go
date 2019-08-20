@@ -65,7 +65,7 @@ func main() {
 	subrouter.HandleFunc("/forum/topic/{topicID}/comments", controller.CommentsPostHandler()).Methods("POST")
 	subrouter.HandleFunc("/forum/topic/{topicID}/comments/{commentID}/ratings", controller.CommentsRatingsHandler()).Methods("POST")
 
-	subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
+	//subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
 	subrouter.HandleFunc("/", controller.MyPageGetHandler()).Methods("GET")
 
 
