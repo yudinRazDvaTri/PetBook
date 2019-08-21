@@ -60,7 +60,6 @@ func (c *Controller) HandleChatConnection() http.HandlerFunc {
 			ID:         fromID,
 			Connection: ws,
 		}
-
 		// Register our new client
 		clients[client] = true
 		messages, err := c.ChatStore.GetMessages(toID, fromID)
