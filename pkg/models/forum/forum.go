@@ -11,7 +11,7 @@ type ForumStorer interface {
 	//Comment Methods
 	AddNewComment(topicID, userID int, content string) (err error)
 	RateComment(commentID, userID int) (bool, error)
-	GetCommentRating(commentID int) (rating int, err error)
+	GetCommentRatings(commentID int) (ratings []int64, err error)
 }
 
 type ForumStore struct {
