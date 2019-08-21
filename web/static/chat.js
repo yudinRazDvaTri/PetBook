@@ -20,7 +20,7 @@ new Vue({
                     + msg.message + '<br/>';
 
             var element = document.getElementById('chat-messages');
-            element.scrollTop = element.scrollHeight - element.clientHeight;; // Auto scroll to the bottom
+            element.scrollTop = element.scrollHeight - element.clientHeight; // Auto scroll to the bottom
         });
     },
 

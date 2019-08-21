@@ -40,7 +40,6 @@ func (c *Controller) HandleChatConnectionGET() http.HandlerFunc {
 			return
 		}
 		view.GenerateHTML(w, nil, "chat")
-
 	}
 }
 

@@ -16,12 +16,19 @@ main {
     overflow-y: scroll;
 }
 .nav-wrapper {
-  background-color: #757575  !important;
+  background-color: #FAFAFA  !important;
+
 }
 .page-footer{
-	  background-color: #757575  !important;
+	  background-color: #FAFAFA  !important;
 }
-
+.nav-wrapper > ul {
+  margin-left: 70px;
+}
+}
+#nav-wrapper  {
+  margin-left: 70px;
+}
 .group {
   position: relative;
   margin-bottom: 30px;
