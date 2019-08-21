@@ -39,8 +39,6 @@ func (c *Controller) HandleChatConnectionGET() http.HandlerFunc {
 			http.Redirect(w, r, "/mypage", http.StatusNotFound)
 			return
 		}
-
-		//view.GenerateTimeHTML(w, "Chat", "navbar")
 		view.GenerateHTML(w, nil, "chat")
 
 	}
@@ -93,14 +91,12 @@ func (c *Controller) HandleChatConnection() http.HandlerFunc {
 			msg.FromID = fromID
 			msg.ToID = toID
 			msg.CreatedAt = time.Now().Format("02-01-2006 15:04:05")
-			// Read in a new message as JSON and map it to a Message object
 			err := ws.ReadJSON(&msg)
 			if err != nil {
 				logger.Error(err)
-				//delete(clients, client) // TODO:fix bug with auto disconnect
+				delete(clients, client)
 				break
 			}
-			// Send the newly received message to the broadcast channel
 			broadcast <- msg
 		}
 	}
