@@ -32,11 +32,10 @@
                                 <br>
                                 <small>{{ .CreatedTime | fdate}}</small>
                                 <small>Rating: {{ len .Likes}}</small>
-
-                                {{ if not (eq .UserID $.ContextUserID)}}
+                                {{ if .CanLike $.ContextUserID }}
 
                                     <input type="submit" value="Like">
-                                    
+
                                 {{end}}
 
                             </form>

@@ -20,6 +20,18 @@ type ViewComment struct {
 	Comment
 }
 
+func (v *ViewComment) CanLike(userID int) bool {
+	if v.UserID == userID {
+		return false
+	}
+	for i := range v.Likes {
+		if int(v.Likes[i]) == userID {
+			return false
+		}
+	}
+	return true
+}
+
 type ByRating []ViewComment
 
 // Methods to sort ViewComments by Rating
