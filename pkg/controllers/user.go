@@ -75,6 +75,7 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 			Name:    "accessToken",
 			Value:   tokens.AccessTokenValue,
 			Expires: tokens.AccessExpirationTime,
+			Path:    "/",
 		})
 
 		if err := c.RefreshTokenStore.UpdateRefreshToken(userID, tokens.RefreshTokenValue, tokens.RefreshExpirationTime); err != nil {
@@ -87,6 +88,7 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 			Name:    "refreshToken",
 			Value:   tokens.RefreshTokenValue,
 			Expires: tokens.RefreshExpirationTime,
+			Path:    "/",
 		})
 
 		_, err = c.UserStore.GetPet(userID)
