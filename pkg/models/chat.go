@@ -17,12 +17,11 @@ type MessageToView struct {
 }
 
 type Message struct {
-	ID        int       `json:"id", omitemnty db:"id"`
+	ID        int       `db:"id"`
 	ToID      int       `json:"toid" db:"to_id"`
 	FromID    int       `json:"fromid" db:"from_id"`
 	Text      string    `json:"text" db:"text"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	Read      bool      `db:"read"`
 }
 
 type Client struct {
@@ -40,12 +39,12 @@ type ChatStore struct {
 }
 
 type ChatStorer interface {
-	GetMessages(user *User) ([]Message, error)
-	//SaveMessage(message *Message) error
+	GetMessages(toID, fromID int) ([]Message, error)
+	SaveMessage(message *Message) error
 }
 
-func (c *ChatStore) GetMessages(user *User) ([]Message, error) {
-	rows, err := c.DB.Query("select * from messages where to_id=$1 or from_id = $1 order by created_at", user.ID)
+func (c *ChatStore) GetMessages(toID, fromID int) ([]Message, error) {
+	rows, err := c.DB.Query("select * from messages where (to_id=$1 and from_id=$2) or (from_id=$1 and to_id= $2) order by created_at", toID, fromID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot make querry: %v", err)
 	}
@@ -58,14 +57,15 @@ func (c *ChatStore) GetMessages(user *User) ([]Message, error) {
 	return messages, nil
 }
 
-// func (c *ChatStore) SaveMessage(message *Message) error {
-// 	_, err := c.DB.Query("insert into messages (to_id, from_id, text,created_at,read) values($1, $2, $3, $4, $5)",
-// 		message.FromID, message.ToID, message.Text, message.CreatedAt, message.Read)
-// 	if err != nil {
-// 		return fmt.Errorf("cannot insert message to messages in pets in db: %v", err)
-// 	}
-// 	return nil
-// }
+func (c *ChatStore) SaveMessage(message *Message) error {
+	_, err := c.DB.Query(`insert into messages (to_id, from_id, text,created_at) select $1,$2,$3,$4
+		WHERE NOT EXISTS (select 1 from messages  where to_id =$1 and from_id = $2 and text = $3 and created_at = $4)`,
+		message.ToID, message.FromID, message.Text, message.CreatedAt)
+	if err != nil {
+		return fmt.Errorf("cannot insert message to messages in db: %v", err)
+	}
+	return nil
+}
 
 //TODO
 // func (c *ChatStore) GetChats(user *User) ([]Chat, error) {
