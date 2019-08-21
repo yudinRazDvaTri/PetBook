@@ -5,7 +5,6 @@ import (
 	"github.com/dpgolang/PetBook/pkg/models"
 	"github.com/dpgolang/PetBook/pkg/view"
 	"github.com/gorilla/context"
-	"log"
 	"net/http"
 )
 
@@ -30,7 +29,6 @@ func (c *Controller) ChatsGetHandler() http.HandlerFunc {
 			}
 			viewChats = append(viewChats, viewChat)
 		}
-		log.Println(viewChats)
 		view.GenerateTimeHTML(w, "Chats", "navbar")
 		view.GenerateTimeHTML(w, viewChats, "chatlist")
 	}
