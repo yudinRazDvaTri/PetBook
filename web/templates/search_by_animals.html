@@ -1,135 +1,182 @@
 {{ define "layout"}}
 
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Title</title>
-        <link rel="stylesheet" href="../static/search.css">
-    </head>
-    <body>
-    <h1>Search</h1>
-    <div id="search_menu" class="box">
-        <input type="text" name="email" id="search">
-        <input type="submit" id="search_button" value="Search">
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../static/search.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+
+    <div id="search_menu" class="w-50 container mb-3 input-group " style="margin-top:10px;">
+        <input type="email" placeholder="Pet's name" class="form-control " name="name" id="search">
+        <div class="input-group-append">
+            <input type="submit" class="btn btn-outline-success btn-secondary" id="search_button" value="Search">
+        </div>
     </div>
-    <div class="sections">
-        <a class="menu"href="/search?section=auto"><span>Search by all</span></a><br>
-        <a class="menu"href="/search?section=user"><span>Search by user</span></a><br>
-        <a class="menu"href="/search?section=animal"><span>Search by animal</span></a>
+    <div class="container">
+        <div class="row">
+            <div class=" .col-sm-1" style="margin-left:-40px;margin-top: 125px;">
+                <div class="btn-group-vertical">
+                    <a class="btn btn-outline-success" href="/search?section=user"><span>Search by
+                            user</span></a><br>
+                    <a class="btn btn-outline-success" href="/search?section=animal"><span>Search by
+                            animal</span></a>
+                    <a class="btn btn-outline-success" href="/search?section=forum"><span>Search by
+                            forum</span></a><br>
+                </div>
+            </div>
+            <div class="col-md-8 ">
+                <ul>
+                    {{ range . }}
+                    <div class="card mb-3 border-success " style="max-width: 35rem;">
+                        <div class="row no-gutters">
+                            <div class="col-md-4">
+                                <!-- <img src="..." class="card-img" alt="..."> -->
+                                <p>PHOTO</p>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body text-success">
+                                    <h5 class="card-title ">{{ .Name }}</h5>
+                                    <p class="card-text">{{ .Description }}</p>
+                                    <a href="#" class="btn btn-outline-success btn-lg" disabled>Add to Friends</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{ else }}
+                        <div class="card mb-3">
+                            <h2>Nothing to show</h2>
+                        </div>
+                        {{ end}}
+                </ul>
+            </div>
+            <div class="filters form-group col-md-1">
+                <label for="age">Enter pet's age:</label>
+                <input type="number" id="age" name="age" min="0" max="30" step="1" placeholder="age"
+                    class="btn-outline-success">
+                <label for="type">Enter animal type:</label>
+                <select name="animal_type" id="type" class="btn-outline-success">
+                    <option selected>Type of animal</option>
+                    <option name="dog">dog</option>
+                    <option name="cat">cat</option>
+                    <option name="fish">fish</option>
+                    <option name="rodent">rodent</option>
+                    <option name="bird">bird</option>
+                </select></label>
+                <label for="breed">Enter animal breed</label>
+                <input type="text" name="breed" id="breed" class="btn-outline-success">
+                <label for="weight">Enter pet's weight:</label>
+                <input type="number" id="weight" name="weight" min="0" max="50" step="1" placeholder="weight"
+                    class="btn-outline-success">
+                <label for="gender">Choose animal gender</label>
+                <select name="gender" id="gender" class="btn-outline-success">
+                    <option selected>Gender</option>
+                    <option name="male">male</option>
+                    <option name="female">female</option>
+                </select>
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    <input type="submit" id="apply" value="Apply" class="btn btn-outline-success btn-secondary">
+                    <input type="submit" id="reset_parameters" value="Reset parameters" href="/search?section=animal"
+                        class="btn btn-outline-success btn-secondary">
+                </div>
+            </div>
+        </div>
     </div>
 
-    <ul>
-        {{ range . }}
-            <div class="result">
-                {{ .Name }} <br> {{ .Description }}
-            </div>
-        {{ else }}
-            <div class="result">
-                <h2>Nothing to show</h2>
-            </div>
-        {{ end}}
-    </ul>
-    <div class="filters" >
-        <label for="age">Enter pet's age:</label>
-        <input type="number" id="age" name="age" min="0" max="30" step="1"  placeholder="age">
-        <label for="type">Enter animal type:</label>
-        <input id="type" list="animal_type" name="type" /></label>
-        <datalist id="animal_type">
-            <option value="dog">
-            <option value="cat">
-            <option value="fish">
-            <option value="rodent">
-            <option value="bird">
-        </datalist>
-        <label for="breed">Enter animal breed</label>
-        <input type="text" name="breed" id="breed">
-        <label for="weight">Enter pet's weight:</label>
-        <input type="number" id="weight" name="weight" min="0" max="50" step="1" placeholder="weight">
-        <label for="gender">Choose animal gender</label>
-        <input id="gender" list="sex" name="gender">
-        <datalist id="sex">
-            <option value="male">
-            <option value="female">
-        </datalist>
-        <input type="submit" id="apply" value="Apply">
-        <input type="submit" id="reset_parameters" value="Reset parameters" href="/search?section=animal">
-    </div>
 
     <script>
         let url = window.location.href;
-        document.getElementById('search_button').addEventListener("click", function(){
+        function getSelectedText(elementId) {
+            var elt = document.getElementById(elementId);
+
+            if (elt.selectedIndex == -1)
+                return null;
+
+            return elt.options[elt.selectedIndex].text;
+        }
+
+        document.getElementById('search_button').addEventListener("click", function () {
             let str, newUrl = url;
             let name = document.getElementById('search').value;
-            if (name!="") {
-                if(newUrl.match(/name=\S+/)){
-                    str = newUrl.replace(/name=\S+/,"name="+name);
+            let decodeName = name.replace(/\s+/g, '+');
+            if (name != "") {
+                if (newUrl.match(/name=\S+/)) {
+                    str = newUrl.replace(/name=\S+/, "name=" + decodeName);
                     newUrl = str;
-                }else{
-                    newUrl+="&name="+name;
+                } else {
+                    newUrl += "&name=" + decodeName;
                 };
             };
             window.location.replace(newUrl);
         });
-        document.getElementById('apply').addEventListener("click", function(){
+
+        document.getElementById('apply').addEventListener("click", function () {
             let str
             let newUrl = url;
-          var age = document.getElementById('age').value;
-          if (age!="") {
-              if(newUrl.match(/age=\d+/)){
-                  str = newUrl.replace(/age=\d+/,"age="+age);
-                  newUrl = str;
-              }else{
-                  newUrl+="&age="+age;
-              };
-          };
-          var type = document.getElementById('type').value;
-          if (type!="") {
-              if(newUrl.match(/type=\w+[^&]/)){
-                  str = newUrl.replace(/type=\w+[^&]/,"type="+type);
-                  newUrl = str;
-              }else{
-                  newUrl+="&type="+type;
-              };
-          };
-          var breed = document.getElementById('breed').value;
-          if (breed!="") {
-              if(newUrl.match(/breed=\w+[^&]/)){
-                  str = newUrl.replace(/breed=\w+[^&]/,"breed="+breed);
-                  newUrl = str;
-              }else{
-                  newUrl+="&breed="+breed;
-              };
-          };
-          var weight = document.getElementById('weight').value;
-          if (weight!="") {
-              if(newUrl.match(/weight=\d+/)){
-                  str = newUrl.replace(/weight=\d+/,"weight="+weight);
-                  newUrl = str;
-              }else{
-                  newUrl+="&weight="+weight;
-              };
-          };
-          var gender = document.getElementById('gender').value;
-           if(gender!=""){
-               if(newUrl.match(/gender=\w+[^&]/)){
-                   str = newUrl.replace(/gender=\w+[^&]/,"gender="+gender);
-                   newUrl = str;
-               }else{
-                   newUrl+="&gender="+gender;
-               };
-           }
-
-          window.location.replace(newUrl);
+            var age = document.getElementById('age').value;
+            if (age != "") {
+                if (newUrl.match(/age=\d+/)) {
+                    str = newUrl.replace(/age=\d+/, "age=" + age);
+                    newUrl = str;
+                } else {
+                    newUrl += "&age=" + age;
+                };
+            };
+            var type = getSelectedText('type');
+            if (type != "Type of animal") {
+                if (newUrl.match(/type=\w+[^&]/)) {
+                    str = newUrl.replace(/type=\w+[^&]/, "type=" + type);
+                    newUrl = str;
+                } else {
+                    newUrl += "&type=" + type;
+                };
+            };
+            var breed = document.getElementById('breed').value;
+            let decodeBreed = breed.replace(/\s+/g, '+');
+            if (breed != "" && breed.match(/[A-Za-z]+/g)) {
+                if (newUrl.match(/breed=\w+[^&]/)) {
+                    str = newUrl.replace(/breed=\w+[^&]/, "breed=" + decodeBreed);
+                    newUrl = str;
+                } else {
+                    newUrl += "&breed=" + decodeBreed;
+                };
+            };
+            var weight = document.getElementById('weight').value;
+            if (weight != "") {
+                if (newUrl.match(/weight=\d+/)) {
+                    str = newUrl.replace(/weight=\d+/, "weight=" + weight);
+                    newUrl = str;
+                } else {
+                    newUrl += "&weight=" + weight;
+                };
+            };
+            var gender = getSelectedText('gender');
+            if (gender != "Gender") {
+                if (newUrl.match(/gender=\w+[^&]/)) {
+                    str = newUrl.replace(/gender=\w+[^&]/, "gender=" + gender);
+                    newUrl = str;
+                } else {
+                    newUrl += "&gender=" + gender;
+                };
+            }
+            window.location.replace(newUrl);
         });
-    document.getElementById('reset_parameters').addEventListener("click", function(){
-        url = location.protocol + '//' + location.host + location.pathname + '?section=animal'
-        window.location.replace(url);
-    })
+
+        document.getElementById('reset_parameters').addEventListener("click", function () {
+            url = location.protocol + '//' + location.host + location.pathname + '?section=animal'
+            window.location.replace(url);
+        });
 
 
     </script>
-    </body>
-    </html>
+</body>
 
-{{ end }} 
+</html>
+
+{{ end }}

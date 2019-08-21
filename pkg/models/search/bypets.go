@@ -12,7 +12,7 @@ type DispPet struct{
 func (f *SearchStore) GetFilterPets(m map[string]string) (pets []*DispPet, err error) {
 	var (
 		query string
-		firstParam =false
+		firstParam bool
 	)
 	parameters:=make([]string,5)
 	if age, ok := m["age"]; ok {
@@ -43,7 +43,7 @@ func (f *SearchStore) GetFilterPets(m map[string]string) (pets []*DispPet, err e
 
 	}
 	query+=" order by name;"
-	rows, err := f.DB.Query("select name, description from pets where "+ query)
+	rows, err := f.DB.Query("select name, description from pets where " + query)
 	if err != nil {
 		err = fmt.Errorf("Can't read pets from db: %v", err)
 		return
