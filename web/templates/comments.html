@@ -31,8 +31,14 @@
                                 <small>{{ .UserName}}</small>
                                 <br>
                                 <small>{{ .CreatedTime | fdate}}</small>
-                                <small>Rating: {{ .Rating}}</small>
-                                <input type="submit" value="Like">
+                                <small>Rating: {{ len .Likes}}</small>
+
+                                {{ if not (eq .UserID $.ContextUserID)}}
+
+                                    <input type="submit" value="Like">
+                                    
+                                {{end}}
+
                             </form>
                         </div>
                     <br>

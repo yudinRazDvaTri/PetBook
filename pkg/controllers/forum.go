@@ -17,23 +17,23 @@ import (
 func (c *Controller) TopicsGetHandler() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
-			topics, err := c.ForumStore.GetAllTopics()
+		topics, err := c.ForumStore.GetAllTopics()
+		if err != nil {
+			logger.Error(err)
+		}
+
+		var viewTopics []forum.ViewTopic
+
+		for _, topic := range topics {
+			userName, err := c.PetStore.DisplayName(topic.UserID)
 			if err != nil {
 				logger.Error(err)
 			}
+			viewTopics = append(viewTopics, forum.ViewTopic{userName, topic})
+		}
 
-			var viewTopics []forum.ViewTopic
-
-			for _, topic := range topics {
-				userName, err := c.PetStore.DisplayName(topic.UserID)
-				if err != nil {
-					logger.Error(err)
-				}
-				viewTopics = append(viewTopics, forum.ViewTopic{userName, topic})
-			}
-
-			view.GenerateTimeHTML(w, "Forum", "navbar")
-			view.GenerateTimeHTML(w, viewTopics, "topics")
+		view.GenerateTimeHTML(w, "Forum", "navbar")
+		view.GenerateTimeHTML(w, viewTopics, "topics")
 	}
 }
 
@@ -58,6 +58,7 @@ func (c *Controller) TopicsPostHandler() http.HandlerFunc {
 // Returns a Page with Topic's Comments
 func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		userID := context.Get(r, "id").(int)
 
 		vars := mux.Vars(r)
 		topicIdStr := vars["topicID"]
@@ -74,6 +75,7 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 		if err != nil {
 			logger.Error(err)
 		}
+
 		var viewComments []forum.ViewComment
 
 		for _, comment := range comments {
@@ -81,21 +83,21 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 			if err != nil {
 				logger.Error(err)
 			}
-			rating, err := c.ForumStore.GetCommentRating(comment.CommentID)
+			ratedUsers, err := c.ForumStore.GetCommentRatings(comment.CommentID)
 			if err != nil {
 				logger.Error(err)
 			}
-			viewComments = append(viewComments, forum.ViewComment{userName, rating, comment})
+			viewComments = append(viewComments, forum.ViewComment{userName, ratedUsers, comment})
 		}
 
 		sort.Sort(sort.Reverse(forum.ByRating(viewComments)))
 
 		ViewData := struct {
-			ID           int
-			Topic        forum.Topic
-			ViewComments []forum.ViewComment
+			ContextUserID int
+			Topic         forum.Topic
+			ViewComments  []forum.ViewComment
 		}{
-			topicID,
+			userID,
 			topic,
 			viewComments,
 		}
@@ -126,7 +128,7 @@ func (c *Controller) CommentsPostHandler() http.HandlerFunc {
 			return
 		}
 
-		http.Redirect(w, r, "/forum/topic/" + topicIdStr + "/comments", http.StatusFound)
+		http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
 	}
 }
 
@@ -150,9 +152,9 @@ func (c *Controller) CommentsRatingsHandler() http.HandlerFunc {
 			logger.Error(err)
 		}
 		if !rateOk {
-			http.Redirect(w, r, "/forum/topic/" + topicIdStr + "/comments", http.StatusFound)
+			http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
 		}
 
-		http.Redirect(w, r, "/forum/topic/" + topicIdStr + "/comments", http.StatusFound)
+		http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
 	}
 }
