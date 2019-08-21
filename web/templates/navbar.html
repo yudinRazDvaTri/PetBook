@@ -1,16 +1,5 @@
 {{define "layout"}}
-{{/*    <div class="container-fluid" style="background-color: darkorange; height: 35px">*/}}
 
-{{/*        <div class="row" style="margin-top: 5px ">*/}}
-{{/*            <div style="margin-left: 50%;font-size: large;color:white; position: fixed">{{.}}</div>*/}}
-{{/*            <form method="LINK" action="/mypage" style="margin-left: 10%; position: fixed ">*/}}
-{{/*                <input type="submit" value="Home">*/}}
-{{/*            </form>*/}}
-{{/*            <form method="LINK" action="/login" style="display: inline-block;margin-left: 90%;position: fixed">*/}}
-{{/*                <input type="submit" value="Logout">*/}}
-{{/*            </form>*/}}
-{{/*        </div>*/}}
-{{/*    </div>*/}}
 <!doctype html>
 <html >
 <head>
@@ -21,18 +10,43 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 </head>
 <body>
-    <nav class="navbar navbar-light" style="background-color: grey;">
+    <nav class="nnavbar navbar-expand-lg navbar-light bg-light" style="background-color: #a9ffa6;">
 
         <nav class="navbar navbar-light bg-light justify-content-between">
-            <a class="navbar-brand">{{.}}</a>
-            <form class="form-inline">
-                <button class="btn btn-primary" formaction="/">Home</button>
-                <input disabled class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" >
-                <button disabled class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                <button class="btn btn-primary" formaction="/logout">Logout</button>
-            </form>
+            <a class="navbar-brand" >{{.}}</a>
+            <div class="collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/chats">Chat</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/forum">Forum</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+
+                </ul>
+                <div class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" id="search1" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" id="search_button1" type="submit">Search</button>
+                </div>
         </nav>
     </nav>
+    <script>
+    document.getElementById('search_button1').addEventListener("click",function(){
+            let name = document.getElementById('search1').value;
+            let decodeName = name.replace(/\s+/g, '+');
+            if (name != "") {
+                window.location.href = "/search?section=animal"+ "&name=" + decodeName;
+                } else { 
+                    window.location.href = "/search?section=animal"
+                };
+            })
+    </script>
 </body>
 </html>
 {{end}}
