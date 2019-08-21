@@ -29,11 +29,18 @@ type Client struct {
 	Connection *websocket.Conn
 }
 
-type Chat struct {
-	Companion User
-	Messages  []Message
+type ChatToView struct {
+	ToID      int
+	Username  string
+	Message   string
+	CreatedAt string
 }
 
+type Chat struct {
+	ToID      int       `db:"to_id"`
+	Message   string    `db:"text"`
+	CreatedAt time.Time `db:"created_at"`
+}
 type ChatStore struct {
 	DB *sqlx.DB
 }
@@ -41,6 +48,7 @@ type ChatStore struct {
 type ChatStorer interface {
 	GetMessages(toID, fromID int) ([]Message, error)
 	SaveMessage(message *Message) error
+	GetChats(userID int) ([]Chat, error)
 }
 
 func (c *ChatStore) GetMessages(toID, fromID int) ([]Message, error) {
@@ -67,20 +75,22 @@ func (c *ChatStore) SaveMessage(message *Message) error {
 	return nil
 }
 
-//TODO
-// func (c *ChatStore) GetChats(user *User) ([]Chat, error) {
-// 	rows, err := c.DB.Query(
-// 		`select  to_id, text, created_at from (select to_id, text, created_at from messages where from_id = $1
-// 			UNION
-// 		select from_id, text,  created_at from messages where to_id = $2) as select_result order by created_at desc limit 1`, user.ID)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("cannot make querry: %v", err)
-// 	}
-// 	defer rows.Close()
-// 	messages := []Message{}
-// 	err = sqlx.StructScan(rows, &messages)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("cannot scan messages from db: %v", err)
-// 	}
-// 	return nil, nil
-// }
+func (c *ChatStore) GetChats(userID int) ([]Chat, error) {
+	rows, err := c.DB.Query(
+		`SELECT *  FROM (
+		select distinct on (to_id)  to_id, text, created_at from (select to_id, text, created_at from messages where from_id = $1 
+		UNION 
+		select from_id, text,  created_at from messages where to_id = $1 order by created_at ) 
+		as alias1 order by to_id, created_at desc)
+		 as alias2 ORDER BY created_at desc  `, userID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot make querry: %v", err)
+	}
+	defer rows.Close()
+	chats := []Chat{}
+	err = sqlx.StructScan(rows, &chats)
+	if err != nil {
+		return nil, fmt.Errorf("cannot scan messages from db: %v", err)
+	}
+	return chats, nil
+}
