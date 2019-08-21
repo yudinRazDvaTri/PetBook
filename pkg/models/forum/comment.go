@@ -16,8 +16,20 @@ type Comment struct {
 
 type ViewComment struct {
 	UserName string
-	Rating int
+	Likes []int64
 	Comment
+}
+
+func (v *ViewComment) CanLike(userID int) bool {
+	if v.UserID == userID {
+		return false
+	}
+	for i := range v.Likes {
+		if int(v.Likes[i]) == userID {
+			return false
+		}
+	}
+	return true
 }
 
 type ByRating []ViewComment
@@ -30,7 +42,7 @@ func (v ByRating) Swap(i, j int) {
 	v[i], v[j] = v[j], v[i]
 }
 func (v ByRating) Less(i, j int) bool {
-	return v[i].Rating < v[j].Rating
+	return len(v[i].Likes) < len(v[j].Likes)
 }
 
 func (f *ForumStore) AddNewComment(topicID, userID int, content string) (err error) {
@@ -63,13 +75,21 @@ func (f *ForumStore) RateComment(commentID, userID int) (bool, error) {
 	return rateOk, err
 }
 
-func (f *ForumStore) GetCommentRating(commentID int) (rating int, err error) {
-	err = f.DB.QueryRowx(
-		`SELECT COUNT(*) FROM ratings WHERE comment_id = $1;`, commentID).Scan(&rating)
+func (f *ForumStore) GetCommentRatings(commentID int) (likes []int64, err error) {
+	rows, err := f.DB.Query(`SELECT user_id FROM ratings WHERE comment_id = $1;`, commentID)
 	if err != nil {
-		err = fmt.Errorf("Can't count rating of comment with %d id from DB: %v.\n",
-			commentID, err)
+		err = fmt.Errorf("Can't read rating-rows from db: %v", err)
 	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var like int64
+		err = rows.Scan(&like)
+		if err != nil {
+			err = fmt.Errorf("Can't scan rating-row from db: %v", err)
+		}
+		likes = append(likes, like)
+	}
+
 	return
 }
-

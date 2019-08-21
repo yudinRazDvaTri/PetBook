@@ -70,6 +70,7 @@ func ValidateTokenMiddleware(storeRefreshToken *models.RefreshTokenStore, storeU
 							Name:    "accessToken",
 							Value:   tokens.AccessTokenValue,
 							Expires: tokens.AccessExpirationTime,
+							Path:    "/",
 						})
 
 						err = storeRefreshToken.UpdateRefreshToken(claims.Id, tokens.RefreshTokenValue, tokens.RefreshExpirationTime)
@@ -83,6 +84,7 @@ func ValidateTokenMiddleware(storeRefreshToken *models.RefreshTokenStore, storeU
 							Name:    "refreshToken",
 							Value:   tokens.RefreshTokenValue,
 							Expires: tokens.RefreshExpirationTime,
+							Path:    "/",
 						})
 
 						context.Set(r, "id", claims.Id)

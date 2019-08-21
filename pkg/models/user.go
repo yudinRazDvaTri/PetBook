@@ -140,7 +140,7 @@ func (c *UserStore) Login(email, userPassword string) (int, error) {
 func (c *UserStore) GetPet(userID int) (Pet, error) {
 	var pet Pet
 	err := c.DB.QueryRowx(
-		`SELECT user_id,name,animal_type, breed, age, weight, gender 
+		`SELECT user_id,name,animal_type, breed, age, weight, gender,description
 		FROM pets p, users u 
 		WHERE p.user_id = u.id  
 		AND u.id = $1 `, userID).StructScan(&pet)
