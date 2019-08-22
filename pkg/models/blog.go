@@ -13,6 +13,7 @@ type Blog struct {
 	PetName string
 	Message string
 	Date    time.Time
+	LogoPath string
 }
 
 type BlogStore struct {

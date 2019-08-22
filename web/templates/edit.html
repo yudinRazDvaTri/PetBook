@@ -46,11 +46,16 @@
          style="position: relative;float: left;"
     >
         <div class="col"
-{{/*             style="width: 600px;height: 400px;border: #ffffff solid 2px"*/}}
+             style="width: 600px;height: 400px;border: #ffffff solid 2px"
         >
-            <img class="d-block w-100" src="../static/background.jpg" alt="Первое фото">
+            {{range .LogoPath}}
+{{/*            <img class="d-block w-100" src="../static/background.jpg" alt="Первое фото">*/}}
+            <img class="d-block w-100" alt="Download IMG" src={{.}}>
+            {{end}}
         </div>
-        <div style="position: relative;margin-left: 60px;margin-top: 20px">
+        <div
+                style="position: relative;margin-left: 60px;margin-top: 20px"
+        >
 {{/*            <input type="button" value="Upload img">*/}}
 {{/*            <input type="button" value="Change img">*/}}
             <form
@@ -58,16 +63,17 @@
                     action="http://localhost:8080/upload"
                     method="post"
             >
-                <input type="file"  name="myFile" />
-                <input type="submit" value="upload" />
+                <label for="exampleFormControlFile1">Download ur pet photo=)</label><br>
+                <input type="file"  name="myFile"/>
+                <input class="btn btn-primary" type="submit" value="upload" />
             </form>
         </div>
     </div>
     <div class="col" name="characteristics" style="position: relative;float: right;border: grey solid 1px;">
         <div class="col">
             <table id="pet">
-                <thead><tr><th>User Name</th><td><input type="text" readonly class="form-control-plaintext" name="name" value="{{.Name}}" /></td><td></tr>
-                <thead><tr><th>Email</th><td><input type="text" readonly class="form-control-plaintext" name="email" value="{{.Email}}" /></td><td></tr>
+                <thead><tr><th>User Name</th><td><input class="form-control" type="text" readonly class="form-control-plaintext" name="name" value="{{.Name}}" /></td><td></tr>
+                <thead><tr><th>Email</th><td><input class="form-control" type="text" readonly class="form-control-plaintext" name="email" value="{{.Email}}" /></td><td></tr>
 {{/*                <thead><tr><th>Password</th><td><input type="text" name="password" value="{{.Password}}" /></td><td></tr>*/}}
             </table>
 
@@ -75,13 +81,29 @@
         <div class="col" style="margin: 10px">
             <form method="post">
             <table id="pet">
-                <thead><tr><th>Name</th><td><input type="text" name="name" value="{{.PetName}}" /></td><td></tr>
-                <thead><tr><th>Age</th><td><input type="text" name="age" value="{{.Age}}" /></td><td></tr>
-                <thead><tr><th>Pet type</th><td><input type="text" name="animal_type" value="{{.PetType}}" /></td><td></tr>
-                <thead><tr><th>Breed</th><td><input type="text" name="breed" value="{{.Breed}}" /></td><td></tr>
-                <thead><tr><th>Description</th><td><input type="text" name="description" value="{{.Description}}" /></td><td></tr>
-                <thead><tr><th>Weight</th><td><input type="text" name="weight" value="{{.Weight}}" /></td><td></tr>
-                <thead><tr><th>Gender</th><td><input type="text" name="gender" value="{{.Gender}}" /></td><td></tr>
+                <thead><tr><th>Name</th><td><input class="form-control" type="text" name="name" value="{{.PetName}}" /></td><td></tr>
+                <thead><tr><th>Age</th><td><input class="form-control" type="text" name="age" value="{{.Age}}" /></td><td></tr>
+                <thead><tr><th>Pet type</th><td>
+{{/*                        <input type="text" name="animal_type" value="{{.PetType}}" />*/}}
+                        <select name="animal_type" class="form-control">
+                            <option selected>{{.PetType}}</option>
+                            <option name="dog">dog</option>
+                            <option name="cat">cat</option>
+                            <option name="fish">fish</option>
+                            <option name="bird">bird</option>
+                            <option name="rodent">rodent</option>
+                        </select>
+                    </td><td></tr>
+                <thead><tr><th>Breed</th><td><input class="form-control" type="text" name="breed" value="{{.Breed}}" /></td><td></tr>
+                <thead><tr><th>Weight</th><td><input class="form-control" type="text" name="weight" value="{{.Weight}}" /></td><td></tr>
+                <thead><tr><th>Gender</th><td>
+                        <select name="gender" class="form-control">
+                            <option selected>{{.Gender}}</option>
+                            <option name="male">male</option>
+                            <option name="female">female</option>
+                        </select>
+                    </td><td></tr>
+                <thead><tr><th>Description</th><td><input class="form-control" type="text" name="description" value="{{.Description}}" /></td><td></tr>
             </table>
             <button class="btn btn-primary" type="submit" >Apply</button>
 

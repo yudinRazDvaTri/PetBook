@@ -5,7 +5,7 @@
         <meta charset="UTF-8">
         <title>Result product</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+{{/*        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">*/}}
 {{/*        <link rel="stylesheet" href="../static/blogCLOSED.css">*/}}
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -15,7 +15,7 @@
             }
         </script>
         <style>
-            .btn-danger {background-color: #337ab7;border: #337ab7; margin: 50%}
+            .btn-danger {background-color: #007bff;border: #007bff; margin: 50%}
         </style>
     </head>
     <body>
@@ -26,7 +26,7 @@
 {{/*                 style="background: #98FB98;padding: 5px;"*/}}
             >
                 <div width="15%" style="font-size: 30px;">
-                    Blog
+                    <p class="h2" >Blog</p>
 {{/*                    <img src="../upload/cat-face_1f431.png" >*/}}
                 </div>
             </div>
@@ -35,6 +35,8 @@
             <form action="/process" method="post">
                 <textarea class="form-control" rows="5" type="text" id="message" name="something" placeholder="type something here..." required></textarea>
                 <input class="btn btn-primary" type="submit" value="Send">
+                <input disabled style="float: right" class="btn btn-secondary" type="button" value="Upload img">
+                <input disabled style="float: right;margin-right: 5px" class="btn btn-secondary" type="button" value="YouTube">
 
 {{/*                <div class="input-group mb-3" style="margin-top: 15px; height: 50px">*/}}
 {{/*                    <input type="text" class="form-control" placeholder="Имя получателя" aria-label="Имя получателя" aria-describedby="basic-addon2">*/}}
@@ -48,29 +50,41 @@
         <table class="table table-hover"
 {{/*               style="background: #90EE90;border-radius: 10px"*/}}
         >
-            <tbody>
-            {{range . }}
+            <tbody >
+            {{range .}}
                 <tr>
                     <td width="5%">
-                        <div style="width:50px;height:50px;margin-left:2px">
-                            <img src="../static/background.jpg" style="width:48px;height:48px">
+                        <div style="margin-left: 5%;margin-top: 20%">
+{{/*                        {{range .LogoPath}}*/}}
+                        <div style="width:65px;height:65px;">
+{{/*                            <img style="width:48px;height:48px" src="../static/usermedia/1/logo/" >*/}}
+                            <img style="width:48px;height:48px" src="../static/background.jpg" >
                         </div>
-                        <div>
+{{/*                        {{end}}*/}}
+
+                        <div style="font-size: 20px;font-family: bold;">
                             {{.PetName}}
                         </div>
+                        </div>
                     </td>
-                    <td width="95%">
+                    <td width="95%" style="font-size: 20px">
                         <div
-                                style="margin-top: 15px;padding: 8px;border-radius: 5px;border:solid grey 1px;
+                                style="margin-top: 15px;padding: 8px;border-radius: 5px;border:solid #343a40 1px;
                                 /*background: #98FB98;*/
                                 "
                         >
                             {{ .Message }}
                         </div>
 
-                        <div width="15%" style="font-size: 10px">
+                        <div width="15%" style="font-size: 15px">
                             {{.Date | fdate}}
                         </div>
+                        <form >
+                            <textarea disabled style="width: 50%; float: right" class="form-control form-control-sm" rows="2" type="text" id="message" name="something" placeholder="leave ur comment"  ></textarea>
+{{/*                            <input class="btn btn-primary" type="submit" value="Send">*/}}
+{{/*                            <input disabled style="float: right" class="btn btn-secondary" type="button" value="Upload img">*/}}
+{{/*                            <input disabled style="float: right;margin-right: 5px" class="btn btn-secondary" type="button" value="YouTube">*/}}
+                        </form>
                     </td>
                     <td width="5%"><a href="/delete?recordid={{.Id}}" class="btn btn-danger" onclick="return ConfirmDelete();">X</a></td>
                 </tr>
@@ -82,3 +96,35 @@
 </body>
 </html>
 {{end}}
+
+{{/*<tbody>*/}}
+{{/*{{range .}}*/}}
+{{/*    <tr>*/}}
+{{/*        <td width="5%">*/}}
+
+{{/*            {{range .LogoPath}}*/}}
+{{/*                <div style="width:50px;height:50px;margin-left:2px">*/}}
+{{/*                    <img style="width:48px;height:48px" src="{{.}}" >*/}}
+{{/*                </div>*/}}
+{{/*            {{end}}*/}}
+
+{{/*            <div>*/}}
+{{/*                {{.PetName}}*/}}
+{{/*            </div>*/}}
+{{/*        </td>*/}}
+{{/*        <td width="95%">*/}}
+{{/*            <div*/}}
+{{/*                    style="margin-top: 15px;padding: 8px;border-radius: 5px;border:solid grey 1px;*/}}
+{{/*                                "*/}}
+{{/*            >*/}}
+{{/*                {{ .Message }}*/}}
+{{/*            </div>*/}}
+
+{{/*            <div width="15%" style="font-size: 10px">*/}}
+{{/*                {{.Date | fdate}}*/}}
+{{/*            </div>*/}}
+{{/*        </td>*/}}
+{{/*        <td width="5%"><a href="/delete?recordid={{.Id}}" class="btn btn-danger" onclick="return ConfirmDelete();">X</a></td>*/}}
+{{/*    </tr>*/}}
+{{/*{{end}}*/}}
+{{/*</tbody>*/}}
