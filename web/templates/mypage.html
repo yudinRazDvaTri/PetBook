@@ -13,32 +13,59 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
         <!--   BOOTSTRAP-->
         <title>My page</title>
+        <style>
+            #pet {
+                font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+                font-size: large;
+            }
+            #pet td, #customers th {
+                text-align: center;
+                /*border: 1px solid #ddd;*/
+                padding: 8px;
+            }
+            #pet tr:nth-child(even)
+            {background-color: #f2f2f2;}
+            #pet tr:hover {background-color: #ddd;}
+            #pet th {
+                width: 140px;
+                padding-top: 12px;
+                padding-bottom: 12px;
+                text-align: center;
+                /*background-color: #4CAF50;*/
+                /*color: white;*/
+            }
+        </style>
     </head>
 
     <!--  NAVBAR-->
     <body style="height: 100%; padding-bottom: 80px">
     <div class="container">
-        <h1 style="margin-bottom: 15px;color: #337ab7">▍{{.Name}}</h1>
+        <h1 style="margin-bottom: 15px;color: #007bff">▍{{.Name}}</h1>
         <div class="row">
 
             <!--   PHOTO CARUSEL-->
-            <div class="col-lg-4 col-md-4 col-sm-12" style="width: 70px;height: 200px">
+
+            <div class="col-lg-5 col-md-5 col-sm-12" style="width: 400px;height: 300px">
                 <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+
                     <ol class="carousel-indicators">
                         <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
-                        <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
-                        <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+                        <li data-target="#carouselExampleIndicators" data-slide-to="1" ></li>
+                        <li data-target="#carouselExampleIndicators" data-slide-to="2" ></li>
                     </ol>
                     <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <img class="d-block w-100" src="../static/background.jpg" alt="Первый слайд">
-                        </div>
-                        <div class="carousel-item">
-                            <img class="d-block w-100" src="../static/background.jpg" alt="Второй слайд">
-                        </div>
-                        <div class="carousel-item">
-                            <img class="d-block w-100" src="../static/background.jpg" alt="Третий слайд">
-                        </div>
+
+                        {{range .LogoPath}}
+                            <div class="carousel-item active">
+                                <img style="width: 400px;height: 300px" class="d-block w-100" src={{.}}>
+                            </div>
+                            <div class="carousel-item ">
+                                <img style="width: 400px;height: 300px;" class="d-block w-100" src={{.}}>
+                            </div>
+                        {{end}}
+
                     </div>
                     <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -53,23 +80,18 @@
 
 
             <!--   CHARACTERISTICS-->
-            <div class="col-lg-8 col-md-8 col-sm-12 desc">
-{{/*                <h3><font color="337ab7"*/}}
-{{/*                            color="#3AC1EF"*/}}
-{{/*                    >▍*/}}
-{{/*                        {{.Name}}*/}}
-{{/*                    </font></h3>*/}}
+            <div class="col-lg-7 col-md-7 col-sm-12 desc">
                 <p>
-                <table >
+                <table id="pet">
                     <thead><tr><th>Age</th><td>{{.Age}}</td><td></tr>
                     <thead><tr><th>Pet type</th><td>{{.PetType}}</td><td></tr>
                     <thead><tr><th>Breed</th><td>{{.Breed}}</td><td></tr>
-                    <thead><tr><th>Description</th><td>{{.Description}}</td><td></tr>
-                    <thead><tr><th>Weight</th><td>{{.Weight}}</td><td></tr>
                     <thead><tr><th>Gender</th><td>{{.Gender}}</td><td></tr>
+                    <thead><tr><th>Weight</th><td>{{.Weight}}</td><td></tr>
+                    <thead><tr><th>Description</th><td>{{.Description}}</td><td></tr>
                 </table>
                 </p>
-{{/*                <button class="btn btn-outline-secondary">Edit</button>*/}}
+                {{/*                <button class="btn btn-outline-secondary">Edit</button>*/}}
             </div>
         </div>
 
@@ -77,17 +99,17 @@
         <!--   BUTTONS-->
         <div class="row" style="margin-top: 5px ">
             <div class="col-md-12"
-{{/*                 style="background-color: bisque"*/}}
+                    {{/*                 style="background-color: bisque"*/}}
             >
                 <form>
                     <div class="btn-group" role="group" aria-label="Basic example">
-                    <button class="btn btn-primary" formaction="/forum">Forum</button>
-                    <button class="btn btn-primary disabled" formaction="/">Friends</button>
-                    <button class="btn btn-primary" formaction="/chats">Chats</button>
-                    <button class="btn btn-primary" formaction="/edit">Settings</button>
-                    <button class="btn btn-primary" formaction="/search">Search</button>
-                    {{/*                    <input type="search" style="float: right; padding: 5px">*/}}
-{{/*                    <input type="button" value="Search" style="float: right; padding: 5px">*/}}
+                        <button  class="btn btn-primary" formaction="/forum">Forum</button>
+                        <button class="btn btn-primary disabled" formaction="/">Friends</button>
+                        <button class="btn btn-primary " formaction="/chats/1">Chats</button>
+                        <button class="btn btn-primary" formaction="/edit">Settings</button>
+                        <button class="btn btn-primary" formaction="/search">Search</button>
+                        {{/*                    <input type="search" style="float: right; padding: 5px">*/}}
+                        {{/*                    <input type="button" value="Search" style="float: right; padding: 5px">*/}}
 
                     </div>
                 </form>

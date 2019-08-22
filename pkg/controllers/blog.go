@@ -6,11 +6,15 @@ import (
 	"net/http"
 )
 
+
 func (c *Controller) GetBlogHandler(w http.ResponseWriter, r *http.Request) {
 	userID := context.Get(r, "id").(int)
 	results := c.BlogStore.GetBlog(userID)
+
+
 	tmpl, _ := template.ParseFiles("./web/templates/blog.html")
 	tmpl.Execute(w, results)
+
 }
 
 func (c *Controller) CreateBlogHandler(w http.ResponseWriter, r *http.Request) {
