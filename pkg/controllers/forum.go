@@ -29,7 +29,11 @@ func (c *Controller) TopicsGetHandler() http.HandlerFunc {
 			if err != nil {
 				logger.Error(err)
 			}
-			viewTopics = append(viewTopics, forum.ViewTopic{userName, topic})
+			viewTopic, err := c.ForumStore.NewViewTopic(userName, topic)
+			if err != nil {
+				logger.Error(err)
+			}
+			viewTopics = append(viewTopics, viewTopic)
 		}
 
 		view.GenerateTimeHTML(w, "Forum", "navbar")
@@ -83,11 +87,11 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 			if err != nil {
 				logger.Error(err)
 			}
-			ratedUsers, err := c.ForumStore.GetCommentRatings(comment.CommentID)
+			viewComment, err := c.ForumStore.NewViewComment(userName, comment)
 			if err != nil {
 				logger.Error(err)
 			}
-			viewComments = append(viewComments, forum.ViewComment{userName, ratedUsers, comment})
+			viewComments = append(viewComments, viewComment)
 		}
 
 		sort.Sort(sort.Reverse(forum.ByRating(viewComments)))
@@ -133,7 +137,7 @@ func (c *Controller) CommentsPostHandler() http.HandlerFunc {
 }
 
 // Process Like-action on Comment
-func (c *Controller) CommentsRatingsHandler() http.HandlerFunc {
+func (c *Controller) CommentsLikeHandler() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)

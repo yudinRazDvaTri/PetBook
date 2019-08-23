@@ -97,7 +97,11 @@ func(c *Controller) searchByForum(w http.ResponseWriter, r * http.Request){
 			if err != nil {
 				logger.Error(err)
 			}
-			viewTopics = append(viewTopics, forum.ViewTopic{userName, topic})
+			viewTopic, err := c.ForumStore.NewViewTopic(userName, topic)
+			if err != nil {
+				logger.Error(err)
+			}
+			viewTopics = append(viewTopics, viewTopic)
 		}
 
 		view.GenerateTimeHTML(w,viewTopics,"search_by_forum")
@@ -114,7 +118,11 @@ func(c *Controller) searchByForum(w http.ResponseWriter, r * http.Request){
 			if err != nil {
 				logger.Error(err)
 			}
-			viewTopics = append(viewTopics, forum.ViewTopic{userName, topic})
+			viewTopic, err := c.ForumStore.NewViewTopic(userName, topic)
+			if err != nil {
+				logger.Error(err)
+			}
+			viewTopics = append(viewTopics, viewTopic)
 		}
 
 		view.GenerateTimeHTML(w,viewTopics,"search_by_forum")

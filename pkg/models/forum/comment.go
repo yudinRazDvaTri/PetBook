@@ -14,22 +14,35 @@ type Comment struct {
 	Content     string    `json:"content" db:"content"`
 }
 
+// View Alias-Struct to layout comment properly
 type ViewComment struct {
 	UserName string
-	Likes []int64
+	LikersIDs []int64
 	Comment
 }
 
+// Method to discover if user can like comment
 func (v *ViewComment) CanLike(userID int) bool {
 	if v.UserID == userID {
 		return false
 	}
-	for i := range v.Likes {
-		if int(v.Likes[i]) == userID {
+	for i := range v.LikersIDs {
+		if int(v.LikersIDs[i]) == userID {
 			return false
 		}
 	}
 	return true
+}
+
+// ViewComment Constructor
+func (f *ForumStore) NewViewComment(userName string, comment Comment) (viewComment ViewComment, err error) {
+	likerIDs, err := f.getCommentLikers(comment.CommentID)
+	if err != nil {
+		err = fmt.Errorf("Can't read %d comment's likersIDs from DB: %v", comment.TopicID, err)
+		return
+	}
+	viewComment = ViewComment{userName, likerIDs, comment}
+	return
 }
 
 type ByRating []ViewComment
@@ -42,7 +55,7 @@ func (v ByRating) Swap(i, j int) {
 	v[i], v[j] = v[j], v[i]
 }
 func (v ByRating) Less(i, j int) bool {
-	return len(v[i].Likes) < len(v[j].Likes)
+	return len(v[i].LikersIDs) < len(v[j].LikersIDs)
 }
 
 func (f *ForumStore) AddNewComment(topicID, userID int, content string) (err error) {
@@ -75,7 +88,7 @@ func (f *ForumStore) RateComment(commentID, userID int) (bool, error) {
 	return rateOk, err
 }
 
-func (f *ForumStore) GetCommentRatings(commentID int) (likes []int64, err error) {
+func (f *ForumStore) getCommentLikers(commentID int) (likersIDs []int64, err error) {
 	rows, err := f.DB.Query(`SELECT user_id FROM ratings WHERE comment_id = $1;`, commentID)
 	if err != nil {
 		err = fmt.Errorf("Can't read rating-rows from db: %v", err)
@@ -83,13 +96,31 @@ func (f *ForumStore) GetCommentRatings(commentID int) (likes []int64, err error)
 	defer rows.Close()
 
 	for rows.Next() {
-		var like int64
-		err = rows.Scan(&like)
+		var likerID int64
+		err = rows.Scan(&likerID)
 		if err != nil {
 			err = fmt.Errorf("Can't scan rating-row from db: %v", err)
 		}
-		likes = append(likes, like)
+		likersIDs = append(likersIDs, likerID)
 	}
+	return
+}
 
+func (f *ForumStore) getCommentsIDs(topicID int) (commentsIDs []int64, err error) {
+	rows, err := f.DB.Query(
+		`SELECT comment_id FROM comments WHERE topic_id = $1;`, topicID)
+	if err != nil {
+		err = fmt.Errorf("Can't number of comments in topic %d from DB: %v", topicID, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var commentID int64
+		err = rows.Scan(&commentID)
+		if err != nil {
+			err = fmt.Errorf("Can't scan comment_id-row from db: %v", err)
+		}
+		commentsIDs = append(commentsIDs, commentID)
+	}
 	return
 }
