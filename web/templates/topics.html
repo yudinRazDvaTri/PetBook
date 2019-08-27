@@ -26,7 +26,7 @@
                 <br>
                 <small>Author: {{ .UserName}}</small>
                 <br>
-                <small>Comments: {{ .CommentsNumber}}</small>
+                <small>Comments: {{ len .CommentsIDs}}</small>
                 <br>
                 <small>{{ .CreatedTime | fdate}}</small>
             </div>

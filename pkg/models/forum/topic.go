@@ -2,7 +2,6 @@ package forum
 
 import (
 	"fmt"
-	"github.com/dpgolang/PetBook/pkg/logger"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -14,18 +13,28 @@ type Topic struct {
 	CreatedTime    time.Time `json:"created_time" db:"created_time"`
 	Title          string    `json:"title" db:"title"`
 	Description    string    `json:"description" db:"description"`
-	CommentsNumber int       `json:"comments_number" db:"comments_number"`
 }
 
+// View Alias-Struct to layout topic properly
 type ViewTopic struct {
 	UserName string
+	CommentsIDs []int64
 	Topic
 }
 
+// ViewTopic Constructor
+func (f *ForumStore) NewViewTopic(userName string, topic Topic) (viewTopic ViewTopic, err error) {
+		commentsIDs, err := f.getCommentsIDs(topic.TopicID)
+		if err != nil {
+			err = fmt.Errorf("Can't read %d topic's commentsIDs from DB: %v", topic.TopicID, err)
+			return
+		}
+		viewTopic = ViewTopic{userName, commentsIDs, topic}
+		return
+}
+
 func (f *ForumStore) CreateNewTopic(userID int, title, description string) (err error) {
-	_, err = f.DB.Exec(
-		`insert into topics (user_id, title, description) values ($1, $2, $3)`,
-		userID, title, description)
+	_, err = f.DB.Exec(`insert into topics (user_id, title, description) values ($1, $2, $3)`, userID, title, description)
 	if err != nil {
 		err = fmt.Errorf("cannot affect rows in topics table of db: %v", err)
 	}
@@ -42,12 +51,6 @@ func (f *ForumStore) GetAllTopics() (topics []Topic, err error) {
 	err = sqlx.StructScan(rows, &topics)
 	if err != nil {
 		err = fmt.Errorf("Can't scan topics-rows from db: %v", err)
-	}
-	for i := range topics {
-		err = f.SetNumberOfComments(topics[i].TopicID)
-		if err != nil {
-			logger.Error(err)
-		}
 	}
 	return
 }
@@ -66,25 +69,8 @@ func (f *ForumStore) GetTopicComments(topicID int) (comments []Comment, err erro
 	return
 }
 
-func (f *ForumStore) SetNumberOfComments(topicID int) (err error) {
-	_, err = f.DB.Exec(
-		`UPDATE topics SET comments_number =
-				(SELECT count(*) FROM comments WHERE topic_id = $1)
-				WHERE topic_id = $1;`, topicID)
-	if err != nil {
-		err = fmt.Errorf("Can't number of comments in topic %d from DB: %v",
-			topicID, err)
-	}
-	return
-}
-
 func (f *ForumStore) GetTopicByID(topicID int) (topic Topic, err error) {
-	err = f.SetNumberOfComments(topicID)
-	if err != nil {
-		logger.Error(err)
-	}
-	err = f.DB.QueryRowx(
-		`SELECT * FROM topics WHERE topic_id = $1`, topicID).StructScan(&topic)
+	err = f.DB.QueryRowx(`SELECT * FROM topics WHERE topic_id = $1`, topicID).StructScan(&topic)
 	if err != nil {
 		err = fmt.Errorf("Error occurred while trying read topic with $d id from DB: %v.\n", topicID, err)
 	}
