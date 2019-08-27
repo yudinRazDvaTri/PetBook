@@ -102,6 +102,7 @@ func (f *ForumStore) getCommentLikers(commentID int) (likersIDs []int64, err err
 		err = rows.Scan(&likerID)
 		if err != nil {
 			err = fmt.Errorf("Can't scan rating-row from db: %v", err)
+			return
 		}
 		likersIDs = append(likersIDs, likerID)
 	}
@@ -122,6 +123,7 @@ func (f *ForumStore) getCommentsIDs(topicID int) (commentsIDs []int64, err error
 		err = rows.Scan(&commentID)
 		if err != nil {
 			err = fmt.Errorf("Can't scan comment_id-row from db: %v", err)
+			return
 		}
 		commentsIDs = append(commentsIDs, commentID)
 	}
