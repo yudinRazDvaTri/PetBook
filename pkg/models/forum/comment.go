@@ -75,13 +75,14 @@ func (f *ForumStore) RateComment(commentID, userID int) (bool, error) {
 		`insert into ratings (comment_id, user_id) values ($1, $2);`,
 		commentID, userID)
 	if err != nil {
+		rateOk = false
 		if pgerr, ok := err.(*pq.Error); ok {
 			if pgerr.Code == "23505" {
 				err = fmt.Errorf("User %d already liked comment %d: %v",
 					userID, commentID, err)
+				return rateOk, err
 			}
 		}
-
 		err = fmt.Errorf("Error while trying to rate %d comment by %d user in DB: %v",
 			userID, commentID, err)
 	}
@@ -92,6 +93,7 @@ func (f *ForumStore) getCommentLikers(commentID int) (likersIDs []int64, err err
 	rows, err := f.DB.Query(`SELECT user_id FROM ratings WHERE comment_id = $1;`, commentID)
 	if err != nil {
 		err = fmt.Errorf("Can't read rating-rows from db: %v", err)
+		return
 	}
 	defer rows.Close()
 
@@ -111,6 +113,7 @@ func (f *ForumStore) getCommentsIDs(topicID int) (commentsIDs []int64, err error
 		`SELECT comment_id FROM comments WHERE topic_id = $1;`, topicID)
 	if err != nil {
 		err = fmt.Errorf("Can't number of comments in topic %d from DB: %v", topicID, err)
+		return
 	}
 	defer rows.Close()
 
