@@ -20,6 +20,8 @@ func (c *Controller) TopicsGetHandler() http.HandlerFunc {
 		topics, err := c.ForumStore.GetAllTopics()
 		if err != nil {
 			logger.Error(err)
+			http.Redirect(w, r, "/forum", http.StatusFound)
+			return
 		}
 
 		var viewTopics []forum.ViewTopic
@@ -28,10 +30,14 @@ func (c *Controller) TopicsGetHandler() http.HandlerFunc {
 			userName, err := c.PetStore.DisplayName(topic.UserID)
 			if err != nil {
 				logger.Error(err)
+				http.Redirect(w, r, "/forum", http.StatusFound)
+				return
 			}
 			viewTopic, err := c.ForumStore.NewViewTopic(userName, topic)
 			if err != nil {
 				logger.Error(err)
+				http.Redirect(w, r, "/forum", http.StatusFound)
+				return
 			}
 			viewTopics = append(viewTopics, viewTopic)
 		}
@@ -69,15 +75,21 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 		topicID, err := strconv.Atoi(topicIdStr)
 		if err != nil {
 			logger.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 
 		comments, err := c.ForumStore.GetTopicComments(topicID)
 		if err != nil {
 			logger.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		topic, err := c.ForumStore.GetTopicByID(topicID)
 		if err != nil {
 			logger.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 
 		var viewComments []forum.ViewComment
@@ -86,10 +98,14 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 			userName, err := c.PetStore.DisplayName(comment.UserID)
 			if err != nil {
 				logger.Error(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
 			}
 			viewComment, err := c.ForumStore.NewViewComment(userName, comment)
 			if err != nil {
 				logger.Error(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
 			}
 			viewComments = append(viewComments, viewComment)
 		}
@@ -120,6 +136,8 @@ func (c *Controller) CommentsPostHandler() http.HandlerFunc {
 		topicID, err := strconv.Atoi(topicIdStr)
 		if err != nil {
 			logger.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 
 		r.ParseForm()
@@ -147,6 +165,8 @@ func (c *Controller) CommentsLikeHandler() http.HandlerFunc {
 		commentID, err := strconv.Atoi(commentIdStr)
 		if err != nil {
 			logger.Error(err)
+			http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
+			return
 		}
 
 		userID := context.Get(r, "id").(int)
@@ -154,9 +174,12 @@ func (c *Controller) CommentsLikeHandler() http.HandlerFunc {
 		rateOk, err := c.ForumStore.RateComment(commentID, userID)
 		if err != nil {
 			logger.Error(err)
+			http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
+			return
 		}
 		if !rateOk {
 			http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
+			return
 		}
 
 		http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
