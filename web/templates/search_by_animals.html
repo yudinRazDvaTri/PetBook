@@ -61,7 +61,7 @@
                 <input type="number" id="age" name="age" min="0" max="30" step="1" placeholder="age"
                     class="btn-outline-success">
                 <label for="type">Enter animal type:</label>
-                <select name="animal_type" id="type" class="btn-outline-success">
+                <select name="animal_type" id="animal_type" class="btn-outline-success">
                     <option selected>Type of animal</option>
                     <option name="dog">dog</option>
                     <option name="cat">cat</option>
@@ -128,13 +128,13 @@
                     newUrl += "&age=" + age;
                 };
             };
-            var type = getSelectedText('type');
-            if (type != "Type of animal") {
-                if (newUrl.match(/type=\w+[^&]/)) {
-                    str = newUrl.replace(/type=\w+[^&]/, "type=" + type);
+            var animal_type = getSelectedText('animal_type');
+            if (animal_type != "Type of animal") {
+                if (newUrl.match(/animal_type=\w+[^&]/)) {
+                    str = newUrl.replace(/animal_type=\w+[^&]/, "animal_type=" + animal_type);
                     newUrl = str;
                 } else {
-                    newUrl += "&type=" + type;
+                    newUrl += "&animal_type=" + animal_type;
                 };
             };
             var breed = document.getElementById('breed').value;

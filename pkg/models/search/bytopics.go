@@ -7,8 +7,8 @@ import (
 )
 
 func (f *SearchStore) GetTopicsBySearch(search string)(topics []forum.Topic,err error){
-	query:=" '%"+search+"%'"+"order by created_time DESC;"
-	rows, err := f.DB.Query("select * from topics where description ilike "+ query)
+
+	rows, err := f.DB.Query("select * from topics where description ilike '%' || $1 || '%'", search)
 	if err != nil {
 		err = fmt.Errorf("Can't read topics-rows from db: %v", err)
 		return

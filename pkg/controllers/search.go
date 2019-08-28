@@ -44,30 +44,13 @@ func (c *Controller) searchByUser(w http.ResponseWriter, r *http.Request)  {
 	}
 }
 func (c *Controller) searchByPet(w http.ResponseWriter, r *http.Request){
-	m := make(map[string]string)
-	age := r.URL.Query().Get("age")
-	if age != "" {
-		m["age"] = age
-	}
-	animalType := r.URL.Query().Get("type")
-	if animalType != "" {
-		m["animal_type"] = animalType
-	}
-	breed := r.URL.Query().Get("breed")
-	if breed != "" {
-		m["breed"] = breed
-	}
-	weight := r.URL.Query().Get("weight")
-	if weight != "" {
-		m["weight"] = weight
-	}
-	gender := r.URL.Query().Get("gender")
-	if gender != "" {
-		m["gender"] = gender
-	}
-	name := r.URL.Query().Get("name")
-	if name != "" {
-		m["name"] = name
+	m := make(map[string]interface{})
+	queryStr:=[]string{"age","animal_type","breed","weight","gender","name"}
+	for _,str:=range queryStr{
+		val:=r.URL.Query().Get(str)
+		if val!=""{
+			m[str]=val
+		}
 	}
 	if len(m) == 0 {
 		pets, err := c.SearchStore.GetAllPets()
