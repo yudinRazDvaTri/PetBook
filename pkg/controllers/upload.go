@@ -11,41 +11,43 @@ import (
 	"strings"
 )
 
-func UploadFile(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("File Upload Endpoint Hit")
-	id:=context.Get(r, "id").(int)
+func UploadFile() http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request){
+		fmt.Println("File Upload Endpoint Hit")
+		id := context.Get(r, "id").(int)
 
-	r.ParseMultipartForm(10 << 20)
-	file, handler, err := r.FormFile("myFile")
-	if err != nil {
-		fmt.Println("Error Retrieving the File")
-		fmt.Println(err)
-		return
-	}
-	defer file.Close()
-	fmt.Printf("Uploaded File: %+v\n", handler.Filename)
-	fmt.Printf("File Size: %+v\n", handler.Size)
-	fmt.Printf("MIME Header: %+v\n", handler.Header)
+		r.ParseMultipartForm(10 << 20)
+		file, handler, err := r.FormFile("myFile")
+		if err != nil {
+			fmt.Println("Error Retrieving the File")
+			fmt.Println(err)
+			return
+		}
+		defer file.Close()
+		fmt.Printf("Uploaded File: %+v\n", handler.Filename)
+		fmt.Printf("File Size: %+v\n", handler.Size)
+		fmt.Printf("MIME Header: %+v\n", handler.Header)
 
-	path:="./web/static/usermedia/"+strconv.Itoa(id)+"/logo"
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		_ = os.Mkdir("./web/static/usermedia/", os.ModeAppend)
-		_ = os.Mkdir("./web/static/usermedia/"+strconv.Itoa(id), os.ModeAppend)
-		_ = os.Mkdir(path, os.ModeAppend)
-	}
-	tempFile, err := ioutil.TempFile(path, "9*.png")
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer tempFile.Close()
+		path := "./web/static/usermedia/" + strconv.Itoa(id) + "/logo"
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			_ = os.Mkdir("./web/static/usermedia/", os.ModeAppend)
+			_ = os.Mkdir("./web/static/usermedia/"+strconv.Itoa(id), os.ModeAppend)
+			_ = os.Mkdir(path, os.ModeAppend)
+		}
+		tempFile, err := ioutil.TempFile(path, "9*.png")
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer tempFile.Close()
 
-	fileBytes, err := ioutil.ReadAll(file)
-	if err != nil {
-		fmt.Println(err)
+		fileBytes, err := ioutil.ReadAll(file)
+		if err != nil {
+			fmt.Println(err)
+		}
+		tempFile.Write(fileBytes)
+		//fmt.Fprintf(w, "Successfully Uploaded File\n")
+		http.Redirect(w, r, "/edit", 301)
 	}
-	tempFile.Write(fileBytes)
-	//fmt.Fprintf(w, "Successfully Uploaded File\n")
-	http.Redirect(w,r,"/edit",301)
 }
 
 func GetImgLogo(id int) []string {
@@ -60,7 +62,7 @@ func GetImgLogo(id int) []string {
 		return nil
 	})
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 	for _, file := range files {
 		fmt.Println(file)

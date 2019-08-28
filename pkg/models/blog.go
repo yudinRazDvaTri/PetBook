@@ -33,7 +33,7 @@ func logFatal(err error) {
 }
 
 func (b *BlogStore) GetBlog(userID int) []Blog {
-	rows, err := b.DB.Query("select blog_id,pets.user_id,name,created_time,content from blog,pets where pets.user_id  = $1 order by created_time desc ", userID)
+	rows, err := b.DB.Query("select blog_id, content, created_time, name from blog,pets where blog.user_id =$1 and pets.user_id=blog.user_id order by created_time desc;", userID)
 	if err != nil {
 		logFatal(err)
 	}
@@ -41,11 +41,10 @@ func (b *BlogStore) GetBlog(userID int) []Blog {
 	var results []Blog
 	for rows.Next() {
 		var blogid int
-		var userid, message, name string
+		var message, name string
 		var time time.Time
-		err = rows.Scan(&blogid, &userid, &name, &time, &message)
+		err = rows.Scan(&blogid, &message, &time, &name)
 		tRes.Id = blogid
-		tRes.UserId = userid
 		tRes.PetName = name
 		tRes.Date = time
 		tRes.Message = message
@@ -93,12 +92,12 @@ func (b *BlogStore) CreateBlog(form string, idUser int) {
 func (b *BlogStore) DeleteBlog(blogid string) {
 	result, err := b.DB.Exec("delete from blog where blog_id = $1", blogid)
 	if err != nil {
-		log.Println("didn't delete  ", 501)
+		log.Println("didn't delete  ", 405)
 		return
 	}
 	n, err := result.RowsAffected()
 	if err != nil {
-		log.Println("didn't delete ", 501)
+		log.Println("didn't delete ", 405)
 		return
 	}
 	fmt.Println("rows affected - ", n)

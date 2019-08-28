@@ -35,10 +35,10 @@ func (c *Controller) MyPageGetHandler() http.HandlerFunc {
 		myPageData.Breed=pet.Breed
 
 		blog := c.BlogStore.GetBlog(userID)
-		for i, v := range blog {
-			v=blog[i]
-			v.LogoPath=path[0]
-		}
+		//for i, v := range blog {
+		//	v=blog[i]
+		//	v.LogoPath=path[0]
+		//}
 		if err != nil {
 			http.Redirect(w, r, "/petcabinet", http.StatusFound)
 			return
