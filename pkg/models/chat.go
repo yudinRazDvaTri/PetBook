@@ -66,7 +66,7 @@ func (c *ChatStore) GetMessages(toID, fromID int) ([]Message, error) {
 }
 
 func (c *ChatStore) SaveMessage(message *Message) error {
-	_, err := c.DB.Query(`insert into messages (to_id, from_id, text,created_at) select $1,$2,$3,$4
+	_, err := c.DB.Exec(`insert into messages (to_id, from_id, text,created_at) select $1,$2,$3,$4
 		WHERE NOT EXISTS (select 1 from messages  where to_id =$1 and from_id = $2 and text = $3 and created_at = $4)`,
 		message.ToID, message.FromID, message.Text, message.CreatedAt)
 	if err != nil {
