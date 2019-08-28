@@ -3,47 +3,25 @@ package search
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"strings"
 )
 
 type DispPet struct{
 	Name string `json:"name" db:"name"'`
 	Description string `json:"description" db:"description"'`
 }
-func (f *SearchStore) GetFilterPets(m map[string]string) (pets []*DispPet, err error) {
-	var (
-		query string
-		firstParam bool
-	)
-	parameters:=make([]string,5)
-	if age, ok := m["age"]; ok {
-		parameters[0]="age="+age
-	}
-	if animalType, ok := m["animal_type"]; ok {
-		parameters[1]="animal_type='"+animalType+"'"
-	}
-	if breed, ok := m["breed"]; ok {
-		parameters[2]="breed='"+breed+"'"
-	}
-	if weight, ok := m["weight"]; ok {
-		parameters[3]="weight="+weight
-	}
-	if gender, ok := m["gender"]; ok {
-		parameters[4]="gender='"+gender+"'"
-	}
-	if name,ok:=m["name"];ok{
-		parameters[4]="name='"+name+"'"
-	}
-	for _, str := range parameters {
-		if str!="" && !firstParam {
-			query += str
-			firstParam=true
-		}else if str!="" && firstParam{
-			query+=" and " + str
+func (f *SearchStore) GetFilterPets(m map[string]interface{}) (pets []*DispPet, err error) {
+	var where []string
+	var values []interface{}
+	var count = 1
+	for _, k := range []string{"age","animal_type","breed","weight","gender","name"}{
+		if v, ok := m[k]; ok {
+			values = append(values, v)
+			where = append(where, fmt.Sprintf("%s = $%d", k, count))
+			count++
 		}
-
 	}
-	query+=" order by name;"
-	rows, err := f.DB.Query("select name, description from pets where " + query)
+	rows, err := f.DB.Query("SELECT name, description FROM pets WHERE " + strings.Join(where, " AND "), values... )
 	if err != nil {
 		err = fmt.Errorf("Can't read pets from db: %v", err)
 		return

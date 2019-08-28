@@ -16,7 +16,7 @@
 <body>
 
         <div id="search_menu" class="w-50 container mb-3 input-group " style="margin-top:10px;">
-                <input type="email" placeholder="User's email" class="form-control " name="email" id="search">
+                <input type="text" placeholder="Topics' text" class="form-control " name="email" id="search">
                 <div class="input-group-append">
                     <input type="submit" class="btn btn-outline-success btn-secondary" id="search_button" value="Search">
                 </div>
@@ -46,7 +46,7 @@
                                     <div class="card-body text-success">
                                         <h5 class="card-title ">Author: {{ .UserName}}</h5>
                                         <p class="card-text">{{ .Description }}</p>
-                                        <p class="card-text">Comments: {{ .CommentsNumber}}</p>
+                                        <p class="card-text">Comments: {{ len .CommentsIDs}}</p>
                                         <p class="card-text"><small>{{ .CreatedTime | fdate}}</small></p>
                                     </div>
                                 </div>
