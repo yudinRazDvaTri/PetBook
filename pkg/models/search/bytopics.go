@@ -6,7 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func (f *SearchStore) GetTopicsBySearch(search string)(topics []forum.Topic,err error){
+func (f *SearchStore) GetTopicsBySearch(search string) (topics []forum.Topic, err error) {
 
 	rows, err := f.DB.Query("select * from topics where description ilike '%' || $1 || '%'", search)
 	if err != nil {
