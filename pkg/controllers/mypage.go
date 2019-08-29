@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/view"
 	"github.com/gorilla/context"
 	"net/http"
@@ -34,7 +35,11 @@ func (c *Controller) MyPageGetHandler() http.HandlerFunc {
 		myPageData.Gender=pet.Gender
 		myPageData.Breed=pet.Breed
 
-		blog := c.BlogStore.GetBlog(userID)
+		blog,err := c.BlogStore.GetBlog(userID)
+		if err!=nil{
+			logger.Error(err)
+			return
+		}
 		//for i, v := range blog {
 		//	v=blog[i]
 		//	v.LogoPath=path[0]

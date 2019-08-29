@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/gorilla/context"
 	"io/ioutil"
 	"net/http"
@@ -19,8 +20,7 @@ func UploadFile() http.HandlerFunc{
 		r.ParseMultipartForm(10 << 20)
 		file, handler, err := r.FormFile("myFile")
 		if err != nil {
-			fmt.Println("Error Retrieving the File")
-			fmt.Println(err)
+			logger.Error(err)
 			return
 		}
 		defer file.Close()
@@ -36,13 +36,15 @@ func UploadFile() http.HandlerFunc{
 		}
 		tempFile, err := ioutil.TempFile(path, "9*.png")
 		if err != nil {
-			fmt.Println(err)
+			logger.Error(err)
+			return
 		}
 		defer tempFile.Close()
 
 		fileBytes, err := ioutil.ReadAll(file)
 		if err != nil {
-			fmt.Println(err)
+			logger.Error(err)
+			return
 		}
 		tempFile.Write(fileBytes)
 		//fmt.Fprintf(w, "Successfully Uploaded File\n")
@@ -62,7 +64,7 @@ func GetImgLogo(id int) []string {
 		return nil
 	})
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err)
 	}
 	for _, file := range files {
 		fmt.Println(file)
