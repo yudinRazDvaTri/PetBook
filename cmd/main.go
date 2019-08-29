@@ -74,9 +74,9 @@ func main() {
 	//subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
 	subrouter.HandleFunc("/", controller.MyPageGetHandler()).Methods("GET")
 
-	subrouter.HandleFunc("/process", controller.CreateBlogHandler).Methods("Post")
-	subrouter.HandleFunc("/delete", controller.DeleteBlogHandler)
-	subrouter.HandleFunc("/upload", controllers.UploadFile)
+	subrouter.HandleFunc("/process", controller.CreateBlogHandler()).Methods("POST")
+	subrouter.HandleFunc("/delete", controller.DeleteBlogHandler()).Methods("GET")
+	subrouter.HandleFunc("/upload", controllers.UploadFile()).Methods("POST")
 	subrouter.HandleFunc("/edit", controller.EditHandler).Methods("GET")
 	subrouter.HandleFunc("/edit", controller.UpdateHandler).Methods("POST")
 
