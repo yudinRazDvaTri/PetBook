@@ -49,10 +49,12 @@ func main() {
 
 	router.HandleFunc("/login", controller.LoginPostHandler()).Methods("POST")
 	router.HandleFunc("/login", controller.LoginGetHandler()).Methods("GET")
+	router.HandleFunc("/loginGoogle", controller.LoginGoogleGetHandler()).Methods("GET")
+	router.HandleFunc("/loginGoogleCallback", controller.GoogleCallback()).Methods("GET")
 	router.HandleFunc("/logout", controller.LogoutGetHandler()).Methods("GET")
 
 	subrouter := router.PathPrefix("/").Subrouter()
-	subrouter.Use(authentication.ValidateTokenMiddleware(&storeRefreshToken, &storeUser))
+	subrouter.Use(authentication.AuthMiddleware(&storeRefreshToken, &storeUser))
 
 	subrouter.HandleFunc("/mypage", controller.MyPageGetHandler()).Methods("GET")
 	subrouter.HandleFunc("/petcabinet", controller.PetPostHandler()).Methods("POST")
