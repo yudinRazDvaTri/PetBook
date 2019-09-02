@@ -31,7 +31,7 @@
                                 <small>{{ .UserName}}</small>
                                 <br>
                                 <small>{{ .CreatedTime | fdate}}</small>
-                                <small>Rating: {{ len .Likes}}</small>
+                                <small>Rating: {{ len .LikersIDs}}</small>
                                 {{ if .CanLike $.ContextUserID }}
 
                                     <input type="submit" value="Like">

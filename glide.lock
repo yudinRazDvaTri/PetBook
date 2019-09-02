@@ -20,7 +20,7 @@ imports:
 - name: github.com/gorilla/securecookie
   version: 86450627d8e6b88e00ea41f228489b89d08a40de
 - name: github.com/gorilla/websocket
-  version: ae1634f6a98965ded3b8789c626cb4e0bd78c3de
+  version: c3e18be99d19e6b3e8f1559eea2c161a665c4b6b
 - name: github.com/jmoiron/sqlx
   version: d161d7a76b5661016ad0b085869f77fd410f3e6a
   subpackages:
