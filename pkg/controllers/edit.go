@@ -35,7 +35,7 @@ func (c *Controller) EditHandler(w http.ResponseWriter, r *http.Request) {
 	usChar.Name=user.Firstname
 	usChar.Email=user.Email
 	usChar.Password=user.Password
-	path:=GetImgLogo(id)
+	//path:= FolderLogoPath(id)
 
 	pet, _ := c.UserStore.GetPet(id)
 	var edit Editstr
@@ -49,7 +49,7 @@ func (c *Controller) EditHandler(w http.ResponseWriter, r *http.Request) {
 	edit.Description=pet.Description
 	edit.Weight=pet.Weight
 	edit.Gender=pet.Gender
-	edit.LogoPath=path
+	//edit.LogoPath=path
 
 	view.GenerateHTML(w,"Settings","navbarBlack")
 	view.GenerateHTML(w,edit,"edit")

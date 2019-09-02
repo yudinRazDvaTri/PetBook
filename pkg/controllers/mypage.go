@@ -15,7 +15,7 @@ type MypageData struct {
 	Description string
 	Weight string
 	Gender string
-	LogoPath []string
+	LogoPath string
 
 }
 
@@ -23,9 +23,10 @@ func (c *Controller) MyPageGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := context.Get(r, "id").(int)
 		pet, err := c.UserStore.GetPet(userID)
-		path:=GetImgLogo(userID)
+		path:=c.MediaStore.GetLogo(userID)
 
 		var myPageData MypageData
+
 		myPageData.LogoPath=path
 		myPageData.Name=pet.Name
 		myPageData.Age=pet.Age
@@ -40,10 +41,6 @@ func (c *Controller) MyPageGetHandler() http.HandlerFunc {
 			logger.Error(err)
 			return
 		}
-		//for i, v := range blog {
-		//	v=blog[i]
-		//	v.LogoPath=path[0]
-		//}
 		if err != nil {
 			http.Redirect(w, r, "/petcabinet", http.StatusFound)
 			return

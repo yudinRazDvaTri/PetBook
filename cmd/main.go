@@ -33,6 +33,7 @@ func main() {
 	storeSearch := search.SearchStore{DB: db}
 	storeBlog := models.BlogStore{DB: db}
 	storeChat := models.ChatStore{DB: db}
+	storeMedia := models.MediaStore{DB: db}
 
 	controller := controllers.Controller{
 		PetStore:          &storePet,
@@ -42,6 +43,7 @@ func main() {
 		RefreshTokenStore: &storeRefreshToken,
 		BlogStore:         &storeBlog,
 		ChatStore:         &storeChat,
+		MediaStore:        &storeMedia,
 	}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
@@ -76,7 +78,7 @@ func main() {
 
 	subrouter.HandleFunc("/process", controller.CreateBlogHandler()).Methods("POST")
 	subrouter.HandleFunc("/delete", controller.DeleteBlogHandler()).Methods("GET")
-	subrouter.HandleFunc("/upload", controllers.UploadFile()).Methods("POST")
+	subrouter.HandleFunc("/upload", controller.UploadLogo()).Methods("POST")
 	subrouter.HandleFunc("/edit", controller.EditHandler).Methods("GET")
 	subrouter.HandleFunc("/edit", controller.UpdateHandler).Methods("POST")
 
