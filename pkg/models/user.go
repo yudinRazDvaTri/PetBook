@@ -8,6 +8,7 @@ import (
 	"github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 	"log"
+	"strings"
 )
 
 func logErr(err error) {
@@ -37,6 +38,8 @@ type UserStorer interface {
 	ChangePassword(user *User, newPassword string) error
 	Login(email, userPassword string) (int, error)
 	GetPet(userID int) (Pet, error)
+	registerOauth(email string) (int, error)
+	LoginOauth(email string) (int, error)
 }
 
 func (c *UserStore) GetUsers() ([]User, error) {
@@ -68,13 +71,12 @@ func (c *UserStore) Register(user *User) error {
 	}
 
 	{
-
 		err = tx.QueryRow("insert into users (email, firstname, lastname, login) values ($1,$2,$3, $4) returning id",
 			user.Email, user.Firstname, user.Lastname, user.Login).Scan(&user.ID)
 
 		if err != nil {
 			if _, ok := err.(*pq.Error); ok {
-				err = &utilerr.UniqueTaken{Description: "Id or login has already been taken!"}
+				err = &utilerr.UniqueTaken{Description: "Email or login has already been taken!"}
 			} else {
 				err = fmt.Errorf("Error occurred while trying to add new user: %v.\n", err)
 			}
@@ -150,4 +152,39 @@ func (c *UserStore) GetPet(userID int) (Pet, error) {
 	}
 
 	return pet, nil
+}
+
+func (c *UserStore) registerOauth(email string) (int, error) {
+	var idFromBase int
+	login := strings.Split(email, "@")[0]
+
+	err := c.DB.QueryRow(`INSERT INTO users(email, login)
+								values ($1, $2) RETURNING id`, email, login).Scan(&idFromBase)
+
+	if err != nil {
+		if _, ok := err.(*pq.Error); ok {
+			return 0, &utilerr.UniqueTaken{Description: "Email or login has already been taken!"}
+		} else {
+			return 0, fmt.Errorf("Error occurred while trying to add new user: %v.\n", err)
+		}
+	}
+	return idFromBase, nil
+}
+
+func (c *UserStore) LoginOauth(email string) (int, error) {
+	var idFromBase int
+	err := c.DB.QueryRow(`SELECT id FROM users 
+								WHERE users.email=$1`, email).Scan(&idFromBase)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			idFromBase, err = c.registerOauth(email)
+			if err != nil {
+				return 0, err
+			}
+		} else {
+			return 0, fmt.Errorf("Error occurred while trying to login user: %v.\n", err)
+		}
+	}
+	return idFromBase, nil
 }
