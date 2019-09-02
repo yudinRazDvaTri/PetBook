@@ -4,27 +4,30 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"github.com/dpgolang/PetBook/pkg/logger"
+	"github.com/gorilla/securecookie"
 )
 
-type keys struct {
+type rsaKeys struct {
 	SignKey   *rsa.PrivateKey
 	VerifyKey *rsa.PublicKey
 }
 
-var Keys = keys{}
+var RsaKeys = rsaKeys{}
+var hashKey = securecookie.GenerateRandomKey(32)
+var SCookie = securecookie.New(hashKey, nil)
 
 func init() {
 	reader := rand.Reader
 	bitSize := 2048
 	var err error
 
-	Keys.SignKey, err = rsa.GenerateKey(reader, bitSize)
+	RsaKeys.SignKey, err = rsa.GenerateKey(reader, bitSize)
 	if err != nil {
-		logger.FatalError(err, "Error occurred while trying to generate rsa keys.\n")
+		logger.FatalError(err, "Error occurred while trying to generate rsa rsaKeys.\n")
 	}
-	Keys.VerifyKey = &Keys.SignKey.PublicKey
+	RsaKeys.VerifyKey = &RsaKeys.SignKey.PublicKey
 
-	// Saving keys to directory. Currently it is not needed.
+	// Saving rsaKeys to directory. Currently it is not needed.
 	/*
 	   func savePEMKey(fileName string, key *rsa.PrivateKey) {
 	   	outFile, err := os.Create(fileName)
