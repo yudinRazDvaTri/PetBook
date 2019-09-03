@@ -1,18 +1,16 @@
 -- +migrate Up
-CREATE type sex AS ENUM ('male','female');
-CREATE type kind_of_animal AS ENUM ('dog','cat','fish','bird','rodent');
-CREATE table if not exists pets
+CREATE type rank AS ENUM ('A','B','C','D');
+CREATE type class AS ENUM ('zoologist','handler','paramedic','surgeon');
+CREATE table if not exists vets
 (
     user_id     integer        not null primary key,
     name        text           not null,
-    age         integer        not null,
-    animal_type kind_of_animal not null,
-    breed       text           not null,
-    description text,
-    weight      float          not null,
-    gender      sex            not null
+    qualification         class        not null,
+    surname text not null,
+    category       rank           not null,
+    certificates text
 );
 -- +migrate Down
-DROP TABLE pets;
-DROP type sex;
-DROP type kind_of_animal;
+DROP TABLE vets;
+DROP type rank;
+DROP type class;

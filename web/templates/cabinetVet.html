@@ -4,34 +4,31 @@
     <html >
     <head>
         <meta charset="UTF-8">
-        <title>Pet</title>
+        <title>Vet</title>
         <link rel="stylesheet" href="../static/registerAndLogin.css">
     </head>
     <body>
     <div class="box">
-        <form method="POST" action="/petcabinet">
+        <form method="POST" action="/vetcabinet">
             <h1>Pet Registration</h1>
-            <input type="text" name="nickname" placeholder="Pet nickname"/>
-{{/*            <label>Animal type</label>*/}}
-
-            <select name="pet-type" class="custom-select">
-                <option selected>Pet type</option>
+            <input type="text" name="nickname" placeholder="Nickname"/>
+            <select name="qualification" class="custom-select">
+                <option selected>Qualification</option>
                 {{range .}}
                     <option >{{.}}</option>
                 {{end}}
             </select>
 
 
-            <input type="text" name="breed" placeholder="Pet breed"/>
-            <input type="number"  name="age" placeholder="Pet age"/>
-            <input type="number" step="0.1" name="weight" placeholder="Pet weight"/>
-{{/*            <label>Pet gender</label>*/}}
-            <select name="gender" class="custom-select">
-                <option selected>Gender</option>
-                <option name="male">male</option>
-                <option name="female">female</option>
+            <input type="text" name="surname" placeholder="Surname"/>
+            <select name="category" class="custom-select">
+                <option selected>Category</option>
+                <option name="A">A</option>
+                <option name="B">B</option>
+                <option name="C">C</option>
+                <option name="D">D</option>
             </select>
-            <input type="text" name="description" placeholder="Pet description"/>
+            <input type="text" name="certificates" placeholder="Certificates"/>
             <input type="submit" value="Send" />
         </form>
     </div>

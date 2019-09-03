@@ -27,6 +27,7 @@ type Controller struct {
 	SearchStore       search.SearchStorer
 	BlogStore         models.BlogStorer
 	ChatStore         models.ChatStorer
+	VetStore  		  models.VetStorer
 }
 
 const (

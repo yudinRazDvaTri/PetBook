@@ -1,7 +1,7 @@
 -- +migrate Up
-ALTER TABLE pets
+ALTER TABLE vets
     ADD constraint users_fk
         FOREIGN KEY (user_id) references users (id);
 -- +migrate Down
-ALTER TABLE pets
+ALTER TABLE vets
     DROP CONSTRAINT users_fk;

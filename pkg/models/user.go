@@ -37,6 +37,7 @@ type UserStorer interface {
 	ChangePassword(user *User, newPassword string) error
 	Login(email, userPassword string) (int, error)
 	GetPet(userID int) (Pet, error)
+	GetVet(userID int) (Vet, error)
 }
 
 func (c *UserStore) GetUsers() ([]User, error) {
@@ -150,4 +151,19 @@ func (c *UserStore) GetPet(userID int) (Pet, error) {
 	}
 
 	return pet, nil
+}
+
+func (c *UserStore) GetVet(userID int) (Vet, error) {
+	var vet Vet
+	err := c.DB.QueryRowx(
+		`SELECT user_id,name,qualification, surname, category, certificates
+		FROM vets p, users u 
+		WHERE p.user_id = u.id  
+		AND u.id = $1 `, userID).StructScan(&vet)
+
+	if err != nil {
+		return vet, err
+	}
+
+	return vet, nil
 }
