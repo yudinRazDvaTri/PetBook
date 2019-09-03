@@ -75,7 +75,7 @@ func (c *Controller) PostFollowerHandler() http.HandlerFunc {
 				logger.Error(err)
 				return
 			}
-
+			http.Redirect(w,r,r.Header.Get("Referer"),302)
 		}
 		err = c.FollowersStore.UnFollowed(userID,followUserID)
 		if err != nil {
@@ -83,7 +83,7 @@ func (c *Controller) PostFollowerHandler() http.HandlerFunc {
 			logger.Error(err)
 			return
 		}
-
+		http.Redirect(w,r,r.Header.Get("Referer"),302)
 
 	}
 }

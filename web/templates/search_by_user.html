@@ -32,6 +32,13 @@
         <div class="col-md-8 ">
             <ul>
                 {{ range .Pets }}
+                    {{if .Name}}
+                <div class="card mb-3 border-success " style="max-width: 35rem;">
+                    <div class="row no-gutters">
+                        <div class="col-md-4">
+                            <!-- <img src="..." class="card-img" alt="..."> -->
+                            <p>PHOTO</p>
+                        </div>
                     <div class="col-md-8">
                         <div class="card-body text-success">
                             <form action="mypage/following" method="POST">
@@ -47,9 +54,12 @@
                             </form>
                         </div>
                     </div>
+                    </div>
+                        {{else}}
                 <div class="card mb-3">
                     <h2>Nothing to show</h2>
                 </div>
+                        {{end}}
                 {{ end}}
 
             </ul>
