@@ -2,6 +2,7 @@ package search
 
 import (
 	"fmt"
+	"github.com/dpgolang/PetBook/pkg/models"
 	"github.com/jmoiron/sqlx"
 	"strings"
 )
@@ -9,8 +10,20 @@ import (
 type DispPet struct {
 	Name        string `json:"name" db:"name"'`
 	Description string `json:"description" db:"description"'`
+	UserID          int `json:"user_id" db:"user_id"`
 }
+func(f *DispPet) CanFollow (userID int, petsFollowing []*models.FollowerPets) bool {
 
+	if f.UserID == userID {
+		return false
+	}
+	for _,val := range petsFollowing {
+		if int(val.UserID) == f.UserID {
+			return false
+		}
+	}
+	return true
+}
 func (f *SearchStore) GetFilterPets(m map[string]interface{}) (pets []*DispPet, err error) {
 	var where []string
 	var values []interface{}
@@ -22,7 +35,7 @@ func (f *SearchStore) GetFilterPets(m map[string]interface{}) (pets []*DispPet, 
 			count++
 		}
 	}
-	rows, err := f.DB.Query("SELECT name, description FROM pets WHERE "+strings.Join(where, " AND "), values...)
+	rows, err := f.DB.Query("SELECT name, description, user_id FROM pets WHERE "+strings.Join(where, " AND "), values...)
 	if err != nil {
 		err = fmt.Errorf("Can't read pets from db: %v", err)
 		return

@@ -33,6 +33,7 @@ func main() {
 	storeSearch := search.SearchStore{DB: db}
 	storeBlog := models.BlogStore{DB: db}
 	storeChat := models.ChatStore{DB: db}
+	storeFollowers:=models.FollowersStore{DB: db}
 
 	controller := controllers.Controller{
 		PetStore:          &storePet,
@@ -42,6 +43,7 @@ func main() {
 		RefreshTokenStore: &storeRefreshToken,
 		BlogStore:         &storeBlog,
 		ChatStore:         &storeChat,
+		FollowersStore:    &storeFollowers,
 	}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
@@ -79,6 +81,9 @@ func main() {
 	subrouter.HandleFunc("/upload", controllers.UploadFile)
 	subrouter.HandleFunc("/edit", controller.EditHandler).Methods("GET")
 	subrouter.HandleFunc("/edit", controller.UpdateHandler).Methods("POST")
+
+	subrouter.HandleFunc("/mypage/{follow:followers|following}", controller.GetFollowerHandler()).Methods("GET")
+	subrouter.HandleFunc("/mypage/{follow:followers|following}", controller.PostFollowerHandler()).Methods("POST")
 
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
 		http.FileServer(http.Dir("./web/static/"))))
