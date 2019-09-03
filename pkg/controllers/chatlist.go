@@ -5,7 +5,9 @@ import (
 	"github.com/dpgolang/PetBook/pkg/models"
 	"github.com/dpgolang/PetBook/pkg/view"
 	"github.com/gorilla/context"
+	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 )
 
 func (c *Controller) ChatsGetHandler() http.HandlerFunc {
@@ -31,5 +33,23 @@ func (c *Controller) ChatsGetHandler() http.HandlerFunc {
 		}
 		view.GenerateTimeHTML(w, "Chats", "navbar")
 		view.GenerateTimeHTML(w, viewChats, "chatlist")
+	}
+}
+func (c *Controller) DeleteChatHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fromID := context.Get(r, "id").(int)
+		params := mux.Vars(r)
+		toID, err := strconv.Atoi(params["id"])
+		if err != nil {
+			logger.Error(err)
+			http.Redirect(w, r, "/chats", http.StatusNotFound)
+			return
+		}
+		err = c.ChatStore.RemoveChat(fromID, toID)
+		if err != nil {
+			logger.Error(err)
+			http.Redirect(w, r, "/chats", http.StatusNotFound)
+		}
+		http.Redirect(w, r, "/chats", http.StatusMovedPermanently)
 	}
 }

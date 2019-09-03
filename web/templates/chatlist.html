@@ -18,6 +18,10 @@
     <ul>
         {{ range . }}
             <div class="box">
+             <form method="post" action="chats/{{ .ToID }}/delete" method ="POST" class="inline">
+                <input type="hidden">
+                <button type="submit" class="link-button">Delete</button>
+            </form>
                 <h5><a href="chats/{{ .ToID }}">{{ .Username }}</a></h5>
                 <br>
                 <h6>{{ .Message }}</h6>
@@ -25,9 +29,10 @@
                 <i>At: {{ .CreatedAt}}</i>
             </div>
         {{ else }}
-            <li> Nothing to show </li>
+        <div class="box">
+            <h5> Nothing to show </h5>
+        </div>
         {{ end}}
-
     </ul>
     </div>
     </body>

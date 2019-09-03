@@ -67,6 +67,7 @@ func main() {
 	subrouter.HandleFunc("/forum/topic/{topicID}/comments/{commentID}/ratings", controller.CommentsLikeHandler()).Methods("POST")
 
 	subrouter.HandleFunc("/chats", controller.ChatsGetHandler()).Methods("GET")
+	subrouter.HandleFunc("/chats/{id}/delete", controller.DeleteChatHandler()).Methods("POST")
 	subrouter.HandleFunc("/chats/{id}", controller.HandleChatConnectionGET()).Methods("GET")
 	subrouter.HandleFunc("/ws", controller.HandleChatConnection())
 	go controller.HandleMessages()
