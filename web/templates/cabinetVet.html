@@ -1,0 +1,41 @@
+{{ define "layout" }}
+
+    <!DOCTYPE html>
+    <html >
+    <head>
+        <meta charset="UTF-8">
+        <title>Pet</title>
+        <link rel="stylesheet" href="../static/registerAndLogin.css">
+    </head>
+    <body>
+    <div class="box">
+        <form method="POST" action="/petcabinet">
+            <h1>Pet Registration</h1>
+            <input type="text" name="nickname" placeholder="Pet nickname"/>
+{{/*            <label>Animal type</label>*/}}
+
+            <select name="pet-type" class="custom-select">
+                <option selected>Pet type</option>
+                {{range .}}
+                    <option >{{.}}</option>
+                {{end}}
+            </select>
+
+
+            <input type="text" name="breed" placeholder="Pet breed"/>
+            <input type="number"  name="age" placeholder="Pet age"/>
+            <input type="number" step="0.1" name="weight" placeholder="Pet weight"/>
+{{/*            <label>Pet gender</label>*/}}
+            <select name="gender" class="custom-select">
+                <option selected>Gender</option>
+                <option name="male">male</option>
+                <option name="female">female</option>
+            </select>
+            <input type="text" name="description" placeholder="Pet description"/>
+            <input type="submit" value="Send" />
+        </form>
+    </div>
+    </body>
+    </html>
+
+{{ end }}
