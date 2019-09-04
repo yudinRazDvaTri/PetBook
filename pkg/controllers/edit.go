@@ -22,24 +22,14 @@ type Editstr struct {
 	LogoPath string
 }
 
-type UserChar struct {
-	Name string
-	Email string
-	Password string
-}
-
 func (c *Controller) EditHandler(w http.ResponseWriter, r *http.Request) {
 	id := context.Get(r, "id").(int)
 	user,_:=c.UserStore.GetUser(id)
-	var usChar UserChar
-	usChar.Name=user.Firstname
-	usChar.Email=user.Email
-	usChar.Password=user.Password
 	path:=c.MediaStore.GetLogo(id)
 
 	pet, _ := c.UserStore.GetPet(id)
 	var edit Editstr
-	edit.Name=user.Firstname
+	edit.Name=user.Login
 	edit.Email=user.Email
 	edit.Password=user.Password
 	edit.PetName=pet.Name
@@ -53,6 +43,7 @@ func (c *Controller) EditHandler(w http.ResponseWriter, r *http.Request) {
 
 	view.GenerateHTML(w,"Settings","navbarBlack")
 	view.GenerateHTML(w,edit,"edit")
+	view.GenerateHTML(w,nil,"gallery_edit")
 	view.GenerateHTML(w,nil,"footer")
 }
 func (c *Controller) UpdateHandler(w http.ResponseWriter, r *http.Request) {

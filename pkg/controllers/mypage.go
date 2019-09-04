@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/dpgolang/PetBook/pkg/logger"
+	"github.com/dpgolang/PetBook/pkg/models"
 	"github.com/dpgolang/PetBook/pkg/view"
 	"github.com/gorilla/context"
 	"net/http"
@@ -16,7 +17,10 @@ type MypageData struct {
 	Weight string
 	Gender string
 	LogoPath string
+}
 
+type BlogData struct {
+	BlogData []models.Blog
 }
 
 func (c *Controller) MyPageGetHandler() http.HandlerFunc {
@@ -24,7 +28,6 @@ func (c *Controller) MyPageGetHandler() http.HandlerFunc {
 		userID := context.Get(r, "id").(int)
 		pet, err := c.UserStore.GetPet(userID)
 		path:=c.MediaStore.GetLogo(userID)
-
 		var myPageData MypageData
 
 		myPageData.LogoPath=path
@@ -37,6 +40,9 @@ func (c *Controller) MyPageGetHandler() http.HandlerFunc {
 		myPageData.Breed=pet.Breed
 
 		blog,err := c.BlogStore.GetBlog(userID)
+		for i := 0; i < len(blog); i++{
+			blog[i].LogoPath=path
+		}
 		if err!=nil{
 			logger.Error(err)
 			return
@@ -47,6 +53,7 @@ func (c *Controller) MyPageGetHandler() http.HandlerFunc {
 		}
 		view.GenerateHTML(w, "MYPAGE", "navbarBlack")
 		view.GenerateHTML(w, myPageData, "mypage")
+		view.GenerateHTML(w, nil, "gallery_main")
 		view.GenerateTimeHTML(w, blog, "blog")
 		view.GenerateHTML(w, nil, "footer")
 	}
