@@ -49,6 +49,7 @@ func (c *Controller) DeleteChatHandler() http.HandlerFunc {
 		if err != nil {
 			logger.Error(err)
 			http.Redirect(w, r, "/chats", http.StatusNotFound)
+			return
 		}
 		http.Redirect(w, r, "/chats", http.StatusMovedPermanently)
 	}
