@@ -52,8 +52,19 @@
                     action="http://localhost:8080/upload"
                     method="post"
             >
-                <label for="exampleFormControlFile1">Download ur pet photo!</label><br>
+                <h6><b>Download logo!</b></h6>
                 <input type="file"  name="myFile"/>
+                <input class="btn btn-primary" type="submit" value="upload" />
+            </form>
+        </div>
+        <div style="position: relative;margin-left:60px; margin-top: 20px;font-family:Trebuchet MS, Arial, Helvetica, sans-serif;font-size: 16px;color: #212529;">
+            <form
+                    enctype="multipart/form-data"
+                    action="http://localhost:8080/uploadmedia"
+                    method="post"
+            >
+                <h6><b>Download photos!</b></h6>
+                <input type="file"  name="myMedia"/>
                 <input class="btn btn-primary" type="submit" value="upload" />
             </form>
         </div>
