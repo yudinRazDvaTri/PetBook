@@ -49,6 +49,7 @@ type ChatStorer interface {
 	GetMessages(toID, fromID int) ([]Message, error)
 	SaveMessage(message *Message) error
 	GetChats(userID int) ([]Chat, error)
+	RemoveChat(user1, user2 int) error
 }
 
 func (c *ChatStore) GetMessages(toID, fromID int) ([]Message, error) {
@@ -66,7 +67,7 @@ func (c *ChatStore) GetMessages(toID, fromID int) ([]Message, error) {
 }
 
 func (c *ChatStore) SaveMessage(message *Message) error {
-	_, err := c.DB.Query(`insert into messages (to_id, from_id, text,created_at) select $1,$2,$3,$4
+	_, err := c.DB.Exec(`insert into messages (to_id, from_id, text,created_at) select $1,$2,$3,$4
 		WHERE NOT EXISTS (select 1 from messages  where to_id =$1 and from_id = $2 and text = $3 and created_at = $4)`,
 		message.ToID, message.FromID, message.Text, message.CreatedAt)
 	if err != nil {
@@ -93,4 +94,21 @@ func (c *ChatStore) GetChats(userID int) ([]Chat, error) {
 		return nil, fmt.Errorf("cannot scan messages from db: %v", err)
 	}
 	return chats, nil
+}
+
+func (c *ChatStore) RemoveChat(user1, user2 int) error {
+	res, err := c.DB.Exec(`DELETE FROM messages 
+		WHERE (to_id =$1 and from_id = $2) or (from_id=$1 and to_id = $2)`,
+		user1, user2)
+	if err != nil {
+		return fmt.Errorf("cannot remove messages from db: %v", err)
+	}
+	rowCnt, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("cannot affect rows while deleting messages from db: %v", err)
+	}
+	if rowCnt == 0 {
+		return fmt.Errorf("there no messages to delete from db: %v", err)
+	}
+	return nil
 }

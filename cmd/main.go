@@ -49,10 +49,12 @@ func main() {
 
 	router.HandleFunc("/login", controller.LoginPostHandler()).Methods("POST")
 	router.HandleFunc("/login", controller.LoginGetHandler()).Methods("GET")
+	router.HandleFunc("/loginGoogle", controller.LoginGoogleGetHandler()).Methods("GET")
+	router.HandleFunc("/loginGoogleCallback", controller.GoogleCallback()).Methods("GET")
 	router.HandleFunc("/logout", controller.LogoutGetHandler()).Methods("GET")
 
 	subrouter := router.PathPrefix("/").Subrouter()
-	subrouter.Use(authentication.ValidateTokenMiddleware(&storeRefreshToken, &storeUser))
+	subrouter.Use(authentication.AuthMiddleware(&storeRefreshToken, &storeUser))
 
 	subrouter.HandleFunc("/mypage", controller.MyPageGetHandler()).Methods("GET")
 	subrouter.HandleFunc("/petcabinet", controller.PetPostHandler()).Methods("POST")
@@ -67,6 +69,7 @@ func main() {
 	subrouter.HandleFunc("/forum/topic/{topicID}/comments/{commentID}/ratings", controller.CommentsLikeHandler()).Methods("POST")
 
 	subrouter.HandleFunc("/chats", controller.ChatsGetHandler()).Methods("GET")
+	subrouter.HandleFunc("/chats/{id}/delete", controller.DeleteChatHandler()).Methods("POST")
 	subrouter.HandleFunc("/chats/{id}", controller.HandleChatConnectionGET()).Methods("GET")
 	subrouter.HandleFunc("/ws", controller.HandleChatConnection())
 	go controller.HandleMessages()
@@ -74,9 +77,9 @@ func main() {
 	//subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
 	subrouter.HandleFunc("/", controller.MyPageGetHandler()).Methods("GET")
 
-	subrouter.HandleFunc("/process", controller.CreateBlogHandler).Methods("Post")
-	subrouter.HandleFunc("/delete", controller.DeleteBlogHandler)
-	subrouter.HandleFunc("/upload", controllers.UploadFile)
+	subrouter.HandleFunc("/process", controller.CreateBlogHandler()).Methods("POST")
+	subrouter.HandleFunc("/delete", controller.DeleteBlogHandler()).Methods("GET")
+	subrouter.HandleFunc("/upload", controllers.UploadFile()).Methods("POST")
 	subrouter.HandleFunc("/edit", controller.EditHandler).Methods("GET")
 	subrouter.HandleFunc("/edit", controller.UpdateHandler).Methods("POST")
 
