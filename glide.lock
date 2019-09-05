@@ -1,8 +1,8 @@
 hash: fd528d8e22e4dc1ec7f7002489942414f098039a4d59286be33edc0fe71eb633
-updated: 2019-08-30T09:12:36.5562213+03:00
+updated: 2019-09-04T09:44:11.523288+03:00
 imports:
 - name: cloud.google.com/go
-  version: 5bc02cbce48731bbb1617d830561bb61da810c1e
+  version: 3b58207d07a2c89721ebc3d4553d5930ef8cf56a
   subpackages:
   - compute/metadata
 - name: github.com/dgrijalva/jwt-go
@@ -33,7 +33,7 @@ imports:
   - oid
   - scram
 - name: github.com/rubenv/sql-migrate
-  version: 87ce952f7079c58e10a2a85835202943ebb9580c
+  version: 8926f37f0bc1a432e673c60cedb705f783306da5
   subpackages:
   - sqlparse
 - name: github.com/subosito/gotenv
@@ -41,7 +41,11 @@ imports:
 - name: github.com/urfave/negroni
   version: c6a59be0ce122566695fbd5e48a77f8f10c8a63a
 - name: golang.org/x/crypto
+<<<<<<< Updated upstream
   version: 60c769a6c58655dab1b9adac0d58967dd517cfba
+=======
+  version: 9756ffdc24725223350eb3266ffb92590d28f278
+>>>>>>> Stashed changes
   subpackages:
   - bcrypt
   - blowfish
