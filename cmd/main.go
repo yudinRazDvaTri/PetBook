@@ -62,11 +62,11 @@ func main() {
 	subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Queries("section", "{section}").Methods("GET")
 	subrouter.HandleFunc("/search", controller.RedirectSearchHandler()).Methods("GET")
 
-	subrouter.HandleFunc("/forum", controller.TopicsGetHandler()).Methods("GET")
-	subrouter.HandleFunc("/forum", controller.TopicsPostHandler()).Methods("POST")
-	subrouter.HandleFunc("/forum/topic/{topicID}/comments", controller.CommentsGetHandler()).Methods("GET")
-	subrouter.HandleFunc("/forum/topic/{topicID}/comments", controller.CommentsPostHandler()).Methods("POST")
-	subrouter.HandleFunc("/forum/topic/{topicID}/comments/{commentID}/ratings", controller.CommentsLikeHandler()).Methods("POST")
+	subrouter.HandleFunc("/topics", controller.TopicsGetHandler()).Methods("GET")
+	subrouter.HandleFunc("/topics", controller.TopicsPostHandler()).Methods("POST")
+	subrouter.HandleFunc("/topics/{topicID}", controller.CommentsGetHandler()).Methods("GET")
+	subrouter.HandleFunc("/topics/{topicID}/comments", controller.CommentPostHandler()).Methods("POST")
+	subrouter.HandleFunc("/topics/{topicID}/comments/{commentID}/ratings", controller.CommentsRatingHandler()).Methods("POST")
 
 	subrouter.HandleFunc("/chats", controller.ChatsGetHandler()).Methods("GET")
 	subrouter.HandleFunc("/chats/{id}/delete", controller.DeleteChatHandler()).Methods("POST")
