@@ -20,7 +20,7 @@
         {{ range . }}
             <li>
             <div class="box" >
-                <h3><a href="forum/topic/{{ .TopicID }}/comments">{{ .Title }}</a></h3>
+                <h3><a href="topics/{{ .TopicID }}">{{ .Title }}</a></h3>
                 <br>
                 <h6>{{ .Description }}</h6>
                 <br>
@@ -39,11 +39,11 @@
     </div>
 
     <div class="footer">
-        <form action="/forum" method="POST">
+        <form action="/topics" method="POST">
             <h1>Add Topic</h1>
             <input type="text" name="title" placeholder="title" required>
             <br>
-            <textarea rows="4" cols="20" name="description" placeholder="description"></textarea>
+            <textarea rows="4" cols="20" name="description" placeholder="description" required></textarea>
             <input type="submit" value="Create">
         </form>
     </div>
