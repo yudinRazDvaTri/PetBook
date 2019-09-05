@@ -51,9 +51,12 @@ func (c *Controller) MyPageGetHandler() http.HandlerFunc {
 			http.Redirect(w, r, "/petcabinet", http.StatusFound)
 			return
 		}
+
+		photos:=c.MediaStore.GetExistedGallery(userID)
+
 		view.GenerateHTML(w, "MYPAGE", "navbarBlack")
 		view.GenerateHTML(w, myPageData, "mypage")
-		view.GenerateHTML(w, nil, "gallery_main")
+		view.GenerateHTML(w, photos, "gallery_main")
 		view.GenerateTimeHTML(w, blog, "blog")
 		view.GenerateHTML(w, nil, "footer")
 	}

@@ -16,43 +16,43 @@ type MediaStore struct {
 	DB *sqlx.DB
 }
 
-//func (c *Controller) UploadMedia() http.HandlerFunc{
-//	return func(w http.ResponseWriter, r *http.Request){
-//		id := context.Get(r, "id").(int)
-//
-//		r.ParseMultipartForm(10 << 20)
-//		file, _, err := r.FormFile("myMedia")
-//		if err != nil {
-//			logger.Error(err)
-//			return
-//		}
-//		defer file.Close()
-//		path := "./web/static/usermedia/" + strconv.Itoa(id) + "/gallery"
-//		if _, err := os.Stat(path); os.IsNotExist(err) {
-//			_ = os.Mkdir("./web/static/usermedia/", os.ModeAppend)
-//			_ = os.Mkdir("./web/static/usermedia/"+strconv.Itoa(id), os.ModeAppend)
-//			_ = os.Mkdir(path, os.ModeAppend)
-//		}
-//		tempFile, err := ioutil.TempFile(path, "*.png")
-//		if err != nil {
-//			logger.Error(err)
-//			return
-//		}
-//		defer tempFile.Close()
-//
-//		fileBytes, err := ioutil.ReadAll(file)
-//		if err != nil {
-//			logger.Error(err)
-//			return
-//		}
-//		tempFile.Write(fileBytes)
-//		renamedFiles:=FolderMediaPath(id)
-//		for _, element := range renamedFiles {
-//			c.MediaStore.AddMediaPathDb(element,id)
-//		}
-//		http.Redirect(w, r, "/edit", 301)
-//	}
-//}
+func (c *Controller) UploadMedia() http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request){
+		id := context.Get(r, "id").(int)
+
+		r.ParseMultipartForm(10 << 20)
+		file, _, err := r.FormFile("myMedia")
+		if err != nil {
+			logger.Error(err)
+			return
+		}
+		defer file.Close()
+		path := "./web/static/usermedia/" + strconv.Itoa(id) + "/gallery"
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			_ = os.Mkdir("./web/static/usermedia/", os.ModeAppend)
+			_ = os.Mkdir("./web/static/usermedia/"+strconv.Itoa(id), os.ModeAppend)
+			_ = os.Mkdir(path, os.ModeAppend)
+		}
+		tempFile, err := ioutil.TempFile(path, "*.png")
+		if err != nil {
+			logger.Error(err)
+			return
+		}
+		defer tempFile.Close()
+
+		fileBytes, err := ioutil.ReadAll(file)
+		if err != nil {
+			logger.Error(err)
+			return
+		}
+		tempFile.Write(fileBytes)
+		renamedFiles:=FolderMediaPath(id)
+		for _, element := range renamedFiles {
+			c.MediaStore.AddMediaPathDb(element,id)
+		}
+		http.Redirect(w, r, "/edit", 301)
+	}
+}
 
 func FolderMediaPath(id int) []string {
 		var files []string

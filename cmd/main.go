@@ -81,7 +81,7 @@ func main() {
 	subrouter.HandleFunc("/upload", controller.UploadLogo()).Methods("POST")
 	subrouter.HandleFunc("/edit", controller.EditHandler).Methods("GET")
 	subrouter.HandleFunc("/edit", controller.UpdateHandler).Methods("POST")
-	//subrouter.HandleFunc("/uploadmedia", controller.UploadMedia()).Methods("POST")
+	subrouter.HandleFunc("/uploadmedia", controller.UploadMedia()).Methods("POST")
 
 
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/",

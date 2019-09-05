@@ -42,56 +42,30 @@
 
                     <div class="carousel-item active">
                         <div class="row">
+                            {{range .}}
                             <div class="col-md-3">
                                 <a href="#">
-                                    <img src="http://placehold.it/250x250" alt="Image" style="max-width:100%;">
+
+                                    <img src={{.}} alt="Image" style="width: 260px;height: 200px">
                                 </a>
                             </div>
-                            <div class="col-md-3">
-                                <a href="#">
-                                    <img src="http://placehold.it/250x250" alt="Image" style="max-width:100%;">
-                                </a>
-                            </div>
-                            <div class="col-md-3">
-                                <a href="#">
-                                    <img src="http://placehold.it/250x250" alt="Image" style="max-width:100%;">
-                                </a>
-                            </div>
-                            <div class="col-md-3">
-                                <a href="#">
-                                    <img src="http://placehold.it/250x250" alt="Image" style="max-width:100%;">
-                                </a>
-                            </div>
+                            {{end}}
                         </div>
                         <!--.row-->
                     </div>
                     <!--.item-->
                     <div class="carousel-item">
                         <div class="row">
+                            {{range .}}
                             <div class="col-md-3">
                                 <a href="#">
-                                    <img src="http://placehold.it/250x250" alt="Image" style="max-width:100%;">
+                                    <img src={{.}} alt="Image" style="width: 260px;height: 200px">
                                 </a>
                             </div>
-                            <div class="col-md-3">
-                                <a href="#">
-                                    <img src="http://placehold.it/250x250" alt="Image" style="max-width:100%;">
-                                </a>
-                            </div>
-                            <div class="col-md-3">
-                                <a href="#">
-                                    <img src="http://placehold.it/250x250" alt="Image" style="max-width:100%;">
-                                </a>
-                            </div>
-                            <div class="col-md-3">
-                                <a href="#">
-                                    <img src="http://placehold.it/250x250" alt="Image" style="max-width:100%;">
-                                </a>
-                            </div>
-                        </div>
-                        <!--.row-->
+                            {{end}}
+{{/*                        <!--.row-->*/}}
                     </div>
-                    <!--.item-->
+{{/*                    <!--.item-->*/}}
                 </div>
                 <!--.carousel-inner-->
             </div>

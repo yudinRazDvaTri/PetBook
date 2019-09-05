@@ -41,9 +41,11 @@ func (c *Controller) EditHandler(w http.ResponseWriter, r *http.Request) {
 	edit.Gender=pet.Gender
 	edit.LogoPath=path
 
+	gallery:=c.MediaStore.GetExistedGallery(id)
+
 	view.GenerateHTML(w,"Settings","navbarBlack")
 	view.GenerateHTML(w,edit,"edit")
-	view.GenerateHTML(w,nil,"gallery_edit")
+	view.GenerateHTML(w,gallery,"gallery_edit")
 	view.GenerateHTML(w,nil,"footer")
 }
 func (c *Controller) UpdateHandler(w http.ResponseWriter, r *http.Request) {
