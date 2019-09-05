@@ -15,7 +15,7 @@
 
     <body>
     <div style="text-align: center">
-        <form action="/forum" method="GET">
+        <form action="/topics" method="GET">
             <input type="submit" value="Forum">
         </form
         ></div>
@@ -26,7 +26,7 @@
         <div style="margin-top: 10%">
                 {{ range .ViewComments }}
                         <div class="container">
-                            <form action="/forum/topic/{{.TopicID}}/comments/{{.CommentID}}/ratings" method="POST">
+                            <form action="/topics/{{.TopicID}}/comments/{{.CommentID}}/ratings" method="POST">
                                 <h6>{{ .Content }}</h6>
                                 <small>{{ .UserName}}</small>
                                 <br>
@@ -48,7 +48,7 @@
         </div>
 
     <div class="container">
-        <form method="POST">
+        <form action="/topics/{{.Topic.TopicID}}/comments" method="POST">
             <textarea rows="4" cols="20" name="content" placeholder="content" required></textarea>
             <input type="submit" value="Comment">
         </form>

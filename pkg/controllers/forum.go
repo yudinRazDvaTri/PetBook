@@ -20,7 +20,7 @@ func (c *Controller) TopicsGetHandler() http.HandlerFunc {
 		topics, err := c.ForumStore.GetAllTopics()
 		if err != nil {
 			logger.Error(err)
-			http.Redirect(w, r, "/forum", http.StatusFound)
+			http.Redirect(w, r, "/topics", http.StatusNotFound)
 			return
 		}
 
@@ -30,13 +30,13 @@ func (c *Controller) TopicsGetHandler() http.HandlerFunc {
 			userName, err := c.PetStore.DisplayName(topic.UserID)
 			if err != nil {
 				logger.Error(err)
-				http.Redirect(w, r, "/forum", http.StatusFound)
+				http.Redirect(w, r, "/topics", http.StatusNotFound)
 				return
 			}
 			viewTopic, err := c.ForumStore.NewViewTopic(userName, topic)
 			if err != nil {
 				logger.Error(err)
-				http.Redirect(w, r, "/forum", http.StatusFound)
+				http.Redirect(w, r, "/topics", http.StatusNotFound)
 				return
 			}
 			viewTopics = append(viewTopics, viewTopic)
@@ -61,7 +61,7 @@ func (c *Controller) TopicsPostHandler() http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		http.Redirect(w, r, "/forum", http.StatusFound)
+		http.Redirect(w, r, "/topics", http.StatusFound)
 	}
 }
 
@@ -128,7 +128,7 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 }
 
 // Process adding new Comment
-func (c *Controller) CommentsPostHandler() http.HandlerFunc {
+func (c *Controller) CommentPostHandler() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -150,12 +150,12 @@ func (c *Controller) CommentsPostHandler() http.HandlerFunc {
 			return
 		}
 
-		http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
+		http.Redirect(w, r, "/topics/"+topicIdStr, http.StatusFound)
 	}
 }
 
 // Process Like-action on Comment
-func (c *Controller) CommentsLikeHandler() http.HandlerFunc {
+func (c *Controller) CommentsRatingHandler() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -165,7 +165,7 @@ func (c *Controller) CommentsLikeHandler() http.HandlerFunc {
 		commentID, err := strconv.Atoi(commentIdStr)
 		if err != nil {
 			logger.Error(err)
-			http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
+			http.Redirect(w, r, "/topics/"+topicIdStr, http.StatusNotFound)
 			return
 		}
 
@@ -174,14 +174,14 @@ func (c *Controller) CommentsLikeHandler() http.HandlerFunc {
 		rateOk, err := c.ForumStore.RateComment(commentID, userID)
 		if err != nil {
 			logger.Error(err)
-			http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
+			http.Redirect(w, r, "/topics/"+topicIdStr, http.StatusInternalServerError)
 			return
 		}
 		if !rateOk {
-			http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
+			http.Redirect(w, r, "/topics/"+topicIdStr, http.StatusInternalServerError)
 			return
 		}
 
-		http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
+		http.Redirect(w, r, "/topics/"+topicIdStr, http.StatusFound)
 	}
 }

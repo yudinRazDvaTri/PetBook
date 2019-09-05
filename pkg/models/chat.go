@@ -49,6 +49,7 @@ type ChatStorer interface {
 	GetMessages(toID, fromID int) ([]Message, error)
 	SaveMessage(message *Message) error
 	GetChats(userID int) ([]Chat, error)
+	RemoveChat(user1, user2 int) error
 }
 
 func (c *ChatStore) GetMessages(toID, fromID int) ([]Message, error) {
@@ -93,4 +94,21 @@ func (c *ChatStore) GetChats(userID int) ([]Chat, error) {
 		return nil, fmt.Errorf("cannot scan messages from db: %v", err)
 	}
 	return chats, nil
+}
+
+func (c *ChatStore) RemoveChat(user1, user2 int) error {
+	res, err := c.DB.Exec(`DELETE FROM messages 
+		WHERE (to_id =$1 and from_id = $2) or (from_id=$1 and to_id = $2)`,
+		user1, user2)
+	if err != nil {
+		return fmt.Errorf("cannot remove messages from db: %v", err)
+	}
+	rowCnt, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("cannot affect rows while deleting messages from db: %v", err)
+	}
+	if rowCnt == 0 {
+		return fmt.Errorf("there no messages to delete from db: %v", err)
+	}
+	return nil
 }

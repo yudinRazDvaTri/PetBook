@@ -21,9 +21,9 @@ type BlogStore struct {
 }
 
 type BlogStorer interface {
-	GetBlog(userid int) []Blog
-	CreateBlog(form string, idUser int)
-	DeleteBlog(blogid string)
+	GetBlog(userid int) ([]Blog,error)
+	CreateBlog(form string, idUser int) error
+	DeleteBlog(blogid string) error
 }
 
 func logFatal(err error) {
@@ -32,29 +32,28 @@ func logFatal(err error) {
 	}
 }
 
-func (b *BlogStore) GetBlog(userID int) []Blog {
-	rows, err := b.DB.Query("select blog_id,pets.user_id,name,created_time,content from blog,pets where pets.user_id  = $1 order by created_time desc ", userID)
+func (b *BlogStore) GetBlog(userID int) ([]Blog ,error){
+	rows, err := b.DB.Query("select blog_id, content, created_time, name from blog,pets where blog.user_id =$1 and pets.user_id=blog.user_id order by created_time desc;", userID)
 	if err != nil {
-		logFatal(err)
+		return nil,fmt.Errorf("cannot connect to database: %v", err)
 	}
 	tRes := Blog{}
 	var results []Blog
 	for rows.Next() {
 		var blogid int
-		var userid, message, name string
+		var message, name string
 		var time time.Time
-		err = rows.Scan(&blogid, &userid, &name, &time, &message)
+		err = rows.Scan(&blogid, &message, &time, &name)
 		tRes.Id = blogid
-		tRes.UserId = userid
 		tRes.PetName = name
 		tRes.Date = time
 		tRes.Message = message
 		results = append(results, tRes)
 		if err != nil {
-			logFatal(err)
+			return nil,fmt.Errorf("cannot insert message to messages in db: %v", err)
 		}
 	}
-	return results
+	return results,nil
 }
 
 //func (b *BlogStore) GetBlog() []Blog{
@@ -78,28 +77,27 @@ func (b *BlogStore) GetBlog(userID int) []Blog {
 //	return results
 //}
 
-func (b *BlogStore) CreateBlog(form string, idUser int) {
+func (b *BlogStore) CreateBlog(form string, idUser int) error{
 	result, err := b.DB.Exec("insert into blog (content,user_id) values ($1,$2);", form, idUser)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("cannot execute database query: %v", err)
 	}
 	_, err = result.RowsAffected()
 	if err != nil {
-		log.Println(err)
-		return
+		return fmt.Errorf("cannot create post: %v", err)
 	}
+	return nil
 }
 
-func (b *BlogStore) DeleteBlog(blogid string) {
+func (b *BlogStore) DeleteBlog(blogid string) error{
 	result, err := b.DB.Exec("delete from blog where blog_id = $1", blogid)
 	if err != nil {
-		log.Println("didn't delete  ", 501)
-		return
+		return fmt.Errorf("cannot execute database query: %v", err)
 	}
 	n, err := result.RowsAffected()
 	if err != nil {
-		log.Println("didn't delete ", 501)
-		return
+		return fmt.Errorf("cannot delete post: %v", err)
 	}
 	fmt.Println("rows affected - ", n)
+	return nil
 }
