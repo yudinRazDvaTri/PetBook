@@ -98,6 +98,7 @@ func (c *Controller) searchByForum(w http.ResponseWriter, r *http.Request) {
 			}
 			viewTopic, err := c.ForumStore.NewViewTopic(userName, topic)
 			if err != nil {
+
 				w.WriteHeader(http.StatusInternalServerError)
 				logger.Error(err)
 				return
