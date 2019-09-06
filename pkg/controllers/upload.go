@@ -46,7 +46,7 @@ func (c *Controller) UploadMedia() http.HandlerFunc{
 			return
 		}
 		tempFile.Write(fileBytes)
-		renamedFiles:=FolderMediaPath(id)
+		renamedFiles:= folderMediaPath(id)
 		for _, element := range renamedFiles {
 			c.MediaStore.AddMediaPathDb(element,id)
 		}
@@ -54,7 +54,7 @@ func (c *Controller) UploadMedia() http.HandlerFunc{
 	}
 }
 
-func FolderMediaPath(id int) []string {
+func folderMediaPath(id int) []string {
 		var files []string
 		root := "./web/static/usermedia/"+strconv.Itoa(id)+"/gallery"
 		err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
@@ -101,7 +101,7 @@ func (c *Controller) UploadLogo() http.HandlerFunc{
 			return
 		}
 		tempFile.Write(fileBytes)
-		renamedFiles:=FolderLogoPath(id)
+		renamedFiles:= folderLogoPath(id)
 		for _, element := range renamedFiles {
 			c.MediaStore.AddLogoPathDb(element,id)
 		}
@@ -109,7 +109,7 @@ func (c *Controller) UploadLogo() http.HandlerFunc{
 	}
 }
 
-func FolderLogoPath(id int) []string {
+func folderLogoPath(id int) []string {
 	var files []string
 	root := "./web/static/usermedia/"+strconv.Itoa(id)+"/logo"
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {

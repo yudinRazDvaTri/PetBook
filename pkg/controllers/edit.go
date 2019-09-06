@@ -22,7 +22,7 @@ type Editstr struct {
 	LogoPath string
 }
 
-func (c *Controller) EditHandler(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) EditPageHandler(w http.ResponseWriter, r *http.Request) {
 	id := context.Get(r, "id").(int)
 	user,_:=c.UserStore.GetUser(id)
 	path:=c.MediaStore.GetLogo(id)
@@ -48,7 +48,7 @@ func (c *Controller) EditHandler(w http.ResponseWriter, r *http.Request) {
 	view.GenerateHTML(w,gallery,"gallery_edit")
 	view.GenerateHTML(w,nil,"footer")
 }
-func (c *Controller) UpdateHandler(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) ProfileUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	id := context.Get(r, "id").(int)
 	if err != nil {

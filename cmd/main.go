@@ -82,8 +82,8 @@ func main() {
 	subrouter.HandleFunc("/process", controller.CreateBlogHandler()).Methods("POST")
 	subrouter.HandleFunc("/delete", controller.DeleteBlogHandler()).Methods("GET")
 	subrouter.HandleFunc("/upload", controller.UploadLogo()).Methods("POST")
-	subrouter.HandleFunc("/edit", controller.EditHandler).Methods("GET")
-	subrouter.HandleFunc("/edit", controller.UpdateHandler).Methods("POST")
+	subrouter.HandleFunc("/edit", controller.EditPageHandler).Methods("GET")
+	subrouter.HandleFunc("/edit", controller.ProfileUpdateHandler).Methods("POST")
 	subrouter.HandleFunc("/uploadmedia", controller.UploadMedia()).Methods("POST")
 
 
