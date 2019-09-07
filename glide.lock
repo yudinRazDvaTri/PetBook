@@ -41,11 +41,7 @@ imports:
 - name: github.com/urfave/negroni
   version: c6a59be0ce122566695fbd5e48a77f8f10c8a63a
 - name: golang.org/x/crypto
-<<<<<<< Updated upstream
   version: 60c769a6c58655dab1b9adac0d58967dd517cfba
-=======
-  version: 9756ffdc24725223350eb3266ffb92590d28f278
->>>>>>> Stashed changes
   subpackages:
   - bcrypt
   - blowfish
