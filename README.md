@@ -1,6 +1,6 @@
 Provides to pet-owners an ability to lead a social life of their pets just like people do in social networks.
 
-#Have to add .env file with settings like those :
+# Have to add .env file with settings like those :
 
 HOST_POSTGRES=localhost  
 PORT_POSTGRES=5434  
