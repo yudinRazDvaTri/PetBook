@@ -2,10 +2,12 @@ package search
 
 import (
 	"fmt"
+
 	"github.com/dpgolang/PetBook/pkg/models/forum"
 	"github.com/jmoiron/sqlx"
 )
 
+//Get filter topics by topics description
 func (f *SearchStore) GetTopicsBySearch(search string) (topics []forum.Topic, err error) {
 
 	rows, err := f.DB.Query("select * from topics where description ilike '%' || $1 || '%'", search)

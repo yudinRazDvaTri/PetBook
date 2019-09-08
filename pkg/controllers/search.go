@@ -11,12 +11,15 @@ import (
 	"github.com/gorilla/context"
 )
 
+//Animal subscriber structure
 type FollowerPets struct {
 	Name        string `json:"name" db:"name"'`
 	Description string `json:"description" db:"description"'`
 	UserID      int    `json:"user_id" db:"user_id"`
 }
-type DataSearch struct {
+
+//All the necessary information to display in the subscribers template
+type dataSearch struct {
 	UserID        int
 	PetsFollowing []*models.FollowerPets
 	Pets          []*search.DispPet
@@ -28,6 +31,8 @@ func (c *Controller) RedirectSearchHandler() http.HandlerFunc {
 		return
 	}
 }
+
+//Search start page handler
 func (c *Controller) ViewSearchHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		view.GenerateHTML(w, "Search", "navbar")
@@ -44,10 +49,11 @@ func (c *Controller) ViewSearchHandler() http.HandlerFunc {
 	}
 }
 
+//Auxiliary search functions in different sections
 func (c *Controller) searchByUser(w http.ResponseWriter, r *http.Request) {
 	var (
 		err        error
-		dataSearch DataSearch
+		dataSearch dataSearch
 	)
 	userID, ok := context.Get(r, "id").(int)
 	if !ok {
@@ -91,7 +97,7 @@ func (c *Controller) searchByUser(w http.ResponseWriter, r *http.Request) {
 func (c *Controller) searchByPet(w http.ResponseWriter, r *http.Request) {
 	var (
 		err        error
-		dataSearch DataSearch
+		dataSearch dataSearch
 	)
 	userID, ok := context.Get(r, "id").(int)
 	if !ok {

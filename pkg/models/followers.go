@@ -22,6 +22,8 @@ type FollowerPets struct {
 	UserID      int    `json:"user_id" db:"user_id"`
 }
 
+//Function that is called in the template. It returns a boolean value,
+//hether the user can subscribe to this user
 func (f *FollowerPets) CanFollow(userID int, petsFollowing []*FollowerPets) bool {
 	if f.UserID == userID {
 		return false
@@ -33,6 +35,8 @@ func (f *FollowerPets) CanFollow(userID int, petsFollowing []*FollowerPets) bool
 	}
 	return true
 }
+
+//Get all subscribers of this user
 func (f *FollowersStore) GetFollowers(userID int) (pets []*FollowerPets, err error) {
 	rows, err := f.DB.Query("select name, description, p.user_id from pets p inner join followers f on p.user_id=f.user_id where f.follower_id=$1;", userID)
 	if err != nil {
@@ -46,6 +50,8 @@ func (f *FollowersStore) GetFollowers(userID int) (pets []*FollowerPets, err err
 	}
 	return
 }
+
+//Get users that this user is subscribed to
 func (f *FollowersStore) GetFollowing(userID int) (pets []*FollowerPets, err error) {
 	rows, err := f.DB.Query("select p.name, p.description, p.user_id from pets p inner join followers f on p.user_id=f.follower_id where f.user_id=$1;", userID)
 	if err != nil {
@@ -60,6 +66,7 @@ func (f *FollowersStore) GetFollowing(userID int) (pets []*FollowerPets, err err
 	return
 }
 
+//Subscribe to user
 func (f *FollowersStore) Followed(userId int, followUser int) error {
 	_, err := f.DB.Exec(`insert into followers values ($1,$2);`, userId, followUser)
 	if err != nil {
@@ -68,6 +75,7 @@ func (f *FollowersStore) Followed(userId int, followUser int) error {
 	return err
 }
 
+//Unsubscribe to user
 func (f *FollowersStore) UnFollowed(userId int, followUser int) error {
 	_, err := f.DB.Exec(`delete from followers where user_id=$1 and follower_id=$2;`, userId, followUser)
 	if err != nil {

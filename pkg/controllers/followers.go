@@ -20,6 +20,7 @@ type dataFollow struct {
 	PetsFollowing []*models.FollowerPets
 }
 
+//Get all subscribers and animals that this user is subscribed to
 func (c *Controller) GetFollowerHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var Data dataFollow
@@ -55,6 +56,7 @@ func (c *Controller) GetFollowerHandler() http.HandlerFunc {
 	}
 }
 
+//Unsubscribe or subscribe to a user
 func (c *Controller) PostFollowerHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var err error

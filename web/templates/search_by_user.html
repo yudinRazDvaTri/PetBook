@@ -14,18 +14,18 @@
     <div id="search_menu" class="w-50 container mb-3 input-group " style="margin-top:10px;">
         <input type="email" placeholder="User's email" class="form-control " name="email" id="search">
         <div class="input-group-append">
-            <input type="submit" class="btn btn-outline-success btn-secondary" id="search_button" value="Search">
+            <input type="submit" class="btn btn-outline-dark btn-success" id="search_button" value="Search">
         </div>
     </div>
     <div class="container">
         <div class="row">
         <div class=" .col-sm-1" style="margin-left:-40px;margin-top: 125px;">
         <div class="btn-group-vertical">
-            <a class="btn btn-outline-success" href="/search?section=user"><span>Search by
+            <a class="btn btn-success btn-outline-dark" href="/search?section=user"><span>Search by
                     user</span></a><br>
-            <a class="btn btn-outline-success" href="/search?section=animal"><span>Search by
+            <a class="btn btn-success btn-outline-dark" href="/search?section=animal"><span>Search by
                     animal</span></a>
-            <a class="btn btn-outline-success" href="/search?section=forum"><span>Search by
+            <a class="btn btn-success btn-outline-dark" href="/search?section=forum"><span>Search by
                     forum</span></a><br>
         </div>
     </div>
@@ -40,16 +40,16 @@
                             <p>PHOTO</p>
                         </div>
                     <div class="col-md-8">
-                        <div class="card-body text-success">
+                        <div class="card-body ">
                             <form action="mypage/following" method="POST">
                                 <h5 class="card-title " name="name">{{ .Name }}</h5>
                                 <p class="card-text" name="description">{{ .Description }}</p>
                                 <input type="hidden" name="followUserID" value="{{printf "%d" .UserID}}">
                                 {{ if not (.CanFollow $.UserID $.PetsFollowing)}}
 
-                                    <input type="submit" name="follow" value="Unfollow">
+                                    <input type="submit" name="follow" class="btn btn-success btn-outline-dark" value="Unfollow">
                                 {{else}}
-                                    <input type="submit" name="follow" value="Follow">
+                                    <input type="submit" name="follow" class="btn btn-success btn-outline-dark" value="Follow">
                                 {{end}}
                             </form>
                         </div>

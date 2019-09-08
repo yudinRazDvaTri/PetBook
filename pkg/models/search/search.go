@@ -7,7 +7,7 @@ import (
 
 type SearchStorer interface {
 	GetAllPets(userID int) ([]*DispPet, error)
-	GetByUser(userID int,email string) (*DispPet)
+	GetByUser(userID int, email string) *DispPet
 	GetFilterPets(m map[string]interface{}) ([]*DispPet, error)
 	GetTopicsBySearch(search string) ([]forum.Topic, error)
 }

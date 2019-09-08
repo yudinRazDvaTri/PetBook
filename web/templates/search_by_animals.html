@@ -16,18 +16,18 @@
     <div id="search_menu" class="w-50 container mb-3 input-group " style="margin-top:10px;">
         <input type="email" placeholder="Pet's name" class="form-control " name="name" id="search">
         <div class="input-group-append">
-            <input type="submit" class="btn btn-outline-success btn-secondary" id="search_button" value="Search">
+            <input type="submit" class="btn btn-success btn-outline-dark" id="search_button" value="Search">
         </div>
     </div>
     <div class="container">
         <div class="row">
             <div class=" .col-sm-1" style="margin-left:-40px;margin-top: 125px;">
                 <div class="btn-group-vertical">
-                    <a class="btn btn-outline-success" href="/search?section=user"><span>Search by
+                    <a class="btn btn-success btn-outline-dark" href="/search?section=user"><span>Search by
                             user</span></a><br>
-                    <a class="btn btn-outline-success" href="/search?section=animal"><span>Search by
+                    <a class="btn btn-success btn-outline-dark" href="/search?section=animal"><span>Search by
                             animal</span></a>
-                    <a class="btn btn-outline-success" href="/search?section=forum"><span>Search by
+                    <a class="btn btn-success btn-outline-dark" href="/search?section=forum"><span>Search by
                             forum</span></a><br>
                 </div>
             </div>
@@ -42,16 +42,16 @@
                                 <p>PHOTO</p>
                             </div>
                             <div class="col-md-8">
-                                <div class="card-body text-success">
+                                <div class="card-body ">
                                     <form action="mypage/following" method="POST">
                                         <h5 class="card-title " name="name">{{ .Name }}</h5>
                                         <p class="card-text" name="description">{{ .Description }}</p>
                                         <input type="hidden" name="followUserID" value="{{printf "%d" .UserID}}">
                                         {{ if not (.CanFollow $.UserID $.PetsFollowing)}}
 
-                                            <input type="submit" name="follow" value="Unfollow">
+                                            <input type="submit" class="btn btn-success btn-outline-dark" name="follow" value="Unfollow">
                                         {{else}}
-                                            <input type="submit" name="follow" value="Follow">
+                                            <input type="submit" class="btn btn-success btn-outline-dark" name="follow" value="Follow">
                                         {{end}}
                                     </form>
                                 </div>
@@ -69,9 +69,9 @@
             <div class="filters form-group col-md-1">
                 <label for="age">Enter pet's age:</label>
                 <input type="number" id="age" name="age" min="0" max="30" step="1" placeholder="age"
-                    class="btn-outline-success">
+                    class="btn-success btn-outline-dark">
                 <label for="type">Enter animal type:</label>
-                <select name="animal_type" id="animal_type" class="btn-outline-success">
+                <select name="animal_type" id="animal_type" class="btn-success btn-outline-dark">
                     <option selected>Type of animal</option>
                     <option name="dog">dog</option>
                     <option name="cat">cat</option>
@@ -80,20 +80,20 @@
                     <option name="bird">bird</option>
                 </select></label>
                 <label for="breed">Enter animal breed</label>
-                <input type="text" name="breed" id="breed" class="btn-outline-success">
+                <input type="text" name="breed" id="breed" class="btn-success btn-outline-dark">
                 <label for="weight">Enter pet's weight:</label>
                 <input type="number" id="weight" name="weight" min="0" max="50" step="1" placeholder="weight"
-                    class="btn-outline-success">
+                    class="btn-success btn-outline-dark">
                 <label for="gender">Choose animal gender</label>
-                <select name="gender" id="gender" class="btn-outline-success">
+                <select name="gender" id="gender" class="btn-success btn-outline-dark">
                     <option selected>Gender</option>
                     <option name="male">male</option>
                     <option name="female">female</option>
                 </select>
                 <div class="btn-group" role="group" aria-label="Basic example">
-                    <input type="submit" id="apply" value="Apply" class="btn btn-outline-success btn-secondary">
+                    <input type="submit" id="apply" value="Apply" class="btn btn-success btn-outline-dark">
                     <input type="submit" id="reset_parameters" value="Reset parameters" href="/search?section=animal"
-                        class="btn btn-outline-success btn-secondary">
+                        class="btn btn-success btn-outline-dark">
                 </div>
             </div>
         </div>
