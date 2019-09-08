@@ -3,12 +3,14 @@ package models
 import (
 	"database/sql"
 	"fmt"
+	"github.com/avast/retry-go"
 	"github.com/dpgolang/PetBook/pkg/utilerr"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"strings"
+	"time"
 )
 
 func logErr(err error) {
@@ -38,7 +40,6 @@ type UserStorer interface {
 	ChangePassword(user *User, newPassword string) error
 	Login(email, userPassword string) (int, error)
 	GetPet(userID int) (Pet, error)
-	registerOauth(email string) (int, error)
 	LoginOauth(email string) (int, error)
 }
 
@@ -80,7 +81,13 @@ func (c *UserStore) Register(user *User) error {
 			} else {
 				err = fmt.Errorf("Error occurred while trying to add new user: %v.\n", err)
 			}
-			tx.Rollback()
+
+			_ = retry.Do(
+				func() error {return tx.Rollback()},
+				retry.Attempts(3),
+				retry.Delay(500 * time.Millisecond),
+				)
+
 			return err
 		}
 	}
@@ -90,7 +97,13 @@ func (c *UserStore) Register(user *User) error {
 			user.ID, user.Password)
 
 		if err != nil {
-			tx.Rollback()
+
+			_ = retry.Do(
+				func() error {return tx.Rollback()},
+				retry.Attempts(3),
+				retry.Delay(500 * time.Millisecond),
+			)
+
 			return fmt.Errorf("Error occurred while trying to set user's passwordL %v.\n", err)
 		}
 	}
@@ -154,7 +167,7 @@ func (c *UserStore) GetPet(userID int) (Pet, error) {
 	return pet, nil
 }
 
-func (c *UserStore) registerOauth(email string) (int, error) {
+func registerOauth(email string, c *UserStore) (int, error) {
 	var idFromBase int
 	login := strings.Split(email, "@")[0]
 
@@ -178,7 +191,7 @@ func (c *UserStore) LoginOauth(email string) (int, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			idFromBase, err = c.registerOauth(email)
+			idFromBase, err = registerOauth(email, c)
 			if err != nil {
 				return 0, err
 			}
