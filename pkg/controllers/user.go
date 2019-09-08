@@ -32,6 +32,7 @@ type Controller struct {
 	ChatStore         models.ChatStorer
 	MediaStore        models.MediaStorer
 	VetStore  		  models.VetStorer
+	CommentBlogStore	models.CommentBlogStorer
 }
 
 const (

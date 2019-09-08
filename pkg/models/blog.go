@@ -80,9 +80,6 @@ func (b *BlogStore) GetVetBlog(userID int) ([]Blog ,error){
 	return results,nil
 }
 
-
-
-
 func (b *BlogStore) CreateBlog(form string, idUser int) error{
 	result, err := b.DB.Exec("insert into blog (content,user_id) values ($1,$2);", form, idUser)
 	if err != nil {

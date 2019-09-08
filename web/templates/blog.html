@@ -3,7 +3,7 @@
     <html >
     <head>
         <meta charset="UTF-8">
-        <title>Result product</title>
+        <title>Blog</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
 {{/*        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">*/}}
 {{/*        <link rel="stylesheet" href="../static/blogCLOSED.css">*/}}
@@ -32,38 +32,25 @@
             </div>
         </div>
         <div class="form-group">
-            <form action="/process" method="post">
+            <form action="/blogs" method="post">
                 <textarea class="form-control" rows="5" type="text" id="message" name="something" placeholder="type something here..." required></textarea>
                 <input class="btn btn-primary" type="submit" value="Send">
                 <input disabled style="float: right" class="btn btn-secondary" type="button" value="Upload img">
                 <input disabled style="float: right;margin-right: 5px" class="btn btn-secondary" type="button" value="YouTube">
 
-{{/*                <div class="input-group mb-3" style="margin-top: 15px; height: 50px">*/}}
-{{/*                    <input type="text" class="form-control" placeholder="Имя получателя" aria-label="Имя получателя" aria-describedby="basic-addon2">*/}}
-{{/*                    <div class="input-group-append">*/}}
-{{/*                        <button class="btn btn-primary" type="button">Send</button>*/}}
-{{/*                    </div>*/}}
-{{/*                </div>*/}}
-
             </form>
         </div>
         <table class="table table-hover"
-{{/*               style="background: #90EE90;border-radius: 10px"*/}}
         >
             <tbody >
-{{/*            VERY IMPT RANGE*/}}
             {{range .}}
                 <tr>
                     <td width="5%">
                         <div style="margin-left: 5%;margin-top: 20%">
-{{/*                        {{range .LogoPath}}*/}}
                         <div style="width:65px;height:65px;">
-{{/*                            <img style="width:48px;height:48px" src="../static/usermedia/1/logo/" >*/}}
-{{/*                            <img style="width:48px;height:48px" src="../static/background.jpg" >*/}}
                             <img style="width:48px;height:48px" src={{.LogoPath}} >
                         </div>
-{{/*                        {{end}}*/}}
-{{/*{{range .BlogData}}*/}}
+
                         <div style="font-size: 20px;font-family: bold;">
                             {{.Name}}
                         </div>
@@ -81,14 +68,34 @@
                         <div width="15%" style="font-size: 15px">
                             {{.Date | fdate}}
                         </div>
-                        <form >
-                            <textarea disabled style="width: 50%; float: right" class="form-control form-control-sm" rows="2" type="text" id="message" name="something" placeholder="leave ur comment"  ></textarea>
-{{/*                            <input class="btn btn-primary" type="submit" value="Send">*/}}
-{{/*                            <input disabled style="float: right" class="btn btn-secondary" type="button" value="Upload img">*/}}
-{{/*                            <input disabled style="float: right;margin-right: 5px" class="btn btn-secondary" type="button" value="YouTube">*/}}
+                        <form action="/commentblogs" method="post">
+                            <textarea style="width: 50%; float: right" class="form-control form-control-sm" rows="2" type="text" id="message" name="createcommentblog" placeholder="leave ur comment" required></textarea>
+{{/*                            <input class="btn btn-primary" type="submit" value="Send" style="margin-left: 420px">*/}}
+                            <a href="/commentblogs/{{.Id}}?recordidcom={{.Id}}" type="submit" class="btn btn-primary" >Gavno</a>
                         </form>
                     </td>
-                    <td width="5%"><a href="/delete?recordid={{.Id}}" class="btn btn-danger" onclick="return ConfirmDelete();">X</a></td>
+                    <td width="5%"><a href="/blogs/{{.Id}}?recordid={{.Id}}" class="btn btn-danger" onclick="return ConfirmDelete();">X</a></td>
+{{/*                    {{range .}}*/}}
+{{/*                        <div style="margin-left: 5%;margin-top: 20%">*/}}
+{{/*                            <div style="font-size: 20px;font-family: bold;">*/}}
+{{/*                                {{.CommentName}}*/}}
+{{/*                            </div>*/}}
+{{/*                        </div>*/}}
+{{/*                        </td>*/}}
+{{/*                        <td width="95%" style="font-size: 20px">*/}}
+{{/*                            <div*/}}
+{{/*                                    style="margin-top: 15px;padding: 8px;border-radius: 5px;border:solid #343a40 1px;*/}}
+{{/*                                /*background: #98FB98;*/}}
+{{/*                                "*/}}
+{{/*                            >*/}}
+{{/*                                {{ .CommentMessage }}*/}}
+{{/*                            </div>*/}}
+{{/*                            <div width="15%" style="font-size: 15px">*/}}
+{{/*                                {{.CommentDate | fdate}}*/}}
+{{/*                            </div>*/}}
+{{/*                        </td>*/}}
+{{/*                        <td width="5%"><a href="/commentblogs/{{.CommentId}}?recordid={{.CommentId}}" class="btn btn-danger" onclick="return ConfirmDelete();">X</a></td>*/}}
+{{/*                    {{end}}*/}}
                 </tr>
             {{end}}
             </tbody>
@@ -99,34 +106,3 @@
 </html>
 {{end}}
 
-{{/*<tbody>*/}}
-{{/*{{range .}}*/}}
-{{/*    <tr>*/}}
-{{/*        <td width="5%">*/}}
-
-{{/*            {{range .LogoPath}}*/}}
-{{/*                <div style="width:50px;height:50px;margin-left:2px">*/}}
-{{/*                    <img style="width:48px;height:48px" src="{{.}}" >*/}}
-{{/*                </div>*/}}
-{{/*            {{end}}*/}}
-
-{{/*            <div>*/}}
-{{/*                {{.Name}}*/}}
-{{/*            </div>*/}}
-{{/*        </td>*/}}
-{{/*        <td width="95%">*/}}
-{{/*            <div*/}}
-{{/*                    style="margin-top: 15px;padding: 8px;border-radius: 5px;border:solid grey 1px;*/}}
-{{/*                                "*/}}
-{{/*            >*/}}
-{{/*                {{ .Message }}*/}}
-{{/*            </div>*/}}
-
-{{/*            <div width="15%" style="font-size: 10px">*/}}
-{{/*                {{.Date | fdate}}*/}}
-{{/*            </div>*/}}
-{{/*        </td>*/}}
-{{/*        <td width="5%"><a href="/delete?recordid={{.Id}}" class="btn btn-danger" onclick="return ConfirmDelete();">X</a></td>*/}}
-{{/*    </tr>*/}}
-{{/*{{end}}*/}}
-{{/*</tbody>*/}}

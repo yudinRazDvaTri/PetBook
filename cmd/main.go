@@ -35,6 +35,7 @@ func main() {
 	storeChat := models.ChatStore{DB: db}
 	storeMedia := models.MediaStore{DB: db}
 	storeVet := models.VetStore{DB: db}
+	storeCommentBlog := models.CommentBlogStore{DB:db}
 
 	controller := controllers.Controller{
 		PetStore:          &storePet,
@@ -46,6 +47,7 @@ func main() {
 		ChatStore:         &storeChat,
 		MediaStore:        &storeMedia,
 		VetStore:         &storeVet,
+		CommentBlogStore: &storeCommentBlog,
 	}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
@@ -83,8 +85,10 @@ func main() {
 	//subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
 	subrouter.HandleFunc("/", controller.MyPageGetHandler()).Methods("GET")
 
-	subrouter.HandleFunc("/process", controller.CreateBlogHandler()).Methods("POST")
-	subrouter.HandleFunc("/delete", controller.DeleteBlogHandler()).Methods("GET")
+	subrouter.HandleFunc("/blogs", controller.CreateBlogHandler()).Methods("POST")
+	subrouter.HandleFunc("/blogs/{id}", controller.DeleteBlogHandler()).Methods("GET")
+	subrouter.HandleFunc("/commentblogs/{id}", controller.CreateCommentBlogHandler()).Methods("POST")
+	//subrouter.HandleFunc("/commentblogs/{id}", controller.DeleteCommentBlogHandler()).Methods("GET")
 	subrouter.HandleFunc("/upload", controller.UploadLogo()).Methods("POST")
 	subrouter.HandleFunc("/edit", controller.EditPageHandler).Methods("GET")
 	subrouter.HandleFunc("/edit", controller.ProfileUpdateHandler).Methods("POST")
