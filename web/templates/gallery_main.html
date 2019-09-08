@@ -25,6 +25,57 @@
         .blog .carousel-indicators .active {
             background: #007bff;
         }
+
+        .grid {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-flex-wrap: wrap;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+            -webkit-box-align: start;
+            -webkit-align-items: flex-start;
+            -ms-flex-align: start;
+            align-items: flex-start;
+            -webkit-align-content: flex-start;
+            -ms-flex-line-pack: start;
+            align-content: flex-start;
+            /*z-index: 0;*/
+            height: 100%;
+            padding: 10px;
+            overflow: auto;
+            /*background-color: #222;*/
+            text-align: center;
+            -webkit-transition: opacity .75s;
+            transition: opacity .75s;
+        }
+        .grid .grid-item {
+            display: inline-block;
+            /*width: 25%;*/
+            padding: 3px;
+            opacity: .85;
+            -webkit-transition: opacity .5s;
+            transition: opacity .5s;
+        }
+        .grid .grid-item:hover {
+            opacity: 1;
+        }
+        @media screen and (max-width: 1024px) {
+            .grid .grid-item {
+                width: 50%;
+            }
+        }
+        @media screen and (max-width: 480px) {
+            .grid .grid-item {
+                width: 100%;
+            }
+        }
+        .grid img {
+            max-width: 100%;
+            max-height: 100%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
     </style>
 </head>
 <body>
@@ -43,10 +94,10 @@
                     <div class="carousel-item active">
                         <div class="row">
                             {{range .}}
-                            <div class="col-md-3">
-                                <a href="#">
-
-                                    <img src={{.}} alt="Image" style="width: 260px;height: 200px">
+{{/*                            <div class="col-md-3">*/}}
+                            <div class="grid">
+                                <a href={{.}} >
+                                    <img class="grid-item" src={{.}} alt="Image" style="width: 260px;height: 200px">
                                 </a>
                             </div>
                             {{end}}
@@ -57,9 +108,10 @@
                     <div class="carousel-item">
                         <div class="row">
                             {{range .}}
-                            <div class="col-md-3">
-                                <a href="#">
-                                    <img src={{.}} alt="Image" style="width: 260px;height: 200px">
+{{/*                            <div class="col-md-3">*/}}
+                            <div class="grid">
+                                <a href={{.}}>
+                                    <img class="grid-item" src={{.}} alt="Image" style="width: 260px;height: 200px">
                                 </a>
                             </div>
                             {{end}}

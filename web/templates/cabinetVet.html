@@ -1,0 +1,38 @@
+{{ define "layout" }}
+
+    <!DOCTYPE html>
+    <html >
+    <head>
+        <meta charset="UTF-8">
+        <title>Vet</title>
+        <link rel="stylesheet" href="../static/registerAndLogin.css">
+    </head>
+    <body>
+    <div class="box">
+        <form method="POST" action="/vetcabinet">
+            <h1>Pet Registration</h1>
+            <input type="text" name="nickname" placeholder="Nickname"/>
+            <select name="qualification" class="custom-select">
+                <option selected>Qualification</option>
+                {{range .}}
+                    <option >{{.}}</option>
+                {{end}}
+            </select>
+
+
+            <input type="text" name="surname" placeholder="Surname"/>
+            <select name="category" class="custom-select">
+                <option selected>Category</option>
+                <option name="A">A</option>
+                <option name="B">B</option>
+                <option name="C">C</option>
+                <option name="D">D</option>
+            </select>
+            <input type="text" name="certificates" placeholder="Certificates"/>
+            <input type="submit" value="Send" />
+        </form>
+    </div>
+    </body>
+    </html>
+
+{{ end }}

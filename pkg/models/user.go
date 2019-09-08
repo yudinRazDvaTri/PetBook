@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"fmt"
+	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/utilerr"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -25,6 +26,7 @@ type User struct {
 	Firstname string `json:"firstname" db:"firstname"`
 	Lastname  string `json:"lastname" db:"lastname"`
 	Password  string `json:"password" db:"password"`
+	Role      string `json:"role" db:"pet_or_vet"`
 }
 
 type UserStore struct {
@@ -40,6 +42,9 @@ type UserStorer interface {
 	GetPet(userID int) (Pet, error)
 	registerOauth(email string) (int, error)
 	LoginOauth(email string) (int, error)
+	GetVet(userID int) (Vet, error)
+	GetUserEnums() []string
+	GetUserRole(userID int) string
 }
 
 func (c *UserStore) GetUsers() ([]User, error) {
@@ -71,8 +76,8 @@ func (c *UserStore) Register(user *User) error {
 	}
 
 	{
-		err = tx.QueryRow("insert into users (email, firstname, lastname, login) values ($1,$2,$3, $4) returning id",
-			user.Email, user.Firstname, user.Lastname, user.Login).Scan(&user.ID)
+		err = tx.QueryRow("insert into users (email, firstname, lastname, login,pet_or_vet) values ($1,$2,$3, $4,$5) returning id",
+			user.Email, user.Firstname, user.Lastname, user.Login,user.Role).Scan(&user.ID)
 
 		if err != nil {
 			if _, ok := err.(*pq.Error); ok {
@@ -188,3 +193,45 @@ func (c *UserStore) LoginOauth(email string) (int, error) {
 	}
 	return idFromBase, nil
 }
+
+func (c *UserStore) GetVet(userID int) (Vet, error) {
+	var vet Vet
+	err := c.DB.QueryRowx(
+		`SELECT user_id,name,qualification, surname, category, certificates
+		FROM vets p, users u 
+		WHERE p.user_id = u.id  
+		AND u.id = $1 `, userID).StructScan(&vet)
+
+	if err != nil {
+		return vet, err
+	}
+
+	return vet, nil
+}
+
+func (c *UserStore) GetUserEnums() []string {
+	var userRole []string
+	var role string
+	rows, err := c.DB.Queryx("SELECT unnest(enum_range(NULL::role))::text")
+	if err != nil {
+		logger.Error(err)
+	}
+	for rows.Next() {
+		err = rows.Scan(&role)
+		if err != nil {
+			logger.Error(err)
+		}
+		userRole = append(userRole, role)
+	}
+	return userRole
+}
+
+func (c *UserStore) GetUserRole(userID int) string {
+	var role string
+	err:=c.DB.QueryRowx("select pet_or_vet from users where id=$1",userID).Scan(&role)
+	if err != nil {
+		logger.Error(err)
+	}
+	return role
+}
+

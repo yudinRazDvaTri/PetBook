@@ -121,14 +121,20 @@
 </head>
 <body style="margin-bottom: 40px">
 <div class="col-md-12" style="margin-top: 0px;width: 80%; margin-left: 10%">
+
     {{range .}}
 <input type="checkbox" id={{.}}/>
 <label for="pic-1" class="lightbox"><img src={{.}}/></label>
     {{end}}
 
 <div class="grid">
+    <div class="col-md-12">
+    <h1 style="margin-bottom: 15px;color: #343a40;">Gallery</h1>
+    </div>
     {{range .}}
-    <label for="pic-1" class="grid-item"><img src={{.}}/></label>
+    <label for="pic-1" class="grid-item"><img src={{.}}/> </label>
+{{/*    <a href="/deleteimg?path={{.}}" class="btn btn-danger" >X</a>*/}}
+    <a class="btn btn-danger" href="/deleteimg" name={{.}}>X</a>
     {{end}}
 </div>
 </div>

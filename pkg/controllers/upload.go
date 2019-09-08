@@ -138,3 +138,15 @@ func changePath(files [] string) []string{
 	}
 	return files
 }
+func (c *Controller) DeleteImgHandler() http.HandlerFunc{
+	return func (w http.ResponseWriter, r *http.Request){
+		path := r.FormValue("path")
+		p:=strings.Replace(path,"%2f","/",100)
+
+		c.MediaStore.DeleteFile(".."+p)
+		http.Redirect(w, r, "/", 301)
+	}
+}
+
+
+

@@ -1,8 +1,11 @@
 package models
 
 import (
+	"fmt"
+	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/jmoiron/sqlx"
 	"log"
+	"os"
 	"time"
 )
 
@@ -25,6 +28,7 @@ type MediaStorer interface {
 	GetExistedLogo(userId int) []string
 	AddMediaPathDb(path string,userId int)
 	GetExistedGallery(userId int) []string
+	DeleteFile(path string)
 }
 
 func (m *MediaStore) AddLogoPathDb(path string,userId int){
@@ -80,4 +84,16 @@ func (m *MediaStore) GetExistedGallery(userId int) []string{
 		results = append(results, p)
 	}
 	return results
+}
+
+func (m *MediaStore) DeleteFile(path string) {
+	var err2 = os.Remove(path)
+	if err2 != nil{
+		logger.Error(err2)
+	}
+	_, err := m.DB.Exec("delete from gallery where file_path = $1", path)
+	if err != nil {
+		fmt.Errorf("cannot execute database query: %v", err)
+	}
+	fmt.Println("==> done deleting file")
 }
