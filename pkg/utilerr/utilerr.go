@@ -12,6 +12,10 @@ type TokenDoesNotExist struct {
 	Description string
 }
 
+type UniqueTokenError struct {
+	Description string
+}
+
 func (e *UniqueTaken) Error() string {
 	return e.Description
 }
@@ -21,5 +25,9 @@ func (e *WrongCredentials) Error() string {
 }
 
 func (e *TokenDoesNotExist) Error() string {
+	return e.Description
+}
+
+func (e *UniqueTokenError) Error() string {
 	return e.Description
 }
