@@ -56,7 +56,7 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 			case *utilerr.WrongCredentials:
 				// TODO: display flash-message
 				fmt.Fprint(w, e.Error())
-				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				//http.Redirect(w, r, "/login", http.StatusSeeOther)
 				return
 			default:
 				logger.Error(err)
@@ -81,10 +81,18 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 			Path:    "/",
 		})
 
-		if err := c.RefreshTokenStore.UpdateRefreshToken(userID, tokens.RefreshTokenValue, tokens.RefreshExpirationTime); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			logger.Error(err)
-			return
+		userAgent := authentication.GetUserAgent(r)
+
+		if err := c.RefreshTokenStore.UpdateRefreshToken(userID, tokens.RefreshTokenValue, tokens.RefreshExpirationTime, userAgent); err != nil {
+			switch e := err.(type) {
+			case *utilerr.UniqueTokenError:
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				return
+			default:
+				logger.Error(e)
+				http.Error(w, e.Error(), http.StatusInternalServerError)
+				return
+			}
 		}
 
 		http.SetCookie(w, &http.Cookie{
@@ -102,10 +110,10 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 
 		_, err = c.UserStore.GetPet(userID)
 		if err != nil {
-			http.Redirect(w, r, "/petcabinet", http.StatusFound)
+			http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
 			return
 		}
-		http.Redirect(w, r, "/mypage", http.StatusFound)
+		http.Redirect(w, r, "/mypage", http.StatusSeeOther)
 	}
 }
 
@@ -164,7 +172,7 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 
 		response, err := http.Get(authentication.OauthGoogleUrlAPI + googleToken.AccessToken)
 		if err != nil {
-			logger.Error("Error occurred while trying to get user info: %v.\n", err.Error())
+			logger.Error(err, "Error occurred while trying to get user info.\n")
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
@@ -173,7 +181,7 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 		contents, err := ioutil.ReadAll(response.Body)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			logger.Error("Error occurred while trying to read user info bytes: %v.\n",err)
+			logger.Error(err, "Error occurred while trying to read user info bytes.\n")
 			return
 		}
 
@@ -181,7 +189,7 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 
 		if err := json.Unmarshal(contents, &googleUserInfo); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			logger.Error("Error occurred while trying to unmarshal user info: %v.\n",err)
+			logger.Error(err, "Error occurred while trying to unmarshal user info.\n")
 			return
 		}
 
@@ -192,7 +200,7 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 			case *utilerr.UniqueTaken:
 				// TODO: display flash-message
 				fmt.Fprint(w, e.Error())
-				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				//http.Redirect(w, r, "/login", http.StatusSeeOther)
 				return
 			default:
 				logger.Error(err)
@@ -223,6 +231,11 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 			return
 		}
 
+		_, err = c.UserStore.GetPet(userId)
+		if err != nil {
+			http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
+			return
+		}
 		http.Redirect(w, r, "/mypage", http.StatusSeeOther)
 	}
 }
@@ -232,7 +245,6 @@ func getGoogleOauthToken(code string) (*oauth2.Token, error) {
 	if err != nil {
 		return token, fmt.Errorf("code exchange wrong: %s", err.Error())
 	}
-	//authentication.GoogleOauthConfig.Client(context.Background(), token)
 	return token, nil
 }
 
@@ -260,7 +272,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			http.Redirect(w, r, "/register", http.StatusFound)
+			http.Redirect(w, r, "/register", http.StatusSeeOther)
 			return
 		}
 
@@ -270,7 +282,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			http.Redirect(w, r, "/register", http.StatusFound)
+			http.Redirect(w, r, "/register", http.StatusSeeOther)
 			return
 		}
 
@@ -280,12 +292,12 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			http.Redirect(w, r, "/register", http.StatusFound)
+			http.Redirect(w, r, "/register", http.StatusSeeOther)
 			return
 		}
 
 		if password != confirmPassword {
-			http.Redirect(w, r, "/register", http.StatusFound)
+			http.Redirect(w, r, "/register", http.StatusSeeOther)
 			return
 		}
 
@@ -309,7 +321,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 			case *utilerr.UniqueTaken:
 				// TODO: display flash-message
 				fmt.Fprint(w, e.Error())
-				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				//http.Redirect(w, r, "/login", http.StatusSeeOther)
 				return
 			default:
 				logger.Error(e)
@@ -317,10 +329,11 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 				return
 			}
 		}
-		http.Redirect(w, r, "/login", http.StatusFound)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	}
 }
 
+// TODO: rewrite case
 func (c *Controller) LogoutGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -330,6 +343,7 @@ func (c *Controller) LogoutGetHandler() http.HandlerFunc {
 			if err = c.RefreshTokenStore.DeleteRefreshToken(refreshTokenString); err != nil {
 				switch e := err.(type) {
 				case *utilerr.TokenDoesNotExist:
+
 				default:
 					logger.Error(e)
 					http.Error(w, e.Error(), http.StatusInternalServerError)
