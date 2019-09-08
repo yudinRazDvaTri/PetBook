@@ -1,0 +1,145 @@
+{{ define "layout"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <!--   BOOTSTRAP-->
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        label[for] {
+            cursor: pointer;
+        }
+
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        body {
+            /*background-color: #000;*/
+        }
+
+        .lightbox, .grid {
+            /*width: 70%;*/
+            /*position: fixed;*/
+            /*top: -20%;*/
+            /*left: 20%;*/
+        }
+
+        .lightbox {
+            z-index: 1;
+            min-height: 100%;
+            overflow: auto;
+            -webkit-transform: scale(0);
+            -ms-transform: scale(0);
+            transform: scale(0);
+            -webkit-transition: -webkit-transform .5s ease-out;
+            transition: transform .5s ease-out;
+        }
+        .lightbox img {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            max-width: 96%;
+            max-height: 96%;
+            -webkit-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        input[type="checkbox"]:checked + .lightbox {
+            -webkit-transform: scale(1);
+            -ms-transform: scale(1);
+            transform: scale(1);
+        }
+
+        input[type="checkbox"]:checked ~ .grid {
+            opacity: .125;
+        }
+
+        .grid {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-flex-wrap: wrap;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+            -webkit-box-align: start;
+            -webkit-align-items: flex-start;
+            -ms-flex-align: start;
+            align-items: flex-start;
+            -webkit-align-content: flex-start;
+            -ms-flex-line-pack: start;
+            align-content: flex-start;
+            z-index: 0;
+            height: 100%;
+            padding: 16px;
+            overflow: auto;
+            /*background-color: #222;*/
+            background-color: #cccccc;
+            text-align: center;
+            -webkit-transition: opacity .75s;
+            transition: opacity .75s;
+        }
+        .grid .grid-item {
+            display: inline-block;
+            width: 25%;
+            padding: 16px;
+            opacity: .75;
+            -webkit-transition: opacity .5s;
+            transition: opacity .5s;
+        }
+        .grid .grid-item:hover {
+            opacity: 1;
+        }
+        @media screen and (max-width: 1024px) {
+            .grid .grid-item {
+                width: 50%;
+            }
+        }
+        @media screen and (max-width: 480px) {
+            .grid .grid-item {
+                width: 100%;
+            }
+        }
+        .grid img {
+            max-width: 100%;
+            max-height: 100%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+    </style>
+</head>
+<body style="margin-bottom: 40px">
+<div class="col-md-12" style="margin-top: 0px;width: 80%; margin-left: 10%">
+
+    {{range .}}
+<input type="checkbox" id={{.}}/>
+<label for="pic-1" class="lightbox"><img src={{.}}/></label>
+    {{end}}
+
+<div class="grid">
+    <div class="col-md-12">
+    <h1 style="margin-bottom: 15px;color: #343a40;">Gallery</h1>
+    </div>
+    {{range .}}
+    <label for="pic-1" class="grid-item"><img src={{.}}/> </label>
+{{/*    <a href="/deleteimg?path={{.}}" class="btn btn-danger" >X</a>*/}}
+    <a class="btn btn-danger" href="/deleteimg" name={{.}}>X</a>
+    {{end}}
+</div>
+</div>
+</body>
+</html>
+
+
+{{end}}

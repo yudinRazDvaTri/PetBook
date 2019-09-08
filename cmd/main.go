@@ -33,6 +33,8 @@ func main() {
 	storeSearch := search.SearchStore{DB: db}
 	storeBlog := models.BlogStore{DB: db}
 	storeChat := models.ChatStore{DB: db}
+	storeMedia := models.MediaStore{DB: db}
+	storeVet := models.VetStore{DB: db}
 
 	controller := controllers.Controller{
 		PetStore:          &storePet,
@@ -42,6 +44,8 @@ func main() {
 		RefreshTokenStore: &storeRefreshToken,
 		BlogStore:         &storeBlog,
 		ChatStore:         &storeChat,
+		MediaStore:        &storeMedia,
+		VetStore:         &storeVet,
 	}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
@@ -56,9 +60,11 @@ func main() {
 	subrouter := router.PathPrefix("/").Subrouter()
 	subrouter.Use(authentication.AuthMiddleware(&storeRefreshToken, &storeUser))
 
-	subrouter.HandleFunc("/mypage", controller.MyPageGetHandler()).Methods("GET")
+	//subrouter.HandleFunc("/mypage", controller.MyPageGetHandler()).Methods("GET")
 	subrouter.HandleFunc("/petcabinet", controller.PetPostHandler()).Methods("POST")
 	subrouter.HandleFunc("/petcabinet", controller.PetGetHandler()).Methods("GET")
+	subrouter.HandleFunc("/vetcabinet", controller.VetPostHandler()).Methods("POST")
+	subrouter.HandleFunc("/vetcabinet", controller.VetGetHandler()).Methods("GET")
 	subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Queries("section", "{section}").Methods("GET")
 	subrouter.HandleFunc("/search", controller.RedirectSearchHandler()).Methods("GET")
 
@@ -79,9 +85,14 @@ func main() {
 
 	subrouter.HandleFunc("/process", controller.CreateBlogHandler()).Methods("POST")
 	subrouter.HandleFunc("/delete", controller.DeleteBlogHandler()).Methods("GET")
-	subrouter.HandleFunc("/upload", controllers.UploadFile()).Methods("POST")
-	subrouter.HandleFunc("/edit", controller.EditHandler).Methods("GET")
-	subrouter.HandleFunc("/edit", controller.UpdateHandler).Methods("POST")
+	subrouter.HandleFunc("/upload", controller.UploadLogo()).Methods("POST")
+	subrouter.HandleFunc("/edit", controller.EditPageHandler).Methods("GET")
+	subrouter.HandleFunc("/edit", controller.ProfileUpdateHandler).Methods("POST")
+	subrouter.HandleFunc("/uploadmedia", controller.UploadMedia()).Methods("POST")
+	subrouter.HandleFunc("/{id}", controller.MyPageOtherUsersHandler()).Methods("GET")
+	subrouter.HandleFunc("/deleteimg", controller.DeleteImgHandler()).Methods("Post")
+
+
 
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
 		http.FileServer(http.Dir("./web/static/"))))

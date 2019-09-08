@@ -82,28 +82,27 @@
         <div class="col" style="margin: 10px">
             <form method="post">
             <table id="pet">
-                <thead><tr><th>Name</th><td><input class="form-control" type="text" name="name" value="{{.PetName}}" /></td><td></tr>
-                <thead><tr><th>Age</th><td><input class="form-control" type="text" name="age" value="{{.Age}}" /></td><td></tr>
-                <thead><tr><th>Pet type</th><td>
-                        <select name="animal_type" class="form-control">
-                            <option selected>{{.PetType}}</option>
-                            <option name="dog">dog</option>
-                            <option name="cat">cat</option>
-                            <option name="fish">fish</option>
-                            <option name="bird">bird</option>
-                            <option name="rodent">rodent</option>
+                <thead><tr><th>Name</th><td><input class="form-control" type="text" name="name" value="{{.VetName}}" /></td><td></tr>
+                <thead><tr><th>Surname</th><td><input class="form-control" type="text" name="surname" value="{{.Surname}}" /></td><td></tr>
+                <thead><tr><th>Qualification</th><td>
+                        <select name="qualification" class="form-control">
+                            <option selected>{{.Qualification}}</option>
+                            <option name="zoologist">zoologist</option>
+                            <option name="handler">handler</option>
+                            <option name="paramedic">paramedic</option>
+                            <option name="surgeon">surgeon</option>
                         </select>
                     </td><td></tr>
-                <thead><tr><th>Breed</th><td><input class="form-control" type="text" name="breed" value="{{.Breed}}" /></td><td></tr>
-                <thead><tr><th>Weight</th><td><input class="form-control" type="text" name="weight" value="{{.Weight}}" /></td><td></tr>
-                <thead><tr><th>Gender</th><td>
-                        <select name="gender" class="form-control">
-                            <option selected>{{.Gender}}</option>
-                            <option name="male">male</option>
-                            <option name="female">female</option>
+                <thead><tr><th>Category</th><td>
+                        <select name="category" class="form-control">
+                            <option selected>{{.Category}}</option>
+                            <option name="A">A</option>
+                            <option name="B">B</option>
+                            <option name="C">C</option>
+                            <option name="D">D</option>
                         </select>
                     </td><td></tr>
-                <thead><tr><th>Description</th><td><input class="form-control" type="text" name="description" value="{{.Description}}" /></td><td></tr>
+                <thead><tr><th>Certificates</th><td><input class="form-control" type="text" name="certificates" value="{{.Certificates}}" /></td><td></tr>
             </table>
             <button class="btn btn-primary" type="submit" >Apply</button>
             </form>

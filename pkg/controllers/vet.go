@@ -9,8 +9,8 @@ import (
 	"regexp"
 )
 
-
-func (c *Controller) PetPostHandler() http.HandlerFunc {
+// TODO: check input values
+func (c *Controller) VetPostHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		id := context.Get(r, "id").(int)
@@ -21,20 +21,18 @@ func (c *Controller) PetPostHandler() http.HandlerFunc {
 				return
 			}
 
-			http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
+			http.Redirect(w, r, "/vetcabinet", http.StatusSeeOther)
 			return
 		}
-		pet := &models.Pet{
+		vet := &models.Vet{
 			ID:          id,
 			Name:        r.FormValue("nickname"),
-			PetType:     r.FormValue("pet-type"),
-			Breed:       r.FormValue("breed"),
-			Age:         r.FormValue("age"),
-			Weight:      r.FormValue("weight"),
-			Gender:      r.FormValue("gender"),
-			Description: r.FormValue("description"),
+			Qualification:     r.FormValue("qualification"),
+			Surname:       r.FormValue("surname"),
+			Category:         r.FormValue("category"),
+			Certificates:      r.FormValue("certificates"),
 		}
-		err = c.PetStore.RegisterPet(pet)
+		err = c.VetStore.RegisterVet(vet)
 		if err != nil {
 			logger.Error(err, "Error occurred while trying to register pet.\n")
 		}
@@ -42,9 +40,9 @@ func (c *Controller) PetPostHandler() http.HandlerFunc {
 	}
 }
 
-func (c *Controller) PetGetHandler() http.HandlerFunc {
+func (c *Controller) VetGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		petType := c.PetStore.GetPetEnums()
-		view.GenerateHTML(w, petType, "cabinetPet")
+		vetType,_ := c.VetStore.GetVetEnums()
+		view.GenerateHTML(w, vetType, "cabinetVet")
 	}
 }
