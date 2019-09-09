@@ -8,16 +8,16 @@ import (
 )
 
 type Topic struct {
-	TopicID        int       `json:"topic_id" db:"topic_id"`
-	UserID         int       `json:"user_id" db:"user_id"`
-	CreatedTime    time.Time `json:"created_time" db:"created_time"`
-	Title          string    `json:"title" db:"title"`
-	Description    string    `json:"description" db:"description"`
+	TopicID     int       `json:"topic_id" db:"topic_id"`
+	UserID      int       `json:"user_id" db:"user_id"`
+	CreatedTime time.Time `json:"created_time" db:"created_time"`
+	Title       string    `json:"title" db:"title"`
+	Description string    `json:"description" db:"description"`
 }
 
 // View Alias-Struct to layout topic properly
 type ViewTopic struct {
-	UserName string
+	UserName    string
 	CommentsIDs []int64
 	Topic
 }

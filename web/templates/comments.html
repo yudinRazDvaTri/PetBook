@@ -13,14 +13,10 @@
         <!--   BOOTSTRAP-->
     </head>
 
-    <body>
-    <div style="text-align: center">
-        <form action="/topics" method="GET">
-            <input type="submit" value="Forum">
-        </form
-        ></div>
-    <div class="page-header" style="text-align: center">
-        <h1>{{.Topic.Title}}</h1>
+    <body style="height: 100%; background-color: #fafafa; color: #2b2b2b; padding-bottom: 80px">
+    
+    <div class="page-header" style="margin-top:5px; background-color:#fafafa;text-align: center; border: 1px solid black">
+        <h1 >{{.Topic.Title}}</h1>
         <h6>{{.Topic.Description}}</h6>
     </div>
 
@@ -46,6 +42,17 @@
                         </div>
                     <br>
                     <br>
+<<<<<<< HEAD
+                {{ else }}
+                    <h2> Nothing to show </h2>
+                {{ end}}
+        </div>
+
+    <div class="container">
+        <form action="/topics/{{.Topic.TopicID}}/comments" method="POST">
+            <textarea rows="4" cols="20" name="content" class="form-control form-control-sm" style="margin-bottom: 10px;"placeholder="content" required></textarea>
+            <input class="btn btn-outline-info"type="submit" value="Comment">
+=======
 
                       {{ range .NestedComments }}
 
@@ -77,6 +84,7 @@
         <form action="/topics/{{.Topic.TopicID}}/comments?parentID={{0}}" method="POST">
                 <input type="submit" value="Comment">
                 <textarea rows="8" cols="50" name="content" placeholder="content" required></textarea>
+>>>>>>> 6ccde399b3935a6b94c02787e94c67ad633313c1
         </form>
     </div>
 

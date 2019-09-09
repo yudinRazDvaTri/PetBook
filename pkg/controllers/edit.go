@@ -64,7 +64,7 @@ func (c *Controller) EditPageHandler(w http.ResponseWriter, r *http.Request) {
 
 	gallery:=c.MediaStore.GetExistedGallery(id)
 
-	view.GenerateHTML(w,"Settings","navbarBlack")
+	view.GenerateHTML(w,"Settings","navbar")
 	view.GenerateHTML(w,edit,filename)
 	view.GenerateHTML(w,gallery,"gallery_edit")
 	view.GenerateHTML(w,nil,"footer")

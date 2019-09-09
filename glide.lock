@@ -1,5 +1,5 @@
 hash: fd528d8e22e4dc1ec7f7002489942414f098039a4d59286be33edc0fe71eb633
-updated: 2019-09-09T19:54:30.442782+03:00
+updated: 2019-09-09T22:01:06.056649368+03:00
 imports:
 - name: cloud.google.com/go
   version: d4d57431b6a369d42130c17867ad7d92b6ff2970
@@ -35,7 +35,7 @@ imports:
   - oid
   - scram
 - name: github.com/rubenv/sql-migrate
-  version: 8926f37f0bc1a432e673c60cedb705f783306da5
+  version: 87ce952f7079c58e10a2a85835202943ebb9580c
   subpackages:
   - sqlparse
 - name: github.com/subosito/gotenv
@@ -43,7 +43,7 @@ imports:
 - name: github.com/urfave/negroni
   version: c6a59be0ce122566695fbd5e48a77f8f10c8a63a
 - name: golang.org/x/crypto
-  version: 094676da4a83be5288d281081bba63a173ce6772
+  version: 4def268fd1a49955bfb3dda92fe3db4f924f2285
   subpackages:
   - bcrypt
   - blowfish
