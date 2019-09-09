@@ -30,12 +30,9 @@ type Controller struct {
 	SearchStore       search.SearchStorer
 	BlogStore         models.BlogStorer
 	ChatStore         models.ChatStorer
-<<<<<<< HEAD
 	FollowersStore 	  models.FollowersStorer
-=======
 	MediaStore        models.MediaStorer
 	VetStore  		  models.VetStorer
->>>>>>> 2571b48fa327414e75fe8ce8e23ad656052e24b1
 }
 
 const (

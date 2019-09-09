@@ -33,12 +33,9 @@ func main() {
 	storeSearch := search.SearchStore{DB: db}
 	storeBlog := models.BlogStore{DB: db}
 	storeChat := models.ChatStore{DB: db}
-<<<<<<< HEAD
 	storeFollowers:=models.FollowersStore{DB: db}
-=======
 	storeMedia := models.MediaStore{DB: db}
 	storeVet := models.VetStore{DB: db}
->>>>>>> 2571b48fa327414e75fe8ce8e23ad656052e24b1
 
 	controller := controllers.Controller{
 		PetStore:          &storePet,
@@ -48,12 +45,9 @@ func main() {
 		RefreshTokenStore: &storeRefreshToken,
 		BlogStore:         &storeBlog,
 		ChatStore:         &storeChat,
-<<<<<<< HEAD
 		FollowersStore:    &storeFollowers,
-=======
 		MediaStore:        &storeMedia,
 		VetStore:         &storeVet,
->>>>>>> 2571b48fa327414e75fe8ce8e23ad656052e24b1
 	}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")

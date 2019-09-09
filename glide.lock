@@ -1,15 +1,8 @@
 hash: fd528d8e22e4dc1ec7f7002489942414f098039a4d59286be33edc0fe71eb633
-<<<<<<< HEAD
 updated: 2019-09-09T09:59:50.000521604+03:00
 imports:
 - name: cloud.google.com/go
   version: 436cd0a2ddb683b3730f6f5aad3fa3d444ec6c54
-=======
-updated: 2019-09-04T09:44:11.523288+03:00
-imports:
-- name: cloud.google.com/go
-  version: 3b58207d07a2c89721ebc3d4553d5930ef8cf56a
->>>>>>> 2571b48fa327414e75fe8ce8e23ad656052e24b1
   subpackages:
   - compute/metadata
 - name: github.com/dgrijalva/jwt-go

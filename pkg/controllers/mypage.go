@@ -78,7 +78,7 @@ func (c *Controller) MyPagePetGetHandler(userID int,w http.ResponseWriter, r *ht
 
 		photos := c.MediaStore.GetExistedGallery(userID)
 
-		view.GenerateHTML(w, "MYPAGE", "navbarBlack")
+		view.GenerateHTML(w, "My page", "navbar")
 		view.GenerateHTML(w, myPageData, "mypage")
 		view.GenerateHTML(w, photos, "gallery_main")
 		view.GenerateTimeHTML(w, blog, "blog")
@@ -113,7 +113,7 @@ func (c *Controller) MyPageVetGetHandler(userID int,w http.ResponseWriter, r *ht
 
 		photos := c.MediaStore.GetExistedGallery(userID)
 
-		view.GenerateHTML(w, "MYPAGE", "navbarBlack")
+		view.GenerateHTML(w, "My page", "navbar")
 		view.GenerateHTML(w, myPageData, "mypage_vet")
 		view.GenerateHTML(w, photos, "gallery_main")
 		view.GenerateTimeHTML(w, blog, "blog")
