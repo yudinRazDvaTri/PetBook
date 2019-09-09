@@ -71,7 +71,6 @@ func main() {
 	subrouter.HandleFunc("/chats/{id}", controller.HandleChatConnectionGET()).Methods("GET")
 	subrouter.HandleFunc("/chats/{id}/search/{date}", controller.HandleChatSearchConnection()).Methods("GET")
 	subrouter.HandleFunc("/ws/{id}", controller.HandleChatConnection())
-	go controller.HandleMessages()
 
 	//subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
 	subrouter.HandleFunc("/", controller.MyPageGetHandler()).Methods("GET")

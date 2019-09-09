@@ -15,14 +15,7 @@ import (
 	"time"
 )
 
-var clients = make(map[models.Client]bool)      // connected clients
-var broadcast = make(chan models.MessageToView) // broadcast channel
-
-type ChatChannel struct { //use this cha
-	client1   models.Client
-	client2   models.Client
-	broadcast chan models.MessageToView
-}
+var clients = make(map[models.Client]bool) // connected clients
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -57,13 +50,9 @@ func (c *Controller) HandleChatConnection() http.HandlerFunc {
 			logger.Error(err)
 			return
 		}
-		defer ws.Close()
+		//defer ws.Close()
 
 		fromID := context.Get(r, "id").(int)
-		client := models.Client{
-			ID:         fromID,
-			Connection: ws,
-		}
 
 		params := mux.Vars(r)
 		toID, err := strconv.Atoi(params["id"])
@@ -72,9 +61,13 @@ func (c *Controller) HandleChatConnection() http.HandlerFunc {
 			http.Redirect(w, r, "/chats", http.StatusNotFound)
 			return
 		}
-
+		client := models.Client{
+			ID:         fromID,
+			Connection: ws,
+		}
 		// Register our new client
 		clients[client] = true
+		// Register our new client
 		messages, err := c.ChatStore.GetMessages(toID, fromID)
 		if err != nil {
 			logger.Error("can't get messages: ", err)
@@ -96,24 +89,66 @@ func (c *Controller) HandleChatConnection() http.HandlerFunc {
 			}
 		}
 
+		broadcast := make(chan models.MessageToView)
+		go c.HandleMessages(ws, broadcast, client, toID)
+	}
+}
+
+func (c *Controller) HandleMessages(ws *websocket.Conn, broadcast chan models.MessageToView, client models.Client, toID int) {
+	go func() {
 		for {
 			var msg models.MessageToView
-			msg.Username, err = c.PetStore.DisplayName(fromID)
+			var err error
+			msg.Username, err = c.PetStore.DisplayName(client.ID)
 			if err != nil {
 				logger.Error("cannot display name correctly: ", err)
 			}
-			msg.FromID = fromID
+			msg.FromID = client.ID
 			msg.ToID = toID
 			msg.CreatedAt = time.Now().Format("02-01-2006 15:04:05")
-			err := ws.ReadJSON(&msg)
+			err = ws.ReadJSON(&msg)
 			if err != nil {
 				logger.Error(err)
 				delete(clients, client)
-				break
+				ws.Close()
+				return
 			}
 			broadcast <- msg
 		}
-	}
+	}()
+
+	go func() {
+		for {
+			msg := <-broadcast
+			messageCreatedAt, err := time.Parse("02-01-2006 15:04:05", msg.CreatedAt)
+			if err != nil {
+				logger.Error("something gone wrong while parsing message created_at:", err)
+				continue
+			}
+			messageForSavingIntoDB := &models.Message{
+				FromID:    msg.FromID,
+				ToID:      msg.ToID,
+				Text:      msg.Message,
+				CreatedAt: messageCreatedAt,
+			}
+			err = c.ChatStore.SaveMessage(messageForSavingIntoDB)
+			if err != nil {
+				logger.Error(err)
+			}
+			for client := range clients {
+				if client.ID == msg.FromID || client.ID == msg.ToID {
+					err = client.Connection.WriteJSON(msg)
+					if err != nil {
+						logger.Error("send message error:", err)
+						ws.Close()
+						client.Connection.Close()
+						delete(clients, client)
+						return
+					}
+				}
+			}
+		}
+	}()
 }
 
 func (c *Controller) HandleChatSearchConnection() http.HandlerFunc {
@@ -159,36 +194,5 @@ func (c *Controller) HandleChatSearchConnection() http.HandlerFunc {
 			http.Redirect(w, r, "/chats/"+strToID, http.StatusNotFound)
 		}
 		w.Write(marshalledMsgs)
-	}
-}
-
-func (c *Controller) HandleMessages() {
-	for {
-		msg := <-broadcast
-		messageCreatedAt, err := time.Parse("02-01-2006 15:04:05", msg.CreatedAt)
-		if err != nil {
-			logger.Error("something gone wrong while parsing message created_at:", err)
-			continue
-		}
-		messageForSavingIntoDB := &models.Message{
-			FromID:    msg.FromID,
-			ToID:      msg.ToID,
-			Text:      msg.Message,
-			CreatedAt: messageCreatedAt,
-		}
-		for client := range clients {
-			err := c.ChatStore.SaveMessage(messageForSavingIntoDB)
-			if err != nil {
-				logger.Error(err)
-			}
-			if client.ID == msg.FromID || client.ID == msg.ToID { // check that there are correct users to send and to get message
-				err = client.Connection.WriteJSON(msg)
-				if err != nil {
-					logger.Error("send message error:", err)
-					client.Connection.Close()
-					delete(clients, client)
-				}
-			}
-		}
 	}
 }
