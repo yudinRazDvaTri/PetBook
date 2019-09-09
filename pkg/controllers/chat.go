@@ -94,54 +94,52 @@ func (c *Controller) HandleChatConnection() http.HandlerFunc {
 }
 
 func (c *Controller) HandleMessages(ws *websocket.Conn, client models.Client, toID int) {
-	go func() {
-		for {
-			var msg models.MessageToView
-			var err error
-			msg.Username, err = c.PetStore.DisplayName(client.ID)
-			if err != nil {
-				logger.Error("cannot display name correctly: ", err)
-			}
-			msg.FromID = client.ID
-			msg.ToID = toID
-			msg.CreatedAt = time.Now().Format("02-01-2006 15:04:05")
-			err = ws.ReadJSON(&msg)
-			if err != nil {
-				logger.Error(err)
-				delete(clients, client)
-				ws.Close()
-				return
-			}
+	for {
+		var msg models.MessageToView
+		var err error
+		msg.Username, err = c.PetStore.DisplayName(client.ID)
+		if err != nil {
+			logger.Error("cannot display name correctly: ", err)
+		}
+		msg.FromID = client.ID
+		msg.ToID = toID
+		msg.CreatedAt = time.Now().Format("02-01-2006 15:04:05")
+		err = ws.ReadJSON(&msg)
+		if err != nil {
+			logger.Error(err)
+			delete(clients, client)
+			ws.Close()
+			return
+		}
 
-			messageCreatedAt, err := time.Parse("02-01-2006 15:04:05", msg.CreatedAt)
-			if err != nil {
-				logger.Error("something gone wrong while parsing message created_at:", err)
-				continue
-			}
-			messageForSavingIntoDB := &models.Message{
-				FromID:    msg.FromID,
-				ToID:      msg.ToID,
-				Text:      msg.Message,
-				CreatedAt: messageCreatedAt,
-			}
-			err = c.ChatStore.SaveMessage(messageForSavingIntoDB)
-			if err != nil {
-				logger.Error(err)
-			}
-			for client := range clients {
-				if client.ID == msg.FromID || client.ID == msg.ToID {
-					err = client.Connection.WriteJSON(msg)
-					if err != nil {
-						logger.Error("send message error:", err)
-						ws.Close()
-						client.Connection.Close()
-						delete(clients, client)
-						return
-					}
+		messageCreatedAt, err := time.Parse("02-01-2006 15:04:05", msg.CreatedAt)
+		if err != nil {
+			logger.Error("something gone wrong while parsing message created_at:", err)
+			continue
+		}
+		messageForSavingIntoDB := &models.Message{
+			FromID:    msg.FromID,
+			ToID:      msg.ToID,
+			Text:      msg.Message,
+			CreatedAt: messageCreatedAt,
+		}
+		err = c.ChatStore.SaveMessage(messageForSavingIntoDB)
+		if err != nil {
+			logger.Error(err)
+		}
+		for client := range clients {
+			if client.ID == msg.FromID || client.ID == msg.ToID {
+				err = client.Connection.WriteJSON(msg)
+				if err != nil {
+					logger.Error("send message error:", err)
+					ws.Close()
+					client.Connection.Close()
+					delete(clients, client)
+					return
 				}
 			}
 		}
-	}()
+	}
 }
 
 func (c *Controller) HandleChatSearchConnection() http.HandlerFunc {
