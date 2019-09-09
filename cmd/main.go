@@ -31,6 +31,8 @@ func main() {
 	storeSearch := search.SearchStore{DB: db}
 	storeBlog := models.BlogStore{DB: db}
 	storeChat := models.ChatStore{DB: db}
+	storeMedia := models.MediaStore{DB: db}
+	storeVet := models.VetStore{DB: db}
 
 	controller := controllers.Controller{
 		PetStore:          &storePet,
@@ -40,6 +42,8 @@ func main() {
 		RefreshTokenStore: &storeRefreshToken,
 		BlogStore:         &storeBlog,
 		ChatStore:         &storeChat,
+		MediaStore:        &storeMedia,
+		VetStore:         &storeVet,
 	}
 
 	basicRouter.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
@@ -57,9 +61,11 @@ func main() {
 	petRouter := authRouter.PathPrefix("/").Subrouter()
 	petRouter.Use(authentication.PetMiddleware(&storeUser))
 
-	authRouter.HandleFunc("/mypage", controller.MyPageGetHandler()).Methods("GET")
+	//authRouter.HandleFunc("/mypage", controller.MyPageGetHandler()).Methods("GET")
 	authRouter.HandleFunc("/petcabinet", controller.PetPostHandler()).Methods("POST")
 	authRouter.HandleFunc("/petcabinet", controller.PetGetHandler()).Methods("GET")
+  authRouter.HandleFunc("/vetcabinet", controller.VetGetHandler()).Methods("POST")
+  authRouter.HandleFunc("/vetcabinet", controller.VetGetHandler()).Methods("GET")
 	authRouter.HandleFunc("/search", controller.ViewSearchHandler()).Queries("section", "{section}").Methods("GET")
 	authRouter.HandleFunc("/search", controller.RedirectSearchHandler()).Methods("GET")
 
@@ -77,12 +83,15 @@ func main() {
 
 	//authRouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
 	authRouter.HandleFunc("/", controller.MyPageGetHandler()).Methods("GET")
-
+  
 	authRouter.HandleFunc("/process", controller.CreateBlogHandler()).Methods("POST")
 	authRouter.HandleFunc("/delete", controller.DeleteBlogHandler()).Methods("GET")
-	authRouter.HandleFunc("/upload", controllers.UploadFile()).Methods("POST")
-	authRouter.HandleFunc("/edit", controller.EditHandler).Methods("GET")
-	authRouter.HandleFunc("/edit", controller.UpdateHandler).Methods("POST")
+	authRouter.HandleFunc("/upload", controllers.UploadLogo()).Methods("POST")
+	authRouter.HandleFunc("/edit", controller.EditPageHandler).Methods("GET")
+	authRouter.HandleFunc("/edit", controller.ProfileUpdateHandler).Methods("POST")
+  authRouter.HandleFunc("/uploadmedia", controller.UploadMedia()).Methods("POST")
+	authRouter.HandleFunc("/{id}", controller.MyPageOtherUsersHandler()).Methods("GET")
+	authRouter.HandleFunc("/deleteimg", controller.DeleteImgHandler()).Methods("Post")
 
 	basicRouter.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
 		http.FileServer(http.Dir("./web/static/"))))

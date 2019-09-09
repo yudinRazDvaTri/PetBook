@@ -30,6 +30,8 @@ type Controller struct {
 	SearchStore       search.SearchStorer
 	BlogStore         models.BlogStorer
 	ChatStore         models.ChatStorer
+	MediaStore        models.MediaStorer
+	VetStore  		  models.VetStorer
 }
 
 const (
@@ -108,12 +110,31 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 			Path:    "/",
 		})
 
-		_, err = c.UserStore.GetPet(userID)
+		//_, err = c.UserStore.GetPet(userID)
+		//if err != nil {
+		//	http.Redirect(w, r, "/petcabinet", http.StatusFound)
+		//	return
+		//}
+		c.cabinetFilled(userID,w,r)
+
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+}
+
+func (c *Controller) cabinetFilled(id int,w http.ResponseWriter, r *http.Request) {
+	role:=c.UserStore.GetUserRole(id)
+	if role=="pet" {
+		_, err := c.UserStore.GetPet(id)
 		if err != nil {
 			http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
 			return
 		}
-		http.Redirect(w, r, "/mypage", http.StatusSeeOther)
+	}else if role =="vet"{
+		_, err := c.UserStore.GetVet(id)
+		if err != nil {
+			http.Redirect(w, r, "/vetcabinet", http.StatusFound)
+			return
+		}
 	}
 }
 
@@ -230,13 +251,9 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
-		_, err = c.UserStore.GetPet(userId)
-		if err != nil {
-			http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
-			return
-		}
-		http.Redirect(w, r, "/mypage", http.StatusSeeOther)
+    
+		c.cabinetFilled(userId,w,r)
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
@@ -250,7 +267,8 @@ func getGoogleOauthToken(code string) (*oauth2.Token, error) {
 
 func (c *Controller) RegisterGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		view.GenerateHTML(w, nil, "register")
+		roles:=c.UserStore.GetUserEnums()
+		view.GenerateHTML(w, roles, "register")
 	}
 }
 
@@ -262,7 +280,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 		email := r.FormValue("email")
 		password := r.FormValue("password")
 		confirmPassword := r.FormValue("confirmPassword")
-		//userType := r.FormValue("userType")
+		userType := r.FormValue("user-role")
 		firstName := r.FormValue("firstName")
 		lastName := r.FormValue("lastName")
 
@@ -314,6 +332,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 			Firstname: firstName,
 			Lastname:  lastName,
 			Password:  string(hashedPassword),
+			Role:userType,
 		}
 
 		if err := c.UserStore.Register(&user); err != nil {

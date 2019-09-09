@@ -11,7 +11,7 @@ import (
 func (c *Controller) GetBlogHandler() http.HandlerFunc{
 	return func (w http.ResponseWriter, r *http.Request){
 		userID := context.Get(r, "id").(int)
-		results,err := c.BlogStore.GetBlog(userID)
+		results,err := c.BlogStore.GetPetBlog(userID)
 		if err !=nil{
 			logger.Error(err)
 			return
@@ -38,7 +38,7 @@ func (c *Controller) CreateBlogHandler() http.HandlerFunc{
 		id := context.Get(r, "id").(int)
 		fn := r.FormValue("something")
 		c.BlogStore.CreateBlog(fn, id)
-		http.Redirect(w, r, "/mypage", 301)
+		http.Redirect(w, r, "/", 301)
 	}
 }
 
@@ -50,6 +50,6 @@ func (c *Controller) DeleteBlogHandler() http.HandlerFunc{
 		//}
 		blogid := r.FormValue("recordid")
 		c.BlogStore.DeleteBlog(blogid)
-		http.Redirect(w, r, "/mypage", 301)
+		http.Redirect(w, r, "/", 301)
 	}
 }
