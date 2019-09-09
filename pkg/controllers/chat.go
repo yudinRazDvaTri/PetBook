@@ -89,12 +89,11 @@ func (c *Controller) HandleChatConnection() http.HandlerFunc {
 			}
 		}
 
-		broadcast := make(chan models.MessageToView)
-		go c.HandleMessages(ws, broadcast, client, toID)
+		go c.HandleMessages(ws, client, toID)
 	}
 }
 
-func (c *Controller) HandleMessages(ws *websocket.Conn, broadcast chan models.MessageToView, client models.Client, toID int) {
+func (c *Controller) HandleMessages(ws *websocket.Conn, client models.Client, toID int) {
 	go func() {
 		for {
 			var msg models.MessageToView
@@ -113,13 +112,7 @@ func (c *Controller) HandleMessages(ws *websocket.Conn, broadcast chan models.Me
 				ws.Close()
 				return
 			}
-			broadcast <- msg
-		}
-	}()
 
-	go func() {
-		for {
-			msg := <-broadcast
 			messageCreatedAt, err := time.Parse("02-01-2006 15:04:05", msg.CreatedAt)
 			if err != nil {
 				logger.Error("something gone wrong while parsing message created_at:", err)
