@@ -1,0 +1,135 @@
+{{ define "layout"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <style>
+        .blog .carousel-indicators {
+            left: 0;
+            top: auto;
+            bottom: -50px;
+
+        }
+        .blog .carousel-indicators li {
+            background: #007bff;
+            border-radius: 50%;
+            width: 20px;
+            height: 1px;
+        }
+        .blog .carousel-indicators .active {
+            background: #007bff;
+        }
+
+        .grid {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-flex-wrap: wrap;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+            -webkit-box-align: start;
+            -webkit-align-items: flex-start;
+            -ms-flex-align: start;
+            align-items: flex-start;
+            -webkit-align-content: flex-start;
+            -ms-flex-line-pack: start;
+            align-content: flex-start;
+            /*z-index: 0;*/
+            height: 100%;
+            padding: 10px;
+            overflow: auto;
+            /*background-color: #222;*/
+            text-align: center;
+            -webkit-transition: opacity .75s;
+            transition: opacity .75s;
+        }
+        .grid .grid-item {
+            display: inline-block;
+            /*width: 25%;*/
+            padding: 3px;
+            opacity: .85;
+            -webkit-transition: opacity .5s;
+            transition: opacity .5s;
+        }
+        .grid .grid-item:hover {
+            opacity: 1;
+        }
+        @media screen and (max-width: 1024px) {
+            .grid .grid-item {
+                width: 50%;
+            }
+        }
+        @media screen and (max-width: 480px) {
+            .grid .grid-item {
+                width: 100%;
+            }
+        }
+        .grid img {
+            max-width: 100%;
+            max-height: 100%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+    </style>
+</head>
+<body>
+<div class="container" style="margin-top: 40px">
+    <div class="row blog">
+        <div class="col-md-12">
+            <div id="blogCarousel" class="carousel slide" data-ride="carousel">
+
+                <ol class="carousel-indicators">
+                    <li data-target="#blogCarousel" data-slide-to="0" class="active"></li>
+                    <li data-target="#blogCarousel" data-slide-to="1"></li>
+                </ol>
+                <!-- Carousel items -->
+                <div class="carousel-inner">
+
+                    <div class="carousel-item active">
+                        <div class="row">
+                            {{range .}}
+{{/*                            <div class="col-md-3">*/}}
+                            <div class="grid">
+                                <a href={{.}} >
+                                    <img class="grid-item" src={{.}} alt="Image" style="width: 260px;height: 200px">
+                                </a>
+                            </div>
+                            {{end}}
+                        </div>
+                        <!--.row-->
+                    </div>
+                    <!--.item-->
+                    <div class="carousel-item">
+                        <div class="row">
+                            {{range .}}
+{{/*                            <div class="col-md-3">*/}}
+                            <div class="grid">
+                                <a href={{.}}>
+                                    <img class="grid-item" src={{.}} alt="Image" style="width: 260px;height: 200px">
+                                </a>
+                            </div>
+                            {{end}}
+{{/*                        <!--.row-->*/}}
+                    </div>
+{{/*                    <!--.item-->*/}}
+                </div>
+                <!--.carousel-inner-->
+            </div>
+            <!--.Carousel-->
+
+        </div>
+    </div>
+</div>
+        <script>
+            $('#blogCarousel').carousel({
+            interval:4});
+        </script>
+</body>
+</html>
+{{end}}

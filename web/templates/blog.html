@@ -20,7 +20,7 @@
     </head>
     <body>
 
-    <div class="container" style="margin-top: 10px">
+    <div class="container" style="margin-top: 40px">
         <div class="panel panel-default">
             <div class="panel-body"
 {{/*                 style="background: #98FB98;padding: 5px;"*/}}
@@ -51,6 +51,7 @@
 {{/*               style="background: #90EE90;border-radius: 10px"*/}}
         >
             <tbody >
+{{/*            VERY IMPT RANGE*/}}
             {{range .}}
                 <tr>
                     <td width="5%">
@@ -58,12 +59,13 @@
 {{/*                        {{range .LogoPath}}*/}}
                         <div style="width:65px;height:65px;">
 {{/*                            <img style="width:48px;height:48px" src="../static/usermedia/1/logo/" >*/}}
-                            <img style="width:48px;height:48px" src="../static/background.jpg" >
+{{/*                            <img style="width:48px;height:48px" src="../static/background.jpg" >*/}}
+                            <img style="width:48px;height:48px" src={{.LogoPath}} >
                         </div>
 {{/*                        {{end}}*/}}
-
+{{/*{{range .BlogData}}*/}}
                         <div style="font-size: 20px;font-family: bold;">
-                            {{.PetName}}
+                            {{.Name}}
                         </div>
                         </div>
                     </td>
@@ -109,7 +111,7 @@
 {{/*            {{end}}*/}}
 
 {{/*            <div>*/}}
-{{/*                {{.PetName}}*/}}
+{{/*                {{.Name}}*/}}
 {{/*            </div>*/}}
 {{/*        </td>*/}}
 {{/*        <td width="95%">*/}}

@@ -8,11 +8,11 @@ import (
 )
 
 type Blog struct {
-	Id      int
-	UserId  string
-	PetName string
-	Message string
-	Date    time.Time
+	Id       int
+	UserId   string
+	Name     string
+	Message  string
+	Date     time.Time
 	LogoPath string
 }
 
@@ -21,9 +21,10 @@ type BlogStore struct {
 }
 
 type BlogStorer interface {
-	GetBlog(userid int) ([]Blog,error)
+	GetPetBlog(userid int) ([]Blog,error)
 	CreateBlog(form string, idUser int) error
 	DeleteBlog(blogid string) error
+	GetVetBlog(userID int) ([]Blog ,error)
 }
 
 func logFatal(err error) {
@@ -32,7 +33,7 @@ func logFatal(err error) {
 	}
 }
 
-func (b *BlogStore) GetBlog(userID int) ([]Blog ,error){
+func (b *BlogStore) GetPetBlog(userID int) ([]Blog ,error){
 	rows, err := b.DB.Query("select blog_id, content, created_time, name from blog,pets where blog.user_id =$1 and pets.user_id=blog.user_id order by created_time desc;", userID)
 	if err != nil {
 		return nil,fmt.Errorf("cannot connect to database: %v", err)
@@ -45,7 +46,30 @@ func (b *BlogStore) GetBlog(userID int) ([]Blog ,error){
 		var time time.Time
 		err = rows.Scan(&blogid, &message, &time, &name)
 		tRes.Id = blogid
-		tRes.PetName = name
+		tRes.Name = name
+		tRes.Date = time
+		tRes.Message = message
+		results = append(results, tRes)
+		if err != nil {
+			return nil,fmt.Errorf("cannot insert message to messages in db: %v", err)
+		}
+	}
+	return results,nil
+}
+func (b *BlogStore) GetVetBlog(userID int) ([]Blog ,error){
+	rows, err := b.DB.Query("select blog_id, content, created_time, name from blog,vets where blog.user_id =$1 and vets.user_id=blog.user_id order by created_time desc;", userID)
+	if err != nil {
+		return nil,fmt.Errorf("cannot connect to database: %v", err)
+	}
+	tRes := Blog{}
+	var results []Blog
+	for rows.Next() {
+		var blogid int
+		var message, name string
+		var time time.Time
+		err = rows.Scan(&blogid, &message, &time, &name)
+		tRes.Id = blogid
+		tRes.Name = name
 		tRes.Date = time
 		tRes.Message = message
 		results = append(results, tRes)
@@ -56,26 +80,8 @@ func (b *BlogStore) GetBlog(userID int) ([]Blog ,error){
 	return results,nil
 }
 
-//func (b *BlogStore) GetBlog() []Blog{
-//	rows, err:= b.DB.Query("select blog_id, content from blog")
-//	if err != nil{
-//		logFatal(err)
-//	}
-//	tRes:=Blog{}
-//	var results []Blog
-//	for rows.Next(){
-//		var id int
-//		var message string
-//		err = rows.Scan(&id,&message)
-//		tRes.Id=id
-//		tRes.Message=message
-//		results = append(results,tRes)
-//		if err != nil{
-//			logFatal(err)
-//		}
-//	}
-//	return results
-//}
+
+
 
 func (b *BlogStore) CreateBlog(form string, idUser int) error{
 	result, err := b.DB.Exec("insert into blog (content,user_id) values ($1,$2);", form, idUser)

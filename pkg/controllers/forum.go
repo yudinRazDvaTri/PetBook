@@ -30,13 +30,13 @@ func (c *Controller) TopicsGetHandler() http.HandlerFunc {
 			userName, err := c.PetStore.DisplayName(topic.UserID)
 			if err != nil {
 				logger.Error(err)
-				http.Redirect(w, r, "/topics", http.StatusNotFound)
+				http.Redirect(w, r, "/topics", http.StatusInternalServerError)
 				return
 			}
 			viewTopic, err := c.ForumStore.NewViewTopic(userName, topic)
 			if err != nil {
 				logger.Error(err)
-				http.Redirect(w, r, "/topics", http.StatusNotFound)
+				http.Redirect(w, r, "/topics", http.StatusInternalServerError)
 				return
 			}
 			viewTopics = append(viewTopics, viewTopic)
@@ -58,7 +58,7 @@ func (c *Controller) TopicsPostHandler() http.HandlerFunc {
 
 		if err := c.ForumStore.CreateNewTopic(userID, title, description); err != nil {
 			logger.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "can't create new topic", http.StatusInternalServerError)
 			return
 		}
 		http.Redirect(w, r, "/topics", http.StatusFound)
@@ -75,20 +75,20 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 		topicID, err := strconv.Atoi(topicIdStr)
 		if err != nil {
 			logger.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w,"inappropriate request", http.StatusBadRequest)
 			return
 		}
 
 		comments, err := c.ForumStore.GetTopicComments(topicID)
 		if err != nil {
 			logger.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "can't get topic's comments", http.StatusInternalServerError)
 			return
 		}
 		topic, err := c.ForumStore.GetTopicByID(topicID)
 		if err != nil {
 			logger.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "No such topic", http.StatusNotFound)
 			return
 		}
 
@@ -98,13 +98,13 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 			userName, err := c.PetStore.DisplayName(comment.UserID)
 			if err != nil {
 				logger.Error(err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				http.Error(w, "can't get comment creator's name", http.StatusInternalServerError)
 				return
 			}
 			viewComment, err := c.ForumStore.NewViewComment(userName, comment)
 			if err != nil {
 				logger.Error(err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				http.Error(w, "can't get likes-field of comment", http.StatusInternalServerError)
 				return
 			}
 			viewComments = append(viewComments, viewComment)
@@ -136,7 +136,7 @@ func (c *Controller) CommentPostHandler() http.HandlerFunc {
 		topicID, err := strconv.Atoi(topicIdStr)
 		if err != nil {
 			logger.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "inappropriate url", http.StatusInternalServerError)
 			return
 		}
 
@@ -146,7 +146,7 @@ func (c *Controller) CommentPostHandler() http.HandlerFunc {
 
 		if err := c.ForumStore.AddNewComment(topicID, userID, content); err != nil {
 			logger.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "can't add comment", http.StatusInternalServerError)
 			return
 		}
 
@@ -165,7 +165,7 @@ func (c *Controller) CommentsRatingHandler() http.HandlerFunc {
 		commentID, err := strconv.Atoi(commentIdStr)
 		if err != nil {
 			logger.Error(err)
-			http.Redirect(w, r, "/topics/"+topicIdStr, http.StatusNotFound)
+			http.Redirect(w, r, "/topics/"+topicIdStr, http.StatusInternalServerError)
 			return
 		}
 

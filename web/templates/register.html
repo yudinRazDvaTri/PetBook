@@ -18,6 +18,12 @@
         <input type="password" name="confirmPassword" placeholder="Confirm password">
         <input type="text" name="firstName" placeholder="First name">
         <input type="text" name="lastName" placeholder="Last name">
+        <select name="user-role" class="custom-select">
+            <option selected>User role</option>
+            {{range .}}
+                <option >{{.}}</option>
+            {{end}}
+        </select>
         <input type="submit" name="" value="Register">
     </form>
         <a href="/login">Already have an account?</a>

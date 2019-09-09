@@ -117,6 +117,7 @@ func (c *Controller) searchByPet(w http.ResponseWriter, r *http.Request) {
 	queryStr := []string{"age", "animal_type", "breed", "weight", "gender", "name"}
 	for _, str := range queryStr {
 		val := r.URL.Query().Get(str)
+
 		if val != "" {
 			m[str] = val
 		}
