@@ -7,9 +7,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/emojione/2.2.6/assets/css/emojione.min.css"/>
-    <link rel="stylesheet" href="../static/chat.css"/>
+    <link rel="stylesheet" href="/static/chat.css"/>
+    <link rel="stylesheet" href="/static/materialize_css/materialize.min.css"/>
+
 </head>
 <body>
+<a id="UserID" hidden="true">{{.}}</a>
 <nav>
     <div class="nav-wrapper">
       <a class="brand-logo black-text left">Chat</a>
@@ -18,14 +21,29 @@
         <li><a class = "black-text" href="/chats">Chats</a></li>
         <li><a class = "black-text" href="/logout">Logout</a></li>
       </ul>
-     
-        <ul class="right hide-on-med-and-down">
-      </ul>
     </div>
 </nav>
 
+
 <main id="app">
-    <div class="row" style="margin-top: 30px">
+
+<div class="row">
+        <div class="col s12 center">
+          <div class="input-field inline">
+      <input class="datepicker" id="calendar" type="text">
+      <label for="calendar">Search by date</label>
+          </div>
+           <button class="waves-effect waves-light btn" @click="searchByDate">
+                <i class="material-icons right">search</i>
+                Search
+            </button>
+            <button id= "cancelSearchBtn" class="waves-effect waves-light btn hide" @click="cancelSearch">
+                <i class="material-icons right">cancel</i>
+                Cancel
+            </button>
+        </div>
+</div>
+    <div class="row">
         <div class="col s12">
             <div class="card horizontal">
                 <div id="chat-messages" class="card-content" v-html="chatContent">
@@ -34,16 +52,17 @@
         </div>
     </div>
     <div class="row">
-        <div class="input-field col s9">
+        <div id="messageInputbox" class="input-field col s9" >
             <input type="text" v-model="newMsg" @keyup.enter="send">
         </div>
         <div class="input-field col s3">
-            <button class="waves-effect waves-light btn" @click="send">
+            <button id="sendMessageBtn" class="waves-effect waves-light btn" @click="send">
                 <i class="material-icons right">chat</i>
                 Send
             </button>
         </div>
     </div>
+
 </main>
 <footer class="page-footer">
 </footer>
@@ -51,7 +70,18 @@
 <script src="https://cdn.jsdelivr.net/emojione/2.2.6/lib/js/emojione.min.js"></script>
 <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/md5.js"></script>
-<script src="../static/chat.js"></script>
+<script src="/static/chat.js"></script>
+<script src="/static/materialize_js/materialize.min.js"></script>
+<script >
+    document.addEventListener('DOMContentLoaded', function() {
+   var elems = document.querySelectorAll('.datepicker');
+   M.Datepicker.init(elems, {
+    format: 'dd-mm-yyyy',
+    showClearBtn: true
+   });
+ });
+</script>
+
 </body>
 </html>
 {{end}}

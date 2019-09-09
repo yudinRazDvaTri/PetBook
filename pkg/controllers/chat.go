@@ -1,12 +1,15 @@
 package controllers
 
 import (
+	//"bytes"
+	"encoding/json"
 	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/models"
 	"github.com/dpgolang/PetBook/pkg/view"
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
+	//"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -15,7 +18,11 @@ import (
 var clients = make(map[models.Client]bool)      // connected clients
 var broadcast = make(chan models.MessageToView) // broadcast channel
 
-var toID int
+type ChatChannel struct { //use this cha
+	client1   models.Client
+	client2   models.Client
+	broadcast chan models.MessageToView
+}
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -27,7 +34,7 @@ func (c *Controller) HandleChatConnectionGET() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var err error
 		params := mux.Vars(r)
-		toID, err = strconv.Atoi(params["id"])
+		toID, err := strconv.Atoi(params["id"])
 		if err != nil {
 			logger.Error(err)
 			http.Redirect(w, r, "/chats", http.StatusNotFound)
@@ -39,7 +46,7 @@ func (c *Controller) HandleChatConnectionGET() http.HandlerFunc {
 			http.Redirect(w, r, "/mypage", http.StatusNotFound)
 			return
 		}
-		view.GenerateHTML(w, nil, "chat")
+		view.GenerateHTML(w, toID, "chat")
 	}
 }
 
@@ -57,13 +64,21 @@ func (c *Controller) HandleChatConnection() http.HandlerFunc {
 			ID:         fromID,
 			Connection: ws,
 		}
+
+		params := mux.Vars(r)
+		toID, err := strconv.Atoi(params["id"])
+		if err != nil {
+			logger.Error(err)
+			http.Redirect(w, r, "/chats", http.StatusNotFound)
+			return
+		}
+
 		// Register our new client
 		clients[client] = true
 		messages, err := c.ChatStore.GetMessages(toID, fromID)
 		if err != nil {
 			logger.Error("can't get messages: ", err)
 		}
-
 		for _, mes := range messages {
 			msg := models.MessageToView{
 				ToID:      mes.ToID,
@@ -101,6 +116,52 @@ func (c *Controller) HandleChatConnection() http.HandlerFunc {
 	}
 }
 
+func (c *Controller) HandleChatSearchConnection() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fromID := context.Get(r, "id").(int)
+		params := mux.Vars(r)
+		toID, err := strconv.Atoi(params["id"])
+		if err != nil {
+			logger.Error(err)
+			http.Redirect(w, r, "/chats", http.StatusNotFound)
+			return
+		}
+
+		strToID := strconv.FormatInt(int64(toID), 10)
+		date, err := time.Parse("02-01-2006", params["date"])
+		if err != nil {
+			logger.Error(err)
+			http.Redirect(w, r, "/chats/"+strToID, http.StatusNotFound)
+			return
+		}
+		messages, err := c.ChatStore.GetMessagesByDate(toID, fromID, date)
+		if err != nil {
+			logger.Error("can't get messages: ", err)
+		}
+		messagesToView := []models.MessageToView{}
+		for _, mes := range messages {
+			msg := models.MessageToView{
+				ToID:      mes.ToID,
+				FromID:    mes.FromID,
+				Message:   mes.Text,
+				CreatedAt: mes.CreatedAt.Format("02-01-2006 15:04:05"),
+			}
+			msg.Username, err = c.PetStore.DisplayName(msg.FromID)
+			if err != nil {
+				logger.Error("cannot display name correctly: ", err)
+			}
+
+			messagesToView = append(messagesToView, msg)
+		}
+		marshalledMsgs, err := json.Marshal(messagesToView)
+		if err != nil {
+			logger.Error("can't marshall messages: ", err)
+			http.Redirect(w, r, "/chats/"+strToID, http.StatusNotFound)
+		}
+		w.Write(marshalledMsgs)
+	}
+}
+
 func (c *Controller) HandleMessages() {
 	for {
 		msg := <-broadcast
@@ -116,11 +177,11 @@ func (c *Controller) HandleMessages() {
 			CreatedAt: messageCreatedAt,
 		}
 		for client := range clients {
+			err := c.ChatStore.SaveMessage(messageForSavingIntoDB)
+			if err != nil {
+				logger.Error(err)
+			}
 			if client.ID == msg.FromID || client.ID == msg.ToID { // check that there are correct users to send and to get message
-				err := c.ChatStore.SaveMessage(messageForSavingIntoDB)
-				if err != nil {
-					logger.Error(err)
-				}
 				err = client.Connection.WriteJSON(msg)
 				if err != nil {
 					logger.Error("send message error:", err)

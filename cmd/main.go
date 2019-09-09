@@ -67,9 +67,10 @@ func main() {
 	subrouter.HandleFunc("/forum/topic/{topicID}/comments/{commentID}/ratings", controller.CommentsLikeHandler()).Methods("POST")
 
 	subrouter.HandleFunc("/chats", controller.ChatsGetHandler()).Methods("GET")
-	subrouter.HandleFunc("/chats/{id}/delete", controller.DeleteChatHandler()).Methods("POST")
+	subrouter.HandleFunc("/chats/{id}", controller.DeleteChatHandler()).Methods("POST") //does not work with method DELETE with overriding with js too
 	subrouter.HandleFunc("/chats/{id}", controller.HandleChatConnectionGET()).Methods("GET")
-	subrouter.HandleFunc("/ws", controller.HandleChatConnection())
+	subrouter.HandleFunc("/chats/{id}/search/{date}", controller.HandleChatSearchConnection()).Methods("GET")
+	subrouter.HandleFunc("/ws/{id}", controller.HandleChatConnection())
 	go controller.HandleMessages()
 
 	//subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
