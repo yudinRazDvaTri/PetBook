@@ -6,11 +6,9 @@ import (
 	"github.com/dpgolang/PetBook/pkg/controllers"
 	"github.com/dpgolang/PetBook/pkg/driver"
 	"github.com/dpgolang/PetBook/pkg/logger"
-	_ "github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/models"
 	"github.com/dpgolang/PetBook/pkg/models/forum"
 	"github.com/dpgolang/PetBook/pkg/models/search"
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"net/http"
 	"os"
@@ -24,7 +22,7 @@ func main() {
 		logger.FatalError(err, "Migration failed.\n")
 	}
 
-	router := mux.NewRouter()
+	basicRouter := mux.NewRouter()
 
 	storeUser := models.UserStore{DB: db}
 	storePet := models.PetStore{DB: db}
@@ -36,6 +34,7 @@ func main() {
 	storeFollowers:=models.FollowersStore{DB: db}
 	storeMedia := models.MediaStore{DB: db}
 	storeVet := models.VetStore{DB: db}
+
 
 	controller := controllers.Controller{
 		PetStore:          &storePet,
@@ -50,61 +49,59 @@ func main() {
 		VetStore:         &storeVet,
 	}
 
-	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
-	router.HandleFunc("/register", controller.RegisterGetHandler()).Methods("GET")
+	basicRouter.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
+	basicRouter.HandleFunc("/register", controller.RegisterGetHandler()).Methods("GET")
 
-	router.HandleFunc("/login", controller.LoginPostHandler()).Methods("POST")
-	router.HandleFunc("/login", controller.LoginGetHandler()).Methods("GET")
-	router.HandleFunc("/loginGoogle", controller.LoginGoogleGetHandler()).Methods("GET")
-	router.HandleFunc("/loginGoogleCallback", controller.GoogleCallback()).Methods("GET")
-	router.HandleFunc("/logout", controller.LogoutGetHandler()).Methods("GET")
+	basicRouter.HandleFunc("/login", controller.LoginPostHandler()).Methods("POST")
+	basicRouter.HandleFunc("/login", controller.LoginGetHandler()).Methods("GET")
+	basicRouter.HandleFunc("/loginGoogle", controller.LoginGoogleGetHandler()).Methods("GET")
+	basicRouter.HandleFunc("/loginGoogleCallback", controller.GoogleCallback()).Methods("GET")
+	basicRouter.HandleFunc("/logout", controller.LogoutGetHandler()).Methods("GET")
 
-	subrouter := router.PathPrefix("/").Subrouter()
-	subrouter.Use(authentication.AuthMiddleware(&storeRefreshToken, &storeUser))
+	authRouter := basicRouter.PathPrefix("/").Subrouter()
+	authRouter.Use(authentication.AuthMiddleware(&storeRefreshToken))
 
-	//subrouter.HandleFunc("/mypage", controller.MyPageGetHandler()).Methods("GET")
-	subrouter.HandleFunc("/petcabinet", controller.PetPostHandler()).Methods("POST")
-	subrouter.HandleFunc("/petcabinet", controller.PetGetHandler()).Methods("GET")
-	subrouter.HandleFunc("/vetcabinet", controller.VetPostHandler()).Methods("POST")
-	subrouter.HandleFunc("/vetcabinet", controller.VetGetHandler()).Methods("GET")
-	subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Queries("section", "{section}").Methods("GET")
-	subrouter.HandleFunc("/search", controller.RedirectSearchHandler()).Methods("GET")
+	petRouter := authRouter.PathPrefix("/").Subrouter()
+	petRouter.Use(authentication.PetMiddleware(&storeUser))
 
-	subrouter.HandleFunc("/topics", controller.TopicsGetHandler()).Methods("GET")
-	subrouter.HandleFunc("/topics", controller.TopicsPostHandler()).Methods("POST")
-	subrouter.HandleFunc("/topics/{topicID}", controller.CommentsGetHandler()).Methods("GET")
-	subrouter.HandleFunc("/topics/{topicID}/comments", controller.CommentPostHandler()).Methods("POST")
-	subrouter.HandleFunc("/topics/{topicID}/comments/{commentID}/ratings", controller.CommentsRatingHandler()).Methods("POST")
+	//authRouter.HandleFunc("/mypage", controller.MyPageGetHandler()).Methods("GET")
+	authRouter.HandleFunc("/petcabinet", controller.PetPostHandler()).Methods("POST")
+	authRouter.HandleFunc("/petcabinet", controller.PetGetHandler()).Methods("GET")
+  	authRouter.HandleFunc("/vetcabinet", controller.VetGetHandler()).Methods("POST")
+  	authRouter.HandleFunc("/vetcabinet", controller.VetGetHandler()).Methods("GET")
+	authRouter.HandleFunc("/search", controller.ViewSearchHandler()).Queries("section", "{section}").Methods("GET")
+	authRouter.HandleFunc("/search", controller.RedirectSearchHandler()).Methods("GET")
 
-	subrouter.HandleFunc("/chats", controller.ChatsGetHandler()).Methods("GET")
-	subrouter.HandleFunc("/chats/{id}/delete", controller.DeleteChatHandler()).Methods("POST")
-	subrouter.HandleFunc("/chats/{id}", controller.HandleChatConnectionGET()).Methods("GET")
-	subrouter.HandleFunc("/ws", controller.HandleChatConnection())
+	authRouter.HandleFunc("/topics", controller.TopicsGetHandler()).Methods("GET")
+	petRouter.HandleFunc("/topics", controller.TopicsPostHandler()).Methods("POST")
+	authRouter.HandleFunc("/topics/{topicID}", controller.CommentsGetHandler()).Methods("GET")
+	petRouter.HandleFunc("/topics/{topicID}/comments", controller.CommentPostHandler()).Methods("POST")
+	petRouter.HandleFunc("/topics/{topicID}/comments/{commentID}/ratings", controller.CommentsRatingHandler()).Methods("POST")
+
+	authRouter.HandleFunc("/chats", controller.ChatsGetHandler()).Methods("GET")
+	authRouter.HandleFunc("/chats/{id}/delete", controller.DeleteChatHandler()).Methods("POST")
+	authRouter.HandleFunc("/chats/{id}", controller.HandleChatConnectionGET()).Methods("GET")
+	authRouter.HandleFunc("/ws", controller.HandleChatConnection())
 	go controller.HandleMessages()
 
-	//subrouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
-	subrouter.HandleFunc("/", controller.MyPageGetHandler()).Methods("GET")
+	//authRouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
+	authRouter.HandleFunc("/", controller.MyPageGetHandler()).Methods("GET")
+  
+	authRouter.HandleFunc("/process", controller.CreateBlogHandler()).Methods("POST")
+	authRouter.HandleFunc("/delete", controller.DeleteBlogHandler()).Methods("GET")
+	authRouter.HandleFunc("/upload", controller.UploadLogo()).Methods("POST")
+	authRouter.HandleFunc("/edit", controller.EditPageHandler).Methods("GET")
+	authRouter.HandleFunc("/edit", controller.ProfileUpdateHandler).Methods("POST")
+  	authRouter.HandleFunc("/uploadmedia", controller.UploadMedia()).Methods("POST")
+	authRouter.HandleFunc("/{id}", controller.MyPageOtherUsersHandler()).Methods("GET")
+	authRouter.HandleFunc("/deleteimg", controller.DeleteImgHandler()).Methods("Post")
+  
+  authRouter.HandleFunc("/mypage/{follow:followers|following}", controller.GetFollowerHandler()).Methods("GET")
+	authRouter.HandleFunc("/mypage/{follow:followers|following}", controller.PostFollowerHandler()).Methods("POST")
 
-	subrouter.HandleFunc("/process", controller.CreateBlogHandler()).Methods("POST")
-	subrouter.HandleFunc("/delete", controller.DeleteBlogHandler()).Methods("GET")
-	subrouter.HandleFunc("/upload", controller.UploadLogo()).Methods("POST")
-	subrouter.HandleFunc("/edit", controller.EditPageHandler).Methods("GET")
-	subrouter.HandleFunc("/edit", controller.ProfileUpdateHandler).Methods("POST")
-	subrouter.HandleFunc("/uploadmedia", controller.UploadMedia()).Methods("POST")
-	subrouter.HandleFunc("/{id}", controller.MyPageOtherUsersHandler()).Methods("GET")
-	subrouter.HandleFunc("/deleteimg", controller.DeleteImgHandler()).Methods("Post")
+	basicRouter.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static/"))))
 
-
-
-	subrouter.HandleFunc("/mypage/{follow:followers|following}", controller.GetFollowerHandler()).Methods("GET")
-	subrouter.HandleFunc("/mypage/{follow:followers|following}", controller.PostFollowerHandler()).Methods("POST")
-
-	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
-		http.FileServer(http.Dir("./web/static/"))))
-
-	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
-
-	if err := http.ListenAndServe(":8080", loggedRouter); err != nil {
+	if err := http.ListenAndServe(":" + os.Getenv("APP_PORT"), basicRouter); err != nil {
 		logger.FatalError(err, "Error occurred, while trying to listen and serve a server")
 	}
 }

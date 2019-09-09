@@ -48,6 +48,7 @@ func (c *Controller) GetFollowerHandler() http.HandlerFunc {
 		}
 		if follow == "followers" {
 			Data.IsFollowing = false
+<<<<<<< HEAD
 			view.GenerateHTML(w, "My community", "navbar")
 			view.GenerateHTML(w, Data, "follower")
 			view.GenerateHTML(w,nil,"footer")
@@ -56,6 +57,12 @@ func (c *Controller) GetFollowerHandler() http.HandlerFunc {
 		view.GenerateHTML(w, "My community", "navbar")
 		view.GenerateHTML(w, Data, "follower")
 		view.GenerateHTML(w,nil,"footer")
+=======
+			view.GenerateHTML(w, Data, "follower")
+			return
+		}
+		view.GenerateHTML(w, Data, "follower")
+>>>>>>> 6ccde399b3935a6b94c02787e94c67ad633313c1
 		return
 	}
 }
