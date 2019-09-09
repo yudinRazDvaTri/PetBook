@@ -31,7 +31,7 @@ type Tokens struct {
 	RefreshExpirationTime time.Time
 }
 
-func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *models.UserStore) (mw func(http.Handler) http.Handler) {
+func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore) (mw func(http.Handler) http.Handler) {
 	mw = func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Checking whether user logs in with the help of third-party service
@@ -45,7 +45,7 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *mode
 					newToken, err := tokenSource.Token()
 					if err != nil {
 						w.WriteHeader(http.StatusInternalServerError)
-						logger.Error("Error occurred while trying to get Token from TokenSource: %v.\n",err)
+						logger.Error( err, "Error occurred while trying to get Token from TokenSource.\n")
 						return
 					}
 
@@ -61,7 +61,7 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *mode
 						contents, err := ioutil.ReadAll(response.Body)
 						if err != nil {
 							w.WriteHeader(http.StatusInternalServerError)
-							logger.Error("Error occurred while trying to read user info bytes: %v.\n",err)
+							logger.Error(err, "Error occurred while trying to read user info bytes.\n")
 							return
 						}
 
@@ -69,14 +69,14 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *mode
 
 						if err := json.Unmarshal(contents, &googleUserInfo); err != nil {
 							w.WriteHeader(http.StatusInternalServerError)
-							logger.Error("Error occurred while trying to unmarshal user info: %v.\n",err)
+							logger.Error(err, "Error occurred while trying to unmarshal user info.\n")
 							return
 						}
 
 						gob.Register(newToken)
-						value := map[string]interface{} {
+						value := map[string]interface{}{
 							"accessToken": newToken,
-							"userId": value["userId"].(int),
+							"userId":      value["userId"].(int),
 						}
 
 						if encoded, err := SCookie.Encode("oauth", value); err == nil {
@@ -86,7 +86,7 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *mode
 								// Expiration time of cookie which stores oauth information was set twice as much as google oauth token expiration time.
 								// (Google access token expiration time is 3600 seconds)
 								Expires: time.Now().Add(7200 * time.Second),
-								Path:  "/",
+								Path:    "/",
 							}
 							http.SetCookie(w, cookie)
 						} else {
@@ -97,10 +97,11 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *mode
 					}
 
 					gorillaContext.Set(r, "id", value["userId"].(int))
+
 					h.ServeHTTP(w, r)
 					return
 				} else {
-					http.Redirect(w, r, "/login", http.StatusFound)
+					http.Redirect(w, r, "/login", http.StatusSeeOther)
 					return
 				}
 			}
@@ -109,7 +110,7 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *mode
 			if err != nil {
 				refreshToken, err := r.Cookie("refreshToken")
 				if err != nil {
-					http.Redirect(w, r, "/login", http.StatusFound)
+					http.Redirect(w, r, "/login", http.StatusSeeOther)
 					return
 				}
 
@@ -122,7 +123,8 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *mode
 				})
 
 				if err == nil {
-					err := storeRefreshToken.RefreshTokenExists(claims.Id, refreshTokenString)
+					userAgent := GetUserAgent(r)
+					err := storeRefreshToken.RefreshTokenExists(claims.Id, refreshTokenString, userAgent)
 					if err != nil {
 
 						switch e := err.(type) {
@@ -151,7 +153,7 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *mode
 							Path:    "/",
 						})
 
-						err = storeRefreshToken.UpdateRefreshToken(claims.Id, tokens.RefreshTokenValue, tokens.RefreshExpirationTime)
+						err = storeRefreshToken.UpdateRefreshToken(claims.Id, tokens.RefreshTokenValue, tokens.RefreshExpirationTime, userAgent)
 						if err != nil {
 							logger.Error(err)
 							http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -166,14 +168,6 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *mode
 						})
 
 						gorillaContext.Set(r, "id", claims.Id)
-
-						_, err = storeUser.GetPet(claims.Id)
-
-						if err != nil {
-							gorillaContext.Set(r, "pet", false)
-						} else {
-							gorillaContext.Set(r, "pet", true)
-						}
 
 					} else {
 						http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -196,15 +190,6 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *mode
 				if err == nil {
 					if token.Valid {
 						gorillaContext.Set(r, "id", claims.Id)
-
-						_, err = storeUser.GetPet(claims.Id)
-
-						if err != nil {
-							gorillaContext.Set(r, "pet", false)
-						} else {
-							gorillaContext.Set(r, "pet", true)
-						}
-
 					} else {
 						http.Redirect(w, r, "/login", http.StatusSeeOther)
 						return
@@ -214,6 +199,23 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *mode
 					return
 				}
 			}
+			h.ServeHTTP(w, r)
+		})
+	}
+	return
+}
+
+func PetMiddleware(storeUser *models.UserStore) (mw func(http.Handler) http.Handler) {
+	mw = func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			userId := gorillaContext.Get(r, "id").(int)
+
+			_, err := storeUser.GetPet(userId)
+			if err != nil {
+				http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
+				return
+			}
+
 			h.ServeHTTP(w, r)
 		})
 	}
@@ -258,4 +260,9 @@ func GenerateTokenPair(userID int) (Tokens, error) {
 	tokens.RefreshTokenValue = refreshTokenString
 
 	return tokens, nil
+}
+
+func GetUserAgent(r *http.Request) string {
+	ua := r.Header.Get("User-Agent")
+	return ua
 }

@@ -1,10 +1,12 @@
 hash: fd528d8e22e4dc1ec7f7002489942414f098039a4d59286be33edc0fe71eb633
-updated: 2019-09-04T09:44:11.523288+03:00
+updated: 2019-09-08T21:37:51.59103+03:00
 imports:
 - name: cloud.google.com/go
   version: 3b58207d07a2c89721ebc3d4553d5930ef8cf56a
   subpackages:
   - compute/metadata
+- name: github.com/avast/retry-go
+  version: 101acd3290b786bf437607d874596e3996484d8d
 - name: github.com/dgrijalva/jwt-go
   version: 06ea1031745cb8b3dab3f6a236daf2b0aa468b7e
 - name: github.com/golang/protobuf

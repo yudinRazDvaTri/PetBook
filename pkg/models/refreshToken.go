@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/dpgolang/PetBook/pkg/utilerr"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"time"
 )
 
@@ -18,16 +19,23 @@ type RefreshTokenStore struct {
 }
 
 type RefreshTokenStorer interface {
-	RefreshTokenExists(userId int, token string) error
-	UpdateRefreshToken(userId int, token string, lastUpdateAt time.Time) error
+	RefreshTokenExists(userId int, token string, userAgent string) error
+	UpdateRefreshToken(userId int, token string, lastUpdateAt time.Time, userAgent string) error
 	DeleteRefreshToken(token string) error
 }
 
-func (c *RefreshTokenStore) UpdateRefreshToken(userId int, token string, lastUpdateAt time.Time) error {
-	_, err := c.DB.Exec(`INSERT INTO refresh_tokens (user_id, token_string) values ($1, $2)
-								ON CONFLICT (user_id) DO UPDATE 
+// TODO: implement user-agent and token unique error
+func (c *RefreshTokenStore) UpdateRefreshToken(userId int, token string, lastUpdateAt time.Time, userAgent string) error {
+	_, err := c.DB.Exec(`INSERT INTO refresh_tokens (user_id, token_string, last_update_at, user_agent) values ($1, $2, $3, $4)
+								ON CONFLICT (user_id, user_agent) DO UPDATE
 								SET token_string = $2,
-								last_update_at = $3;`, userId, token, lastUpdateAt)
+								last_update_at = $3`, userId, token, lastUpdateAt, userAgent)
+	if err != nil {
+		if _, ok := err.(*pq.Error); ok {
+			return &utilerr.UniqueTokenError{Description: "Token/user_agent is already in database.\n"}
+		}
+	}
+
 	if err != nil {
 		return fmt.Errorf("Error occurred while trying to insert/update refresh token in db: %v.\n", err)
 	}
@@ -54,13 +62,14 @@ func (c *RefreshTokenStore) DeleteRefreshToken(token string) error {
 	return nil
 }
 
-func (c *RefreshTokenStore) RefreshTokenExists(userId int, token string) error {
+func (c *RefreshTokenStore) RefreshTokenExists(userId int, token string, userAgent string) error {
 	var exists bool
 	err := c.DB.QueryRow(`SELECT EXISTS
 								(SELECT 1 
 								FROM refresh_tokens
 								WHERE token_string = $1 
-								AND user_id = $2)`, token, userId).Scan(&exists)
+								AND user_id = $2
+								AND user_agent = $3)`, token, userId, userAgent).Scan(&exists)
 	if err != nil {
 		return fmt.Errorf("Error occurred while trying to delete refresh token in db: %v.\n", err)
 	}
