@@ -31,8 +31,10 @@ func main() {
 	storeSearch := search.SearchStore{DB: db}
 	storeBlog := models.BlogStore{DB: db}
 	storeChat := models.ChatStore{DB: db}
+	storeFollowers:=models.FollowersStore{DB: db}
 	storeMedia := models.MediaStore{DB: db}
 	storeVet := models.VetStore{DB: db}
+
 
 	controller := controllers.Controller{
 		PetStore:          &storePet,
@@ -42,6 +44,7 @@ func main() {
 		RefreshTokenStore: &storeRefreshToken,
 		BlogStore:         &storeBlog,
 		ChatStore:         &storeChat,
+		FollowersStore:    &storeFollowers,
 		MediaStore:        &storeMedia,
 		VetStore:         &storeVet,
 	}
@@ -92,9 +95,11 @@ func main() {
   authRouter.HandleFunc("/uploadmedia", controller.UploadMedia()).Methods("POST")
 	authRouter.HandleFunc("/{id}", controller.MyPageOtherUsersHandler()).Methods("GET")
 	authRouter.HandleFunc("/deleteimg", controller.DeleteImgHandler()).Methods("Post")
+  
+  authRouter.HandleFunc("/mypage/{follow:followers|following}", controller.GetFollowerHandler()).Methods("GET")
+	authRouter.HandleFunc("/mypage/{follow:followers|following}", controller.PostFollowerHandler()).Methods("POST")
 
-	basicRouter.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
-		http.FileServer(http.Dir("./web/static/"))))
+	basicRouter.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static/"))))
 
 	if err := http.ListenAndServe(":" + os.Getenv("APP_PORT"), basicRouter); err != nil {
 		logger.FatalError(err, "Error occurred, while trying to listen and serve a server")

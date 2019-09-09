@@ -30,6 +30,7 @@ type Controller struct {
 	SearchStore       search.SearchStorer
 	BlogStore         models.BlogStorer
 	ChatStore         models.ChatStorer
+	FollowersStore 	  models.FollowersStorer
 	MediaStore        models.MediaStorer
 	VetStore  		  models.VetStorer
 }

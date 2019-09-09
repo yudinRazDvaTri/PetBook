@@ -1,0 +1,91 @@
+{{ define "layout"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" style="color: aliceblue">
+            <img src="../static/friends.jpeg" width="30" height="30" class="d-inline-block align-top" alt="">
+            My Community</a>
+    <a class="navbar-brand btn-dark" href="/mypage/following">Following</a>
+    <a class="navbar-brand btn-dark" href="/mypage/followers">Followers</a>
+    <a class="navbar-brand close btn-dark"  href="/mypage" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </a>
+    </button>
+</nav>
+    <div class="container-fluid " style="margin-top:-50px;height:100px;"></div>
+        <ul>
+            {{if .IsFollowing}}
+            {{ range .PetsFollowing }}
+            <div class="card border-dark container-fluid mb-3" style="max-width: 35rem;">
+                <div class="row no-gutters">
+                    <div class="col-md-4">
+                        <!-- <img src="..." class="card-img" alt="..."> -->
+                        <p>PHOTO</p>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body ">
+                            <form  method="POST">
+                                <h5 class="card-title " name="name">{{ .Name }}</h5>
+                                <p class="card-text" name="description">{{ .Description }}</p>
+                                <input type="hidden" name="followUserID" value="{{printf "%d" .UserID}}">
+                                {{ if not (.CanFollow $.UserID $.PetsFollowing)}}
+
+                                    <input type="submit" class="btn btn-outline-dark" id="buttonUn" name="follow" value="Unfollow">
+                                {{else}}
+                                    <input type="submit" class="btn btn-outline-dark" id="button" name="follow" value="Follow">
+                                {{end}}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                {{ else }}
+                <div class="card mb-3">
+                    <h2>You are not following anyone</h2>
+                </div>
+                {{ end}}
+                {{else}}
+                {{ range .PetsFollowers }}
+                <div class="card mb-3 border-success " style="max-width: 35rem;">
+                    <div class="row no-gutters">
+                        <div class="col-md-4">
+                            <!-- <img src="..." class="card-img" alt="..."> -->
+                            <p>PHOTO</p>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body text-success">
+                                <form  method="POST">
+                                    <h5 class="card-title " name="name">{{ .Name }}</h5>
+                                    <p class="card-text" name="description">{{ .Description }}</p>
+                                    <input type="hidden" name="followUserID" value="{{printf "%d" .UserID}}">
+                                    {{ if not (.CanFollow $.UserID $.PetsFollowing)}}
+
+                                        <input type="submit" id="buttonUn" name="follow" value="Unfollow">
+                                    {{else}}
+                                        <input type="submit" id="button" name="follow" value="Follow">
+                                    {{end}}
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {{ else }}
+                        <div class="card mb-3">
+                            <h2>You have no followers</h2>
+                        </div>
+                    {{ end}}
+
+                {{ end}}
+        </ul>
+    </div>
+
+</body>
+</html>
+{{ end }}
