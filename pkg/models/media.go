@@ -22,9 +22,9 @@ type MediaStore struct {
 
 type MediaStorer interface {
 	AddLogoPathDb(path string, userId int) error
-	GetLogo(userId int) (string,error)
+	GetLogo(userId int) (string, error)
 	AddMediaPathDb(path string, userId int) error
-	GetExistedGallery(userId int) ([]string,error)
+	GetExistedGallery(userId int) ([]string, error)
 	DeleteFile(path string) error
 }
 
@@ -35,7 +35,7 @@ func (m *MediaStore) AddLogoPathDb(path string, userId int) error {
 	}
 	return nil
 }
-func (m *MediaStore) AddMediaPathDb(path string, userId int) error{
+func (m *MediaStore) AddMediaPathDb(path string, userId int) error {
 	_, err := m.DB.Exec("insert into gallery (file_path,user_id)VALUES ($1,$2)", path, userId)
 	if err != nil {
 		return fmt.Errorf("cannot execute database query: %v", err)
@@ -43,21 +43,20 @@ func (m *MediaStore) AddMediaPathDb(path string, userId int) error{
 	return nil
 }
 
-func (m *MediaStore) GetLogo(userId int) (string,error) {
+func (m *MediaStore) GetLogo(userId int) (string, error) {
 	var path string
 	err := m.DB.QueryRow("select logo_path from logos where logo_path IS NOT NULL and user_id=$1 Order by created_time DESC LIMIT 1", userId).Scan(&path)
 	if err != nil {
 		return path, fmt.Errorf("cannot connect to database: %v", err)
 	}
-	return path,nil
+	return path, nil
 }
 
-
-func (m *MediaStore) GetExistedGallery(userId int) ([]string,error){
+func (m *MediaStore) GetExistedGallery(userId int) ([]string, error) {
 	var results []string
 	rows, err := m.DB.Query("select file_path from gallery where user_id =$1 order by created_time desc;", userId)
 	if err != nil {
-		return  results,fmt.Errorf("cannot connect to database: %v", err)
+		return results, fmt.Errorf("cannot connect to database: %v", err)
 	}
 	for rows.Next() {
 		var p string
@@ -67,11 +66,11 @@ func (m *MediaStore) GetExistedGallery(userId int) ([]string,error){
 		}
 		results = append(results, p)
 	}
-	return results,nil
+	return results, nil
 }
 
 func (m *MediaStore) DeleteFile(path string) error {
-	err:= os.Remove(path)
+	err := os.Remove(path)
 	if err != nil {
 		return fmt.Errorf("cannot delete from folder: %v", err)
 	}

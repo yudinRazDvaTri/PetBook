@@ -27,7 +27,7 @@ type Editstr struct {
 	Certificates  string
 }
 
-func (c *Controller) EditPageHandler()http.HandlerFunc {
+func (c *Controller) EditPageHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := context.Get(r, "id").(int)
 		user, err := c.UserStore.GetUser(id)
@@ -39,6 +39,7 @@ func (c *Controller) EditPageHandler()http.HandlerFunc {
 		path, _ := c.MediaStore.GetLogo(id)
 		var filename string
 		var edit Editstr
+
 
 		if user.Role == "pet" {
 			pet, _ := c.UserStore.GetPet(id)
@@ -71,57 +72,57 @@ func (c *Controller) EditPageHandler()http.HandlerFunc {
 		if err != nil {
 			logger.Error(err, "Error occurred while getting user gallery.\n")
 		}
-		view.GenerateHTML(w, "Settings", "navbarBlack")
+		view.GenerateHTML(w, "Settings", "navbar")
 		view.GenerateHTML(w, edit, filename)
 		view.GenerateHTML(w, gallery, "gallery_edit")
 		view.GenerateHTML(w, nil, "footer")
 	}
 }
 
-func (c *Controller) ProfileUpdateHandler()http.HandlerFunc {
+func (c *Controller) ProfileUpdateHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := context.Get(r, "id").(int)
 		err := r.ParseForm()
-	if err != nil {
-		logger.Error(err, "Error occurred while getting user gallery.\n")
-	}
-	user, err := c.UserStore.GetUser(id)
+		if err != nil {
+			logger.Error(err, "Error occurred while getting user gallery.\n")
+		}
+		user, err := c.UserStore.GetUser(id)
 		if err != nil {
 			logger.Error(err)
 			http.Error(w, "can't get user", http.StatusInternalServerError)
 			return
 		}
-	if user.Role == "pet" {
-		pet := &models.Pet{}
-		pet.ID = id
-		pet.Name = r.FormValue("name")
-		pet.PetType = r.FormValue("animal_type")
-		pet.Breed = r.FormValue("breed")
-		pet.Age = r.FormValue("age")
-		pet.Weight = r.FormValue("weight")
-		pet.Gender = r.FormValue("gender")
-		pet.Description = r.FormValue("description")
-		err := c.PetStore.UpdatePet(pet)
-		if err != nil {
-			logger.Error(err)
-			http.Error(w, "can't update pet", http.StatusInternalServerError)
-			return
+		if user.Role == "pet" {
+			pet := &models.Pet{}
+			pet.ID = id
+			pet.Name = r.FormValue("name")
+			pet.PetType = r.FormValue("animal_type")
+			pet.Breed = r.FormValue("breed")
+			pet.Age = r.FormValue("age")
+			pet.Weight = r.FormValue("weight")
+			pet.Gender = r.FormValue("gender")
+			pet.Description = r.FormValue("description")
+			err := c.PetStore.UpdatePet(pet)
+			if err != nil {
+				logger.Error(err)
+				http.Error(w, "can't update pet", http.StatusInternalServerError)
+				return
+			}
+		} else if user.Role == "vet" {
+			vet := &models.Vet{}
+			vet.ID = id
+			vet.Name = r.FormValue("name")
+			vet.Surname = r.FormValue("surname")
+			vet.Qualification = r.FormValue("qualification")
+			vet.Category = r.FormValue("category")
+			vet.Certificates = r.FormValue("certificates")
+			err := c.VetStore.UpdateVet(vet)
+			if err != nil {
+				logger.Error(err)
+				http.Error(w, "can't update Vet", http.StatusInternalServerError)
+				return
+			}
 		}
-	} else if user.Role == "vet" {
-		vet := &models.Vet{}
-		vet.ID = id
-		vet.Name = r.FormValue("name")
-		vet.Surname = r.FormValue("surname")
-		vet.Qualification = r.FormValue("qualification")
-		vet.Category = r.FormValue("category")
-		vet.Certificates = r.FormValue("certificates")
-		err := c.VetStore.UpdateVet(vet)
-		if err != nil {
-			logger.Error(err)
-			http.Error(w, "can't update Vet", http.StatusInternalServerError)
-			return
-		}
-	}
-	http.Redirect(w, r, "/", 301)
+		http.Redirect(w, r, "/", 301)
 	}
 }

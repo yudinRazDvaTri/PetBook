@@ -14,7 +14,7 @@ type GoogleUserInfo struct {
 }
 
 var GoogleOauthConfig = &oauth2.Config{
-	RedirectURL:  "http://localhost:8080/loginGoogleCallback",
+	RedirectURL:  os.Getenv("APP_ADDRESS") + ":" + os.Getenv("APP_PORT") + "/" + os.Getenv("GOOGLE_CALLBACK"),
 	ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 	ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
 	Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},

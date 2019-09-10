@@ -19,7 +19,7 @@ type MediaStore struct {
 func (c *Controller) UploadMedia() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := context.Get(r, "id").(int)
-		err:=r.ParseMultipartForm(10 << 20)
+		err := r.ParseMultipartForm(10 << 20)
 		if err != nil {
 			logger.Error(err)
 			return
@@ -27,7 +27,7 @@ func (c *Controller) UploadMedia() http.HandlerFunc {
 		file, _, err := r.FormFile("myMedia")
 		if err != nil {
 			logger.Error(err)
-			http.Redirect(w, r, "/edit", 301)
+			http.Redirect(w, r, "/mypage/edit", 301)
 			return
 		}
 		defer file.Close()
@@ -47,23 +47,23 @@ func (c *Controller) UploadMedia() http.HandlerFunc {
 		fileBytes, err := ioutil.ReadAll(file)
 		if err != nil {
 			logger.Error(err)
-			http.Redirect(w, r, "/edit", 301)
+			http.Redirect(w, r, "/mypage/edit", 301)
 			return
 		}
-		_,err1:=tempFile.Write(fileBytes)
+		_, err1 := tempFile.Write(fileBytes)
 		if err1 != nil {
 			logger.Error(err)
-			http.Redirect(w, r, "/edit", 301)
+			http.Redirect(w, r, "/mypage/edit", 301)
 			return
 		}
 		renamedFiles := folderMediaPath(id)
 		for _, element := range renamedFiles {
-			err:=c.MediaStore.AddMediaPathDb(element, id)
+			err := c.MediaStore.AddMediaPathDb(element, id)
 			if err != nil {
 				logger.Error(err)
 			}
 		}
-		http.Redirect(w, r, "/edit", 301)
+		http.Redirect(w, r, "/mypage/edit", 301)
 	}
 }
 
@@ -87,16 +87,16 @@ func (c *Controller) UploadLogo() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := context.Get(r, "id").(int)
 
-		err:=r.ParseMultipartForm(10 << 20)
+		err := r.ParseMultipartForm(10 << 20)
 		if err != nil {
 			logger.Error(err)
-			http.Redirect(w, r, "/edit", 301)
+			http.Redirect(w, r, "/mypage/edit", 301)
 			return
 		}
 		file, _, err := r.FormFile("myFile")
 		if err != nil {
 			logger.Error(err)
-			http.Redirect(w, r, "/edit", 301)
+			http.Redirect(w, r, "/mypage/edit", 301)
 			return
 		}
 		defer file.Close()
@@ -121,12 +121,12 @@ func (c *Controller) UploadLogo() http.HandlerFunc {
 		tempFile.Write(fileBytes)
 		renamedFiles := folderLogoPath(id)
 		for _, element := range renamedFiles {
-			err:=c.MediaStore.AddLogoPathDb(element, id)
+			err := c.MediaStore.AddLogoPathDb(element, id)
 			if err != nil {
 				logger.Error(err, "Error occurred while adding user logo.\n")
 			}
 		}
-		http.Redirect(w, r, "/edit", 301)
+		http.Redirect(w, r, "/mypage/edit", 301)
 	}
 }
 
@@ -163,10 +163,10 @@ func (c *Controller) DeleteImgHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		path := r.FormValue("path")
 		p := strings.Replace(path, "%2f", "/", 100)
-		err:=c.MediaStore.DeleteFile(".." + p)
+		err := c.MediaStore.DeleteFile(".." + p)
 		if err != nil {
 			logger.Error(err)
-			http.Redirect(w, r, "/edit", 301)
+			http.Redirect(w, r, "/mypage/edit", 301)
 			return
 		}
 		http.Redirect(w, r, "/", 301)

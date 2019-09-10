@@ -44,12 +44,7 @@ func (c *Controller) VetPostHandler() http.HandlerFunc {
 
 func (c *Controller) VetGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		vetType, err := c.VetStore.GetVetEnums()
-		if err != nil {
-			logger.Error(err, "Error occurred while trying to get vet enums in page cabinetVet.\n")
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		vetType, _ := c.VetStore.GetVetEnums()
 		view.GenerateHTML(w, vetType, "cabinetVet")
 	}
 }

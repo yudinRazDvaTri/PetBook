@@ -65,12 +65,12 @@ func (p *VetStore) GetVetEnums() ([]string, error) {
 	var vtype string
 	rows, err := p.DB.Queryx("SELECT unnest(enum_range(NULL::class))::text")
 	if err != nil {
-		return nil,fmt.Errorf("can't read vet-enums from db: %v", err)
+		return nil, fmt.Errorf("can't read vet-enums from db: %v", err)
 	}
 	for rows.Next() {
 		err = rows.Scan(&vtype)
 		if err != nil {
-			return nil,fmt.Errorf("can't scan vet enums from db: %v", err)
+			return nil, fmt.Errorf("can't scan vet enums from db: %v", err)
 		}
 		vetType = append(vetType, vtype)
 	}

@@ -34,7 +34,6 @@ type MypageDataVet struct {
 	LogoPath      string
 }
 
-//Does it need redirect  /logout?
 func (c *Controller) MyPageGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := context.Get(r, "id").(int)
@@ -44,15 +43,14 @@ func (c *Controller) MyPageGetHandler() http.HandlerFunc {
 			return
 		}
 		if role == "pet" {
-			c.MyPagePetGetHandler(userID, w, r)
+			c.myPageDisplayPet(userID, w, r)
 		} else if role == "vet" {
-			c.MyPageVetGetHandler(userID, w, r)
+			c.myPageDisplayVet(userID, w, r)
 		}
-
 	}
 }
 
-func (c *Controller) MyPagePetGetHandler(userID int, w http.ResponseWriter, r *http.Request) {
+func (c *Controller) myPageDisplayPet(userID int, w http.ResponseWriter, r *http.Request) {
 
 	pet, err := c.UserStore.GetPet(userID)
 	if err != nil {
@@ -82,7 +80,7 @@ func (c *Controller) MyPagePetGetHandler(userID int, w http.ResponseWriter, r *h
 	if err != nil {
 		logger.Error(err, "Error occurred while getting user gallery.\n")
 	}
-	view.GenerateHTML(w, "MYPAGE", "navbarBlack")
+	view.GenerateHTML(w, "My page", "navbar")
 	view.GenerateHTML(w, myPageData, "mypage")
 	view.GenerateHTML(w, photos, "gallery_main")
 	view.GenerateTimeHTML(w, blog, "blog")
@@ -90,14 +88,14 @@ func (c *Controller) MyPagePetGetHandler(userID int, w http.ResponseWriter, r *h
 
 }
 
-func (c *Controller) MyPageVetGetHandler(userID int, w http.ResponseWriter, r *http.Request) {
+func (c *Controller) myPageDisplayVet(userID int, w http.ResponseWriter, r *http.Request) {
 	vet, err := c.UserStore.GetVet(userID)
 	if err != nil {
 		logger.Error(err)
 		http.Redirect(w, r, "/vetcabinet", http.StatusFound)
 		return
 	}
-	path,err := c.MediaStore.GetLogo(userID)
+	path, err := c.MediaStore.GetLogo(userID)
 	if err != nil {
 		logger.Error(err)
 		http.Redirect(w, r, "/vetcabinet", http.StatusFound)
@@ -123,14 +121,15 @@ func (c *Controller) MyPageVetGetHandler(userID int, w http.ResponseWriter, r *h
 	if err != nil {
 		logger.Error(err, "Error occurred while getting user gallery.\n")
 	}
-	view.GenerateHTML(w, "MYPAGE", "navbarBlack")
+	view.GenerateHTML(w, "My page", "navbar")
 	view.GenerateHTML(w, myPageData, "mypage_vet")
 	view.GenerateHTML(w, photos, "gallery_main")
 	view.GenerateTimeHTML(w, blog, "blog")
 	view.GenerateHTML(w, nil, "footer")
+
 }
 
-func (c *Controller) MyPageOtherUsersHandler() http.HandlerFunc {
+func (c *Controller) DisplayOtherUsersHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		petsId := vars["id"]
@@ -147,9 +146,9 @@ func (c *Controller) MyPageOtherUsersHandler() http.HandlerFunc {
 			return
 		}
 		if role == "pet" {
-			c.MyPagePetGetHandler(id, w, r)
+			c.myPageDisplayPet(id, w, r)
 		} else if role == "vet" {
-			c.MyPageVetGetHandler(id, w, r)
+			c.myPageDisplayVet(id, w, r)
 		}
 	}
 

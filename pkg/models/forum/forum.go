@@ -10,7 +10,7 @@ type ForumStorer interface {
 	NewViewTopic(userName string, topic Topic) (viewTopic ViewTopic, err error)
 	//Comment Methods
 	GetTopicComments(topicID int) (comments []Comment, err error)
-	AddNewComment(topicID, userID int, content string) (err error)
+	AddNewComment(topicID, userID, parentID int, content string) (err error)
 	RateComment(commentID, userID int) (bool, error)
 	NewViewComment(userName string, comment Comment) (viewComment ViewComment, err error)
 }

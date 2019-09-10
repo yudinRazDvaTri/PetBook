@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"sort"
 	"strconv"
 
 	"github.com/dpgolang/PetBook/pkg/models/forum"
@@ -110,16 +109,16 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 			viewComments = append(viewComments, viewComment)
 		}
 
-		sort.Sort(sort.Reverse(forum.ByRating(viewComments)))
+		treeVComments, err := forum.TreeViewComments(viewComments)
 
 		ViewData := struct {
 			ContextUserID int
 			Topic         forum.Topic
-			ViewComments  []forum.ViewComment
+			TreeVComments []*forum.ViewComment
 		}{
 			userID,
 			topic,
-			viewComments,
+			treeVComments,
 		}
 
 		view.GenerateTimeHTML(w, "Topic", "navbar")
@@ -131,6 +130,22 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 func (c *Controller) CommentPostHandler() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		var parentID int
+		keys, ok := r.URL.Query()["parentID"]
+
+		if !ok || len(keys[0]) < 1 {
+			logger.Error("missing parentID for comment in URL")
+			http.Error(w, "missing URL parameter", http.StatusInternalServerError)
+			return
+		}
+
+		parentID, err := strconv.Atoi(keys[0])
+		if err != nil {
+			logger.Error("parentID from URL is not an integer")
+			http.Error(w, "inappropriate URL parameter", http.StatusInternalServerError)
+			return
+		}
+
 		vars := mux.Vars(r)
 		topicIdStr := vars["topicID"]
 		topicID, err := strconv.Atoi(topicIdStr)
@@ -144,7 +159,7 @@ func (c *Controller) CommentPostHandler() http.HandlerFunc {
 		content := r.FormValue("content")
 		userID := context.Get(r, "id").(int)
 
-		if err := c.ForumStore.AddNewComment(topicID, userID, content); err != nil {
+		if err := c.ForumStore.AddNewComment(topicID, userID, parentID, content); err != nil {
 			logger.Error(err)
 			http.Error(w, "can't add comment", http.StatusInternalServerError)
 			return

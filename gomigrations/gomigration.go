@@ -1,15 +1,14 @@
 package gomigrations
 
 import (
-	//"database/sql"
-	//"os"
 	"fmt"
+	"log"
+
 	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	migrate "github.com/rubenv/sql-migrate"
-	"log"
 )
 
 func init() {
@@ -18,6 +17,7 @@ func init() {
 	}
 }
 
+//Use migrations in this database
 func Migrate(db *sqlx.DB) (err error) {
 	migrations := getMigrations()
 	n, err := migrate.Exec(db.DB, "postgres", migrations, migrate.Up)
