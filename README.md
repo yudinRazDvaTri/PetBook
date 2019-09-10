@@ -2,7 +2,7 @@ Provides to pet-owners an ability to lead a social life of their pets just like 
 
 # Have to add .env file with settings like those :
 
-HOST_POSTGRES=localhost  
+HOST_POSTGRES=db  
 PORT_POSTGRES=5432  
 POSTGRES_USER=postgres  
 POSTGRES_PASSWORD=root  
