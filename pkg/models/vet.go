@@ -7,12 +7,12 @@ import (
 )
 
 type Vet struct {
-	ID          int    `db:"user_id"`
-	Name        string `db:"name"`
-	Qualification     string `db:"qualification"`
+	ID            int    `db:"user_id"`
+	Name          string `db:"name"`
+	Qualification string `db:"qualification"`
 	Surname       string `db:"surname"`
-	Category         string `db:"category"`
-	Certificates string `db:"certificates"`
+	Category      string `db:"category"`
+	Certificates  string `db:"certificates"`
 }
 
 type VetStore struct {
@@ -23,7 +23,7 @@ type VetStorer interface {
 	RegisterVet(vet *Vet) error
 	//DisplayName(userID int) (name string, err error)
 	GetVetEnums() ([]string, error)
-	UpdateVet(vet *Vet)error
+	UpdateVet(vet *Vet) error
 }
 
 func (c *VetStore) RegisterVet(vet *Vet) error {
@@ -52,7 +52,7 @@ func (c *VetStore) RegisterVet(vet *Vet) error {
 //	return
 //}
 
-func (p *VetStore) UpdateVet(vet *Vet) error{
+func (p *VetStore) UpdateVet(vet *Vet) error {
 	_, err := p.DB.Exec("update vets set name=$1, qualification=$2,surname=$3, category=$4,certificates=$5 where user_id = $6",
 		vet.Name, vet.Qualification, vet.Surname, vet.Category, vet.Certificates, vet.ID)
 	if err != nil {
@@ -65,14 +65,14 @@ func (p *VetStore) GetVetEnums() ([]string, error) {
 	var vtype string
 	rows, err := p.DB.Queryx("SELECT unnest(enum_range(NULL::class))::text")
 	if err != nil {
-		fmt.Println("Error in getting enums")
+		return nil, fmt.Errorf("can't read vet-enums from db: %v", err)
 	}
 	for rows.Next() {
 		err = rows.Scan(&vtype)
 		if err != nil {
-			fmt.Errorf("cannot affect rows in pets in db: %v", err)
+			return nil, fmt.Errorf("can't scan vet enums from db: %v", err)
 		}
 		vetType = append(vetType, vtype)
 	}
-	return vetType,nil
+	return vetType, nil
 }

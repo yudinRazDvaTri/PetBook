@@ -30,9 +30,9 @@ type Controller struct {
 	SearchStore       search.SearchStorer
 	BlogStore         models.BlogStorer
 	ChatStore         models.ChatStorer
-	FollowersStore 	  models.FollowersStorer
+	FollowersStore    models.FollowersStorer
 	MediaStore        models.MediaStorer
-	VetStore  		  models.VetStorer
+	VetStore          models.VetStorer
 }
 
 const (
@@ -110,27 +110,25 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 			Expires: time.Unix(0, 0),
 			Path:    "/",
 		})
-
-		//_, err = c.UserStore.GetPet(userID)
-		//if err != nil {
-		//	http.Redirect(w, r, "/petcabinet", http.StatusFound)
-		//	return
-		//}
-		c.cabinetFilled(userID,w,r)
+		c.cabinetFilled(userID, w, r)
 
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
-func (c *Controller) cabinetFilled(id int,w http.ResponseWriter, r *http.Request) {
-	role:=c.UserStore.GetUserRole(id)
-	if role=="pet" {
+func (c *Controller) cabinetFilled(id int, w http.ResponseWriter, r *http.Request) {
+	role, err := c.UserStore.GetUserRole(id)
+	if err != nil {
+		logger.Error(err, "Error occurred while getting user enums.\n")
+		return
+	}
+	if role == "pet" {
 		_, err := c.UserStore.GetPet(id)
 		if err != nil {
 			http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
 			return
 		}
-	}else if role =="vet"{
+	} else if role == "vet" {
 		_, err := c.UserStore.GetVet(id)
 		if err != nil {
 			http.Redirect(w, r, "/vetcabinet", http.StatusFound)
@@ -142,7 +140,7 @@ func (c *Controller) cabinetFilled(id int,w http.ResponseWriter, r *http.Request
 func (c *Controller) LoginGoogleGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		oauthState := generateStateOauthCookie(w)
-		u := authentication.GoogleOauthConfig.AuthCodeURL(oauthState)+"&access_type=offline"
+		u := authentication.GoogleOauthConfig.AuthCodeURL(oauthState) + "&access_type=offline"
 		http.Redirect(w, r, u, http.StatusTemporaryRedirect)
 	}
 }
@@ -211,6 +209,7 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 
 		if err := json.Unmarshal(contents, &googleUserInfo); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+
 			logger.Error(err, "Error occurred while trying to unmarshal user info.\n")
 			return
 		}
@@ -232,9 +231,9 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 		}
 
 		gob.Register(googleToken)
-		value := map[string]interface{} {
+		value := map[string]interface{}{
 			"accessToken": googleToken,
-			"userId": userId,
+			"userId":      userId,
 		}
 
 		if encoded, err := authentication.SCookie.Encode("oauth", value); err == nil {
@@ -244,16 +243,16 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 				// Expiration time of cookie which stores oauth information was set twice as much as google oauth token expiration time.
 				// (Google access token expiration time is 3600 seconds)
 				Expires: time.Now().Add(7200 * time.Second),
-				Path:  "/",
+				Path:    "/",
 			}
 			http.SetCookie(w, cookie)
 		} else {
-			logger.Error(err.Error(), "; Error occurred while trying to encode cookie.\n", )
+			logger.Error(err.Error(), "; Error occurred while trying to encode cookie.\n")
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-    
-		c.cabinetFilled(userId,w,r)
+
+		c.cabinetFilled(userId, w, r)
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
@@ -268,7 +267,12 @@ func getGoogleOauthToken(code string) (*oauth2.Token, error) {
 
 func (c *Controller) RegisterGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		roles:=c.UserStore.GetUserEnums()
+		roles, err := c.UserStore.GetUserEnums()
+		if err != nil {
+			logger.Error(err, "Error occurred while getting user enums.\n")
+			return
+		}
+
 		view.GenerateHTML(w, roles, "register")
 	}
 }
@@ -333,7 +337,7 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 			Firstname: firstName,
 			Lastname:  lastName,
 			Password:  string(hashedPassword),
-			Role:userType,
+			Role:      userType,
 		}
 
 		if err := c.UserStore.Register(&user); err != nil {

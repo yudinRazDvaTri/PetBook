@@ -45,7 +45,7 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore) (mw func(http.H
 					newToken, err := tokenSource.Token()
 					if err != nil {
 						w.WriteHeader(http.StatusInternalServerError)
-						logger.Error( err, "Error occurred while trying to get Token from TokenSource.\n")
+						logger.Error(err, "Error occurred while trying to get Token from TokenSource.\n")
 						return
 					}
 
@@ -90,7 +90,7 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore) (mw func(http.H
 							}
 							http.SetCookie(w, cookie)
 						} else {
-							logger.Error(err.Error(), "; Error occurred while trying to encode cookie.\n", )
+							logger.Error(err.Error(), "; Error occurred while trying to encode cookie.\n")
 							http.Error(w, err.Error(), http.StatusInternalServerError)
 							return
 						}
