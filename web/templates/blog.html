@@ -32,7 +32,7 @@
             </div>
         </div>
         <div class="form-group">
-            <form action="/process"  method="post">
+            <form action="/blogs"  method="post">
                 <textarea class="form-control" rows="5" type="text" id="message" name="something" placeholder="type something here..." required></textarea>
                 <input class="btn btn-outline-info" style="margin-top: 10px; margin-bottom: 50px;" type="submit" value="Send">
                 <input disabled style="float: right;margin-top: 10px;" class="btn btn-info btn-outline-dark" type="button" value="Upload img">
@@ -88,7 +88,7 @@
 {{/*                            <input disabled style="float: right;margin-right: 5px" class="btn btn-info btn-outline-dark" type="button" value="YouTube">*/}}
                         </form>
                     </td>
-                    <td width="5%"><a href="/delete?recordid={{.Id}}" class="btn btn-info btn-outline-dark" onclick="return ConfirmDelete();">X</a></td>
+                    <td width="5%"><a href="/blogs/{{.Id}}?recordid={{.Id}}" class="btn btn-info btn-outline-dark" onclick="return ConfirmDelete();">X</a></td>
                 </tr>
             {{end}}
             </tbody>
