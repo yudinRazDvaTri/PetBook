@@ -86,8 +86,8 @@ func main() {
 	//authRouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
 	authRouter.HandleFunc("/", controller.MyPageGetHandler()).Methods("GET")
 
-	authRouter.HandleFunc("/process", controller.CreateBlogHandler()).Methods("POST")
-	authRouter.HandleFunc("/delete", controller.DeleteBlogHandler()).Methods("GET")
+	authRouter.HandleFunc("/blogs", controller.CreateBlogHandler()).Methods("POST")
+	authRouter.HandleFunc("/blogs/{id}", controller.DeleteBlogHandler()).Methods("GET")
 	authRouter.HandleFunc("/media/logo", controller.UploadLogo()).Methods("POST")
 	authRouter.HandleFunc("/mypage/edit", controller.EditPageHandler()).Methods("GET")
 	authRouter.HandleFunc("/mypage/edit", controller.ProfileUpdateHandler()).Methods("POST")
