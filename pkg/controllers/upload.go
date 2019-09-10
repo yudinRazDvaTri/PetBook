@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	"fmt"
+	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/gorilla/context"
+	"github.com/jmoiron/sqlx"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -11,47 +12,64 @@ import (
 	"strings"
 )
 
-func UploadFile(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("File Upload Endpoint Hit")
-	id:=context.Get(r, "id").(int)
-
-	r.ParseMultipartForm(10 << 20)
-	file, handler, err := r.FormFile("myFile")
-	if err != nil {
-		fmt.Println("Error Retrieving the File")
-		fmt.Println(err)
-		return
-	}
-	defer file.Close()
-	fmt.Printf("Uploaded File: %+v\n", handler.Filename)
-	fmt.Printf("File Size: %+v\n", handler.Size)
-	fmt.Printf("MIME Header: %+v\n", handler.Header)
-
-	path:="./web/static/usermedia/"+strconv.Itoa(id)+"/logo"
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		_ = os.Mkdir("./web/static/usermedia/", os.ModeAppend)
-		_ = os.Mkdir("./web/static/usermedia/"+strconv.Itoa(id), os.ModeAppend)
-		_ = os.Mkdir(path, os.ModeAppend)
-	}
-	tempFile, err := ioutil.TempFile(path, "9*.png")
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer tempFile.Close()
-
-	fileBytes, err := ioutil.ReadAll(file)
-	if err != nil {
-		fmt.Println(err)
-	}
-	tempFile.Write(fileBytes)
-	//fmt.Fprintf(w, "Successfully Uploaded File\n")
-	http.Redirect(w,r,"/edit",301)
+type MediaStore struct {
+	DB *sqlx.DB
 }
 
-func GetImgLogo(id int) []string {
-	var files []string
+func (c *Controller) UploadMedia() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := context.Get(r, "id").(int)
+		err := r.ParseMultipartForm(10 << 20)
+		if err != nil {
+			logger.Error(err)
+			return
+		}
+		file, _, err := r.FormFile("myMedia")
+		if err != nil {
+			logger.Error(err)
+			http.Redirect(w, r, "/mypage/edit", 301)
+			return
+		}
+		defer file.Close()
+		path := "./web/static/usermedia/" + strconv.Itoa(id) + "/gallery"
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			_ = os.Mkdir("./web/static/usermedia/", os.ModeAppend)
+			_ = os.Mkdir("./web/static/usermedia/"+strconv.Itoa(id), os.ModeAppend)
+			_ = os.Mkdir(path, os.ModeAppend)
+		}
+		tempFile, err := ioutil.TempFile(path, "*.png")
+		if err != nil {
+			logger.Error(err)
+			return
+		}
+		defer tempFile.Close()
 
-	root := "./web/static/usermedia/"+strconv.Itoa(id)+"/logo"
+		fileBytes, err := ioutil.ReadAll(file)
+		if err != nil {
+			logger.Error(err)
+			http.Redirect(w, r, "/mypage/edit", 301)
+			return
+		}
+		_, err1 := tempFile.Write(fileBytes)
+		if err1 != nil {
+			logger.Error(err)
+			http.Redirect(w, r, "/mypage/edit", 301)
+			return
+		}
+		renamedFiles := folderMediaPath(id)
+		for _, element := range renamedFiles {
+			err := c.MediaStore.AddMediaPathDb(element, id)
+			if err != nil {
+				logger.Error(err)
+			}
+		}
+		http.Redirect(w, r, "/mypage/edit", 301)
+	}
+}
+
+func folderMediaPath(id int) []string {
+	var files []string
+	root := "./web/static/usermedia/" + strconv.Itoa(id) + "/gallery"
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if filepath.Ext(path) != ".jpg" && filepath.Ext(path) != ".png" {
 			return nil
@@ -60,49 +78,97 @@ func GetImgLogo(id int) []string {
 		return nil
 	})
 	if err != nil {
-		panic(err)
+		logger.Error(err)
 	}
-	for _, file := range files {
-		fmt.Println(file)
+	return changePath(files)
+}
+
+func (c *Controller) UploadLogo() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := context.Get(r, "id").(int)
+
+		err := r.ParseMultipartForm(10 << 20)
+		if err != nil {
+			logger.Error(err)
+			http.Redirect(w, r, "/mypage/edit", 301)
+			return
+		}
+		file, _, err := r.FormFile("myFile")
+		if err != nil {
+			logger.Error(err)
+			http.Redirect(w, r, "/mypage/edit", 301)
+			return
+		}
+		defer file.Close()
+		path := "./web/static/usermedia/" + strconv.Itoa(id) + "/logo"
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			_ = os.Mkdir("./web/static/usermedia/", os.ModeAppend)
+			_ = os.Mkdir("./web/static/usermedia/"+strconv.Itoa(id), os.ModeAppend)
+			_ = os.Mkdir(path, os.ModeAppend)
+		}
+		tempFile, err := ioutil.TempFile(path, "*.png")
+		if err != nil {
+			logger.Error(err)
+			return
+		}
+		defer tempFile.Close()
+
+		fileBytes, err := ioutil.ReadAll(file)
+		if err != nil {
+			logger.Error(err)
+			return
+		}
+		tempFile.Write(fileBytes)
+		renamedFiles := folderLogoPath(id)
+		for _, element := range renamedFiles {
+			err := c.MediaStore.AddLogoPathDb(element, id)
+			if err != nil {
+				logger.Error(err, "Error occurred while adding user logo.\n")
+			}
+		}
+		http.Redirect(w, r, "/mypage/edit", 301)
 	}
-	for i,file:=range files{
-		file=files[i]
-		v:=strings.Replace(file,"\\","/",100)
-		files[i]=v
+}
+
+func folderLogoPath(id int) []string {
+	var files []string
+	root := "./web/static/usermedia/" + strconv.Itoa(id) + "/logo"
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if filepath.Ext(path) != ".jpg" && filepath.Ext(path) != ".png" {
+			return nil
+		}
+		files = append(files, path)
+		return nil
+	})
+	if err != nil {
+		logger.Error(err)
 	}
-	for i,file:=range files{
-		file=files[i]
-		v:=strings.Replace(file,"web","..",100)
-		files[i]=v
+	return changePath(files)
+}
+
+func changePath(files []string) []string {
+	for i, file := range files {
+		file = files[i]
+		v := strings.Replace(file, "\\", "/", 100)
+		files[i] = v
+	}
+	for i, file := range files {
+		file = files[i]
+		v := strings.Replace(file, "web", "..", 100)
+		files[i] = v
 	}
 	return files
 }
-//func GetImg() []string {
-//	var files []string
-//
-//	root := "./web/static/usermedia"
-//	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-//		if filepath.Ext(path) != ".jpg" && filepath.Ext(path) != ".png" {
-//			return nil
-//		}
-//		files = append(files, path)
-//		return nil
-//	})
-//	if err != nil {
-//		panic(err)
-//	}
-//	for _, file := range files {
-//		fmt.Println(file)
-//	}
-//	for i,file:=range files{
-//		file=files[i]
-//		v:=strings.Replace(file,"\\","/",100)
-//		files[i]=v
-//	}
-//	for i,file:=range files{
-//		file=files[i]
-//		v:=strings.Replace(file,"web","..",100)
-//		files[i]=v
-//	}
-//	return files
-//}
+func (c *Controller) DeleteImgHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		path := r.FormValue("path")
+		p := strings.Replace(path, "%2f", "/", 100)
+		err := c.MediaStore.DeleteFile(".." + p)
+		if err != nil {
+			logger.Error(err)
+			http.Redirect(w, r, "/mypage/edit", 301)
+			return
+		}
+		http.Redirect(w, r, "/", 301)
+	}
+}

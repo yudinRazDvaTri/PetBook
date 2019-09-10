@@ -15,7 +15,7 @@
 
     <body>
     <div style="text-align: center">
-        <form action="/forum" method="GET">
+        <form action="/topics" method="GET">
             <input type="submit" value="Forum">
         </form
         ></div>
@@ -23,36 +23,79 @@
         <h1>{{.Topic.Title}}</h1>
         <h6>{{.Topic.Description}}</h6>
     </div>
-        <div style="margin-top: 10%">
-                {{ range .ViewComments }}
-                        <div class="container">
-                            <form action="/forum/topic/{{.TopicID}}/comments/{{.CommentID}}/ratings" method="POST">
-                                <h6>{{ .Content }}</h6>
-                                <small>{{ .UserName}}</small>
-                                <br>
-                                <small>{{ .CreatedTime | fdate}}</small>
-                                <small>Rating: {{ len .LikersIDs}}</small>
-                                {{ if .CanLike $.ContextUserID }}
 
-                                    <input type="submit" value="Like">
+    <div class="container" style="margin-top: 10%">
+        {{ range .TreeVComments}}
+            <div class="container" style="margin-top: 10%">
+                <h6>{{ .Content }}</h6>
+                <small>{{ .UserName}}</small>
+                <br>
+                <small>{{ .CreatedTime | fdate}}</small>
+                <br>
+                <small>Rating: {{ len .LikersIDs}}</small>
 
-                                {{end}}
+                {{ if .CanReply $.ContextUserID }}
+                    <button onclick="doReply({{.CommentID}}, {{.Content}}, {{.UserName}})">Reply</button>
+                {{ end }}
 
-                            </form>
-                        </div>
+                <form action="/topics/{{.TopicID}}/comments/{{.CommentID}}/ratings" method="POST">
+                    {{ if .CanLike $.ContextUserID }}
+                        <input type="submit" value="Like">
+                    {{ end }}
+                </form>
+            </div>
+            <br>
+            <br>
+
+            {{ range .NestedComments }}
+
+                <div class="offset4" style="margin-left: 5%">
+                    <h6>{{ .Content }}</h6>
+                    <small>{{ .UserName}}</small>
                     <br>
+                    <small>{{ .CreatedTime | fdate}}</small>
                     <br>
-                {{ else }}
-                    <h2> Nothing to show </h2>
-                {{ end}}
-        </div>
+                    <small>Rating: {{ len .LikersIDs}}</small>
 
-    <div class="container">
-        <form method="POST">
-            <textarea rows="4" cols="20" name="content" placeholder="content" required></textarea>
+                    <form action="/topics/{{.TopicID}}/comments/{{.CommentID}}/ratings" method="POST">
+                        {{ if .CanLike $.ContextUserID }}
+                            <input type="submit" value="Like">
+                        {{ end }}
+                    </form>
+                </div>
+                <br>
+                <br>
+
+            {{ end }}
+
+        {{ end }}
+    </div>
+
+
+
+    <div id="comment" class="position-fixed" style="bottom:10px; right:5px;">
+        <form action="/topics/{{.Topic.TopicID}}/comments?parentID={{0}}" method="POST">
             <input type="submit" value="Comment">
+            <textarea rows="8" cols="50" name="content" placeholder="content" required></textarea>
         </form>
     </div>
+
+    <div hidden id="reply" class="position-fixed" style="bottom:10px; right:5px;">
+
+        <form name="replyForm" action="/topics/{{.Topic.TopicID}}/comments?parentID=" method="POST">
+            <input type="submit" value="Reply">
+            <textarea  id="reply-text" rows="8" cols="50" name="content" placeholder="content" required></textarea>
+        </form>
+    </div>
+
+    <script>
+        function doReply(commentID, commentContent, userName) {
+            document.getElementById("comment").style.visibility = "hidden";
+            document.getElementById("reply").removeAttribute("hidden");
+            document.getElementById("reply-text").placeholder = commentContent + "\n" + userName
+            document.replyForm.action += commentID
+        }
+    </script>
 
     </body>
 

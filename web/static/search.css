@@ -3,7 +3,7 @@ body{
     margin: 0;
     padding: 0;
     font-family: sans-serif;
-    background-image: url("background.jpg");
+    background-color: #fafafa;
     background-size: 100%;
   }
   span{
@@ -25,7 +25,7 @@ body{
   }
   .filters input{
     float: left;
-    opacity: 0.7;
+    
   }
  
   

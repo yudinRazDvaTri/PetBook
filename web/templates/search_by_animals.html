@@ -16,52 +16,63 @@
     <div id="search_menu" class="w-50 container mb-3 input-group " style="margin-top:10px;">
         <input type="email" placeholder="Pet's name" class="form-control " name="name" id="search">
         <div class="input-group-append">
-            <input type="submit" class="btn btn-outline-success btn-secondary" id="search_button" value="Search">
+            <input type="submit" class="btn btn-info btn-outline-dark" id="search_button" value="Search">
         </div>
     </div>
     <div class="container">
         <div class="row">
             <div class=" .col-sm-1" style="margin-left:-40px;margin-top: 125px;">
                 <div class="btn-group-vertical">
-                    <a class="btn btn-outline-success" href="/search?section=user"><span>Search by
+                    <a class="btn btn-info btn-outline-dark" href="/search?section=user"><span>Search by
                             user</span></a><br>
-                    <a class="btn btn-outline-success" href="/search?section=animal"><span>Search by
+                    <a class="btn  btn-info btn-outline-dark" href="/search?section=animal"><span>Search by
                             animal</span></a>
-                    <a class="btn btn-outline-success" href="/search?section=forum"><span>Search by
+                    <a class="btn  btn-info btn-outline-dark" href="/search?section=forum"><span>Search by
                             forum</span></a><br>
                 </div>
             </div>
             <div class="col-md-8 ">
                 <ul>
-                    {{ range . }}
-                    <div class="card mb-3 border-success " style="max-width: 35rem;">
+                    {{ range .Pets }}
+                    {{if .Name}}
+                    <div onclick="redirectOnMyPage({{.UserID}})" class="card mb-3 border-info " style="max-width: 35rem;background-color: #fafafa">
                         <div class="row no-gutters">
                             <div class="col-md-4">
                                 <!-- <img src="..." class="card-img" alt="..."> -->
                                 <p>PHOTO</p>
                             </div>
                             <div class="col-md-8">
-                                <div class="card-body text-success">
-                                    <h5 class="card-title ">{{ .Name }}</h5>
-                                    <p class="card-text">{{ .Description }}</p>
-                                    <a href="#" class="btn btn-outline-success btn-lg" disabled>Add to Friends</a>
+                                <div class="card-body ">
+                                    <form action="mypage/following" method="POST">
+                                        <h5 class="card-title "  name="name">{{ .Name }}</h5>
+                                        <p class="card-text" name="description">{{ .Description }}</p>
+                                        <input type="hidden" name="followUserID" value="{{printf "%d" .UserID}}">
+                                        {{ if not (.CanFollow $.UserID $.PetsFollowing)}}
+
+                                            <input type="submit" class="btn btn-info btn-outline-dark" name="follow" value="Unfollow">
+                                        {{else}}
+                                            <input type="submit" class="btn btn-info btn-outline-dark" name="follow" value="Follow">
+                                        {{end}}
+                                    </form>
                                 </div>
                             </div>
                         </div>
-
-                        {{ else }}
-                        <div class="card mb-3">
-                            <h2>Nothing to show</h2>
                         </div>
+                        {{else}}
+                            <div class="card mb-3">
+                                <h2>Nothing to show</h2>
+                            </div>
+                        {{end}}
                         {{ end}}
+
                 </ul>
             </div>
             <div class="filters form-group col-md-1">
                 <label for="age">Enter pet's age:</label>
                 <input type="number" id="age" name="age" min="0" max="30" step="1" placeholder="age"
-                    class="btn-outline-success">
+                style="width: 200px" class="form-control ">
                 <label for="type">Enter animal type:</label>
-                <select name="animal_type" id="type" class="btn-outline-success">
+                <select name="animal_type" id="animal_type"style="width: 200px" class="form-control ">
                     <option selected>Type of animal</option>
                     <option name="dog">dog</option>
                     <option name="cat">cat</option>
@@ -70,20 +81,20 @@
                     <option name="bird">bird</option>
                 </select></label>
                 <label for="breed">Enter animal breed</label>
-                <input type="text" name="breed" id="breed" class="btn-outline-success">
+                <input type="text" class="form-control" style="width:200px" name="breed" id="breed" class=" ">
                 <label for="weight">Enter pet's weight:</label>
                 <input type="number" id="weight" name="weight" min="0" max="50" step="1" placeholder="weight"
-                    class="btn-outline-success">
+                class="form-control" style="width:200px">
                 <label for="gender">Choose animal gender</label>
-                <select name="gender" id="gender" class="btn-outline-success">
+                <select name="gender" id="gender" style="width: 200px;margin-bottom: 10px" class="form-control ">
                     <option selected>Gender</option>
                     <option name="male">male</option>
                     <option name="female">female</option>
                 </select>
                 <div class="btn-group" role="group" aria-label="Basic example">
-                    <input type="submit" id="apply" value="Apply" class="btn btn-outline-success btn-secondary">
+                    <input type="submit" id="apply" value="Apply"  class="btn btn-info btn-outline-dark">
                     <input type="submit" id="reset_parameters" value="Reset parameters" href="/search?section=animal"
-                        class="btn btn-outline-success btn-secondary">
+                        class="btn btn-info btn-outline-dark">
                 </div>
             </div>
         </div>
@@ -128,13 +139,13 @@
                     newUrl += "&age=" + age;
                 };
             };
-            var type = getSelectedText('type');
-            if (type != "Type of animal") {
-                if (newUrl.match(/type=\w+[^&]/)) {
-                    str = newUrl.replace(/type=\w+[^&]/, "type=" + type);
+            var animal_type = getSelectedText('animal_type');
+            if (animal_type != "Type of animal") {
+                if (newUrl.match(/animal_type=\w+[^&]/)) {
+                    str = newUrl.replace(/animal_type=\w+[^&]/, "animal_type=" + animal_type);
                     newUrl = str;
                 } else {
-                    newUrl += "&type=" + type;
+                    newUrl += "&animal_type=" + animal_type;
                 };
             };
             var breed = document.getElementById('breed').value;
@@ -172,7 +183,9 @@
             url = location.protocol + '//' + location.host + location.pathname + '?section=animal'
             window.location.replace(url);
         });
-
+        function redirectOnMyPage(value){
+            location.href="/"+value;
+        }
 
     </script>
 </body>

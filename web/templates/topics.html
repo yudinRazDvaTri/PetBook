@@ -15,12 +15,12 @@
     </head>
 
     <body>
-    <div style="margin-top: 10%">
+    <div style="margin-top: 15%">
     <ul>
         {{ range . }}
             <li>
-            <div class="box" >
-                <h3><a href="forum/topic/{{ .TopicID }}/comments">{{ .Title }}</a></h3>
+            <div class="box " style="margin-top:10px;width: 50%; background-color: #fafafa"  >
+                <h3><a style="color:black; margin-top:10px;" href="topics/{{ .TopicID }}">{{ .Title }}</a></h3>
                 <br>
                 <h6>{{ .Description }}</h6>
                 <br>
@@ -38,13 +38,13 @@
     </ul>
     </div>
 
-    <div class="footer">
-        <form action="/forum" method="POST">
+    <div class="footer" style="background-color: #fafafa">
+        <form action="/topics" method="POST">
             <h1>Add Topic</h1>
-            <input type="text" name="title" placeholder="title" required>
+            <input type="text" name="title" class="form-control form-control-sm" placeholder="title" required>
             <br>
-            <textarea rows="4" cols="20" name="description" placeholder="description"></textarea>
-            <input type="submit" value="Create">
+            <textarea rows="4" cols="20" class="form-control form-control-sm" name="description" placeholder="description" required></textarea>
+            <input type="submit" class="btn btn-info btn-outline-dark"value="Create">
         </form>
     </div>
 

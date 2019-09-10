@@ -1,16 +1,28 @@
 hash: fd528d8e22e4dc1ec7f7002489942414f098039a4d59286be33edc0fe71eb633
-updated: 2019-08-23T08:55:10.85636+03:00
+updated: 2019-09-09T22:01:06.056649368+03:00
 imports:
+- name: cloud.google.com/go
+  version: d4d57431b6a369d42130c17867ad7d92b6ff2970
+  subpackages:
+  - compute/metadata
+- name: github.com/avast/retry-go
+  version: 101acd3290b786bf437607d874596e3996484d8d
 - name: github.com/dgrijalva/jwt-go
   version: 06ea1031745cb8b3dab3f6a236daf2b0aa468b7e
+- name: github.com/golang/protobuf
+  version: 822fe56949f5d56c9e2f02367c657e0e9b4d27d1
+  subpackages:
+  - proto
 - name: github.com/gorilla/context
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/handlers
   version: 8a3748addc242fc560bd6d4ff28b0374c010b1b4
 - name: github.com/gorilla/mux
   version: 00bdffe0f3c77e27d2cf6f5c70232a2d3e4d9c15
+- name: github.com/gorilla/securecookie
+  version: 86450627d8e6b88e00ea41f228489b89d08a40de
 - name: github.com/gorilla/websocket
-  version: ae1634f6a98965ded3b8789c626cb4e0bd78c3de
+  version: c3e18be99d19e6b3e8f1559eea2c161a665c4b6b
 - name: github.com/jmoiron/sqlx
   version: d161d7a76b5661016ad0b085869f77fd410f3e6a
   subpackages:
@@ -31,10 +43,34 @@ imports:
 - name: github.com/urfave/negroni
   version: c6a59be0ce122566695fbd5e48a77f8f10c8a63a
 - name: golang.org/x/crypto
-  version: 60c769a6c58655dab1b9adac0d58967dd517cfba
+  version: 4def268fd1a49955bfb3dda92fe3db4f924f2285
   subpackages:
   - bcrypt
   - blowfish
+- name: golang.org/x/net
+  version: a7b16738d86b947dd0fadb08ca2c2342b51958b6
+  subpackages:
+  - context
+  - context/ctxhttp
+- name: golang.org/x/oauth2
+  version: 0f29369cfe4552d0e4bcddc57cc75f4d7e672a33
+  subpackages:
+  - google
+  - internal
+  - jws
+  - jwt
+- name: google.golang.org/appengine
+  version: 5f2a59506353b8d5ba8cbbcd9f3c1f41f1eaf079
+  subpackages:
+  - internal
+  - internal/app_identity
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/modules
+  - internal/remote_api
+  - internal/urlfetch
+  - urlfetch
 - name: gopkg.in/gorp.v1
   version: 6a667da9c028871f98598d85413e3fc4c6daa52e
 testImports: []

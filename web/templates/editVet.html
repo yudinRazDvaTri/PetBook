@@ -1,0 +1,115 @@
+{{ define "layout"}}
+    <!doctype html>
+    <html >
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <!-- Bootstrap  -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <!--   BOOTSTRAP-->
+        <!--STYLE-->
+        <style>
+        #pet {
+        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+        }
+        #pet td, #customers th {
+            text-align: center;
+        padding: 8px;
+        }
+        #pet tr:nth-child(even)
+        {background-color: #f2f2f2;}
+        #pet tr:hover {background-color: #ddd;}
+        #pet th {
+            width: 140px;
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: center;
+        }
+
+        </style>
+        <!--STYLE-->
+
+        <title>Edit page</title>
+    </head>
+    <body>
+<div class="container" style="margin-top: 10px">
+    <div class="row">
+    <div class="col" name="img"
+         style="position: relative;float: left;"
+    >
+        <div class="col" style="width: 600px;height: 400px;border: #ffffff solid 0px">
+            <img class="d-block w-100" style="width: 600px;height: 400px" alt="" src={{.LogoPath}} >
+
+        </div>
+        <div style="position: relative;margin-left:60px; margin-top: 20px;font-family:Trebuchet MS, Arial, Helvetica, sans-serif;font-size: 16px;color: #212529;">
+            <form
+                    enctype="multipart/form-data"
+                    action="http://localhost:8080/upload"
+                    method="post"
+            >
+                <h6><b>Download logo!</b></h6>
+                <input id="file" type="file"  name="myFile"/>
+                <input class="btn btn-info btn-outline-dark" type="submit" value="upload" />
+            </form>
+        </div>
+        <div style="position: relative;margin-left:60px; margin-bottom: 10px;margin-top: 20px;font-family:Trebuchet MS, Arial, Helvetica, sans-serif;font-size: 16px;color: #212529;">
+
+            <form
+                    enctype="multipart/form-data"
+                    action="http://localhost:8080/uploadmedia"
+                    method="post"
+            >
+                <h6><b>Download photos!</b></h6>
+                <input id="file" type="file" name="myMedia"/>
+                <input class="btn btn-info btn-outline-dark" type="submit" value="upload" />
+            </form>
+        </div>
+    </div>
+    <div class="col" name="characteristics" style="position: relative;float: right;border: #cccccc solid 0px;">
+        <div class="col">
+            <table id="pet">
+                <thead><tr><th>User Login</th><td><input class="form-control" type="text" readonly class="form-control-plaintext" style="background-color: transparent; color: rgba(0, 0, 0, 0.781); border-width: 0px;font-weight: bold" name="name" value="{{.Name}}" /></td><td></tr>
+                <thead><tr><th>Email</th><td><input class="form-control" type="text" readonly class="form-control-plaintext" style="background-color: transparent; color: rgba(0, 0, 0, 0.781); border-width: 0px;font-weight: bold" name="email" value="{{.Email}}" /></td><td></tr>
+{{/*                <thead><tr><th>Password</th><td><input type="text" name="password" value="{{.Password}}" /></td><td></tr>*/}}
+            </table>
+
+        </div>
+        <div class="col" style="margin: 10px">
+            <form method="post">
+            <table id="pet">
+                <thead><tr><th>Name</th><td><input class="form-control" type="text" name="name" value="{{.VetName}}" /></td><td></tr>
+                <thead><tr><th>Surname</th><td><input class="form-control" type="text" name="surname" value="{{.Surname}}" /></td><td></tr>
+                <thead><tr><th>Qualification</th><td>
+                        <select name="qualification" class="form-control">
+                            <option selected>{{.Qualification}}</option>
+                            <option name="zoologist">zoologist</option>
+                            <option name="handler">handler</option>
+                            <option name="paramedic">paramedic</option>
+                            <option name="surgeon">surgeon</option>
+                        </select>
+                    </td><td></tr>
+                <thead><tr><th>Category</th><td>
+                        <select name="category" class="form-control">
+                            <option selected>{{.Category}}</option>
+                            <option name="A">A</option>
+                            <option name="B">B</option>
+                            <option name="C">C</option>
+                            <option name="D">D</option>
+                        </select>
+                    </td><td></tr>
+                <thead><tr><th>Certificates</th><td><input class="form-control" type="text" name="certificates" value="{{.Certificates}}" /></td><td></tr>
+            </table>
+            <button class="btn btn-outline-dark btn-info" type="submit" >Apply</button>
+            </form>
+        </div>
+    </div>
+    </div>
+</div>
+    </body>
+{{ end }}

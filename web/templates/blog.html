@@ -15,12 +15,12 @@
             }
         </script>
         <style>
-            .btn-danger {background-color: #007bff;border: #007bff; margin: 50%}
+            .btn-danger {background-color: #2b2b2b;border: #007bff; margin: 50%}
         </style>
     </head>
     <body>
 
-    <div class="container" style="margin-top: 10px">
+    <div class="container" style="margin-top: 40px">
         <div class="panel panel-default">
             <div class="panel-body"
 {{/*                 style="background: #98FB98;padding: 5px;"*/}}
@@ -32,16 +32,16 @@
             </div>
         </div>
         <div class="form-group">
-            <form action="/process" method="post">
+            <form action="/process"  method="post">
                 <textarea class="form-control" rows="5" type="text" id="message" name="something" placeholder="type something here..." required></textarea>
-                <input class="btn btn-primary" type="submit" value="Send">
-                <input disabled style="float: right" class="btn btn-secondary" type="button" value="Upload img">
-                <input disabled style="float: right;margin-right: 5px" class="btn btn-secondary" type="button" value="YouTube">
+                <input class="btn btn-outline-info" style="margin-top: 10px; margin-bottom: 50px;" type="submit" value="Send">
+                <input disabled style="float: right;margin-top: 10px;" class="btn btn-info btn-outline-dark" type="button" value="Upload img">
+                <input disabled style="float: right;margin-right: 5px; margin-top: 10px;" class="btn btn-info btn-outline-dark" type="button" value="YouTube">
 
 {{/*                <div class="input-group mb-3" style="margin-top: 15px; height: 50px">*/}}
 {{/*                    <input type="text" class="form-control" placeholder="Имя получателя" aria-label="Имя получателя" aria-describedby="basic-addon2">*/}}
 {{/*                    <div class="input-group-append">*/}}
-{{/*                        <button class="btn btn-primary" type="button">Send</button>*/}}
+{{/*                        <button class="btn btn-info btn-outline-dark"  type="button">Send</button>*/}}
 {{/*                    </div>*/}}
 {{/*                </div>*/}}
 
@@ -51,6 +51,7 @@
 {{/*               style="background: #90EE90;border-radius: 10px"*/}}
         >
             <tbody >
+{{/*            VERY IMPT RANGE*/}}
             {{range .}}
                 <tr>
                     <td width="5%">
@@ -58,12 +59,13 @@
 {{/*                        {{range .LogoPath}}*/}}
                         <div style="width:65px;height:65px;">
 {{/*                            <img style="width:48px;height:48px" src="../static/usermedia/1/logo/" >*/}}
-                            <img style="width:48px;height:48px" src="../static/background.jpg" >
+{{/*                            <img style="width:48px;height:48px" src="../static/background.jpg" >*/}}
+                            <img style="width:48px;height:48px" src={{.LogoPath}} >
                         </div>
 {{/*                        {{end}}*/}}
-
+{{/*{{range .BlogData}}*/}}
                         <div style="font-size: 20px;font-family: bold;">
-                            {{.PetName}}
+                            {{.Name}}
                         </div>
                         </div>
                     </td>
@@ -81,12 +83,12 @@
                         </div>
                         <form >
                             <textarea disabled style="width: 50%; float: right" class="form-control form-control-sm" rows="2" type="text" id="message" name="something" placeholder="leave ur comment"  ></textarea>
-{{/*                            <input class="btn btn-primary" type="submit" value="Send">*/}}
-{{/*                            <input disabled style="float: right" class="btn btn-secondary" type="button" value="Upload img">*/}}
-{{/*                            <input disabled style="float: right;margin-right: 5px" class="btn btn-secondary" type="button" value="YouTube">*/}}
+{{/*                            <input class="btn  btn-outline-info"  type="submit" value="Send">*/}}
+{{/*                            <input disabled style="float: right" class="btn btn-info btn-outline-dark" type="button" value="Upload img">*/}}
+{{/*                            <input disabled style="float: right;margin-right: 5px" class="btn btn-info btn-outline-dark" type="button" value="YouTube">*/}}
                         </form>
                     </td>
-                    <td width="5%"><a href="/delete?recordid={{.Id}}" class="btn btn-danger" onclick="return ConfirmDelete();">X</a></td>
+                    <td width="5%"><a href="/delete?recordid={{.Id}}" class="btn btn-info btn-outline-dark" onclick="return ConfirmDelete();">X</a></td>
                 </tr>
             {{end}}
             </tbody>
@@ -109,7 +111,7 @@
 {{/*            {{end}}*/}}
 
 {{/*            <div>*/}}
-{{/*                {{.PetName}}*/}}
+{{/*                {{.Name}}*/}}
 {{/*            </div>*/}}
 {{/*        </td>*/}}
 {{/*        <td width="95%">*/}}

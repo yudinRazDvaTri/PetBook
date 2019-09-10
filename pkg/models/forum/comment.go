@@ -2,8 +2,10 @@ package forum
 
 import (
 	"fmt"
-	"github.com/lib/pq"
+	"sort"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type Comment struct {
@@ -12,13 +14,40 @@ type Comment struct {
 	UserID      int       `json:"user_id" db:"user_id"`
 	CreatedTime time.Time `json:"created_time" db:"created_time"`
 	Content     string    `json:"content" db:"content"`
+	ParentID    int       `json:"parent_id" db:"parent_id"`
+	HaveKids    bool      `json:"have_kids" db:"have_kids"`
 }
 
 // View Alias-Struct to layout comment properly
 type ViewComment struct {
-	UserName string
-	LikersIDs []int64
+	UserName       string
+	LikersIDs      []int64
+	NestedComments []*ViewComment
 	Comment
+}
+
+// Nesting comments
+func TreeViewComments(vComments []ViewComment) (treeVComments []*ViewComment, err error) {
+
+	for i := range vComments {
+
+		if vComments[i].ParentID == 0 {
+			treeVComments = append(treeVComments, &vComments[i])
+		}
+	}
+
+	sort.Sort(sort.Reverse(ByRating(treeVComments)))
+
+	for i := range treeVComments {
+		for j := range vComments {
+			if vComments[j].ParentID == treeVComments[i].CommentID {
+				treeVComments[i].NestedComments = append(treeVComments[i].NestedComments, &vComments[j])
+			}
+		}
+		sort.Sort(sort.Reverse(ByRating(treeVComments[i].NestedComments)))
+	}
+
+	return treeVComments, nil
 }
 
 // Method to discover if user can like comment
@@ -34,6 +63,13 @@ func (v *ViewComment) CanLike(userID int) bool {
 	return true
 }
 
+func (v *ViewComment) CanReply(userID int) bool {
+	if v.UserID == userID {
+		return false
+	}
+	return true
+}
+
 // ViewComment Constructor
 func (f *ForumStore) NewViewComment(userName string, comment Comment) (viewComment ViewComment, err error) {
 	likerIDs, err := f.getCommentLikers(comment.CommentID)
@@ -41,11 +77,12 @@ func (f *ForumStore) NewViewComment(userName string, comment Comment) (viewComme
 		err = fmt.Errorf("Can't read %d comment's likersIDs from DB: %v", comment.TopicID, err)
 		return
 	}
-	viewComment = ViewComment{userName, likerIDs, comment}
+	var emptySlice []*ViewComment
+	viewComment = ViewComment{userName, likerIDs, emptySlice, comment}
 	return
 }
 
-type ByRating []ViewComment
+type ByRating []*ViewComment
 
 // Methods to sort ViewComments by Rating
 func (v ByRating) Len() int {
@@ -58,12 +95,13 @@ func (v ByRating) Less(i, j int) bool {
 	return len(v[i].LikersIDs) < len(v[j].LikersIDs)
 }
 
-func (f *ForumStore) AddNewComment(topicID, userID int, content string) (err error) {
+func (f *ForumStore) AddNewComment(topicID, userID, parentID int, content string) (err error) {
 	_, err = f.DB.Exec(
-		`insert into comments (topic_id, user_id, content) values ($1, $2, $3);`,
-		topicID, userID, content)
+		`insert into comments (topic_id, user_id, parent_id, content) values ($1, $2, $3, $4);`,
+		topicID, userID, parentID, content)
 	if err != nil {
-		err = fmt.Errorf("cannot affect rows in comments table of db: %v", err)
+		err = fmt.Errorf("can not add new comment to db: %v", err)
+		return
 	}
 	return
 }

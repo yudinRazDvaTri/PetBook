@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"sort"
 	"strconv"
 
 	"github.com/dpgolang/PetBook/pkg/models/forum"
@@ -20,7 +19,7 @@ func (c *Controller) TopicsGetHandler() http.HandlerFunc {
 		topics, err := c.ForumStore.GetAllTopics()
 		if err != nil {
 			logger.Error(err)
-			http.Redirect(w, r, "/forum", http.StatusFound)
+			http.Redirect(w, r, "/topics", http.StatusNotFound)
 			return
 		}
 
@@ -30,13 +29,13 @@ func (c *Controller) TopicsGetHandler() http.HandlerFunc {
 			userName, err := c.PetStore.DisplayName(topic.UserID)
 			if err != nil {
 				logger.Error(err)
-				http.Redirect(w, r, "/forum", http.StatusFound)
+				http.Redirect(w, r, "/topics", http.StatusInternalServerError)
 				return
 			}
 			viewTopic, err := c.ForumStore.NewViewTopic(userName, topic)
 			if err != nil {
 				logger.Error(err)
-				http.Redirect(w, r, "/forum", http.StatusFound)
+				http.Redirect(w, r, "/topics", http.StatusInternalServerError)
 				return
 			}
 			viewTopics = append(viewTopics, viewTopic)
@@ -58,10 +57,10 @@ func (c *Controller) TopicsPostHandler() http.HandlerFunc {
 
 		if err := c.ForumStore.CreateNewTopic(userID, title, description); err != nil {
 			logger.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "can't create new topic", http.StatusInternalServerError)
 			return
 		}
-		http.Redirect(w, r, "/forum", http.StatusFound)
+		http.Redirect(w, r, "/topics", http.StatusFound)
 	}
 }
 
@@ -75,20 +74,20 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 		topicID, err := strconv.Atoi(topicIdStr)
 		if err != nil {
 			logger.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "inappropriate request", http.StatusBadRequest)
 			return
 		}
 
 		comments, err := c.ForumStore.GetTopicComments(topicID)
 		if err != nil {
 			logger.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "can't get topic's comments", http.StatusInternalServerError)
 			return
 		}
 		topic, err := c.ForumStore.GetTopicByID(topicID)
 		if err != nil {
 			logger.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "No such topic", http.StatusNotFound)
 			return
 		}
 
@@ -98,28 +97,28 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 			userName, err := c.PetStore.DisplayName(comment.UserID)
 			if err != nil {
 				logger.Error(err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				http.Error(w, "can't get comment creator's name", http.StatusInternalServerError)
 				return
 			}
 			viewComment, err := c.ForumStore.NewViewComment(userName, comment)
 			if err != nil {
 				logger.Error(err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				http.Error(w, "can't get likes-field of comment", http.StatusInternalServerError)
 				return
 			}
 			viewComments = append(viewComments, viewComment)
 		}
 
-		sort.Sort(sort.Reverse(forum.ByRating(viewComments)))
+		treeVComments, err := forum.TreeViewComments(viewComments)
 
 		ViewData := struct {
 			ContextUserID int
 			Topic         forum.Topic
-			ViewComments  []forum.ViewComment
+			TreeVComments []*forum.ViewComment
 		}{
 			userID,
 			topic,
-			viewComments,
+			treeVComments,
 		}
 
 		view.GenerateTimeHTML(w, "Topic", "navbar")
@@ -128,15 +127,31 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 }
 
 // Process adding new Comment
-func (c *Controller) CommentsPostHandler() http.HandlerFunc {
+func (c *Controller) CommentPostHandler() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		var parentID int
+		keys, ok := r.URL.Query()["parentID"]
+
+		if !ok || len(keys[0]) < 1 {
+			logger.Error("missing parentID for comment in URL")
+			http.Error(w, "missing URL parameter", http.StatusInternalServerError)
+			return
+		}
+
+		parentID, err := strconv.Atoi(keys[0])
+		if err != nil {
+			logger.Error("parentID from URL is not an integer")
+			http.Error(w, "inappropriate URL parameter", http.StatusInternalServerError)
+			return
+		}
+
 		vars := mux.Vars(r)
 		topicIdStr := vars["topicID"]
 		topicID, err := strconv.Atoi(topicIdStr)
 		if err != nil {
 			logger.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "inappropriate url", http.StatusInternalServerError)
 			return
 		}
 
@@ -144,18 +159,18 @@ func (c *Controller) CommentsPostHandler() http.HandlerFunc {
 		content := r.FormValue("content")
 		userID := context.Get(r, "id").(int)
 
-		if err := c.ForumStore.AddNewComment(topicID, userID, content); err != nil {
+		if err := c.ForumStore.AddNewComment(topicID, userID, parentID, content); err != nil {
 			logger.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "can't add comment", http.StatusInternalServerError)
 			return
 		}
 
-		http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
+		http.Redirect(w, r, "/topics/"+topicIdStr, http.StatusFound)
 	}
 }
 
 // Process Like-action on Comment
-func (c *Controller) CommentsLikeHandler() http.HandlerFunc {
+func (c *Controller) CommentsRatingHandler() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -165,7 +180,7 @@ func (c *Controller) CommentsLikeHandler() http.HandlerFunc {
 		commentID, err := strconv.Atoi(commentIdStr)
 		if err != nil {
 			logger.Error(err)
-			http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
+			http.Redirect(w, r, "/topics/"+topicIdStr, http.StatusInternalServerError)
 			return
 		}
 
@@ -174,14 +189,14 @@ func (c *Controller) CommentsLikeHandler() http.HandlerFunc {
 		rateOk, err := c.ForumStore.RateComment(commentID, userID)
 		if err != nil {
 			logger.Error(err)
-			http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
+			http.Redirect(w, r, "/topics/"+topicIdStr, http.StatusInternalServerError)
 			return
 		}
 		if !rateOk {
-			http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
+			http.Redirect(w, r, "/topics/"+topicIdStr, http.StatusInternalServerError)
 			return
 		}
 
-		http.Redirect(w, r, "/forum/topic/"+topicIdStr+"/comments", http.StatusFound)
+		http.Redirect(w, r, "/topics/"+topicIdStr, http.StatusFound)
 	}
 }

@@ -8,35 +8,35 @@ import (
 )
 
 type Topic struct {
-	TopicID        int       `json:"topic_id" db:"topic_id"`
-	UserID         int       `json:"user_id" db:"user_id"`
-	CreatedTime    time.Time `json:"created_time" db:"created_time"`
-	Title          string    `json:"title" db:"title"`
-	Description    string    `json:"description" db:"description"`
+	TopicID     int       `json:"topic_id" db:"topic_id"`
+	UserID      int       `json:"user_id" db:"user_id"`
+	CreatedTime time.Time `json:"created_time" db:"created_time"`
+	Title       string    `json:"title" db:"title"`
+	Description string    `json:"description" db:"description"`
 }
 
 // View Alias-Struct to layout topic properly
 type ViewTopic struct {
-	UserName string
+	UserName    string
 	CommentsIDs []int64
 	Topic
 }
 
 // ViewTopic Constructor
 func (f *ForumStore) NewViewTopic(userName string, topic Topic) (viewTopic ViewTopic, err error) {
-		commentsIDs, err := f.getCommentsIDs(topic.TopicID)
-		if err != nil {
-			err = fmt.Errorf("Can't read %d topic's commentsIDs from DB: %v", topic.TopicID, err)
-			return
-		}
-		viewTopic = ViewTopic{userName, commentsIDs, topic}
+	commentsIDs, err := f.getCommentsIDs(topic.TopicID)
+	if err != nil {
+		err = fmt.Errorf("Can't read %d topic's commentsIDs from DB: %v", topic.TopicID, err)
 		return
+	}
+	viewTopic = ViewTopic{userName, commentsIDs, topic}
+	return
 }
 
 func (f *ForumStore) CreateNewTopic(userID int, title, description string) (err error) {
 	_, err = f.DB.Exec(`insert into topics (user_id, title, description) values ($1, $2, $3)`, userID, title, description)
 	if err != nil {
-		err = fmt.Errorf("cannot affect rows in topics table of db: %v", err)
+		err = fmt.Errorf("Cannot affect rows in topics table of db: %v", err)
 	}
 	return
 }
@@ -56,7 +56,8 @@ func (f *ForumStore) GetAllTopics() (topics []Topic, err error) {
 }
 
 func (f *ForumStore) GetTopicComments(topicID int) (comments []Comment, err error) {
-	rows, err := f.DB.Query("select * from comments where topic_id = $1 order by created_time ASC", topicID)
+	rows, err := f.DB.Query("select * from comments where topic_id = $1 order by created_time ASC",
+		topicID)
 	if err != nil {
 		err = fmt.Errorf("Can't read comment-rows from db: %v", err)
 		return
