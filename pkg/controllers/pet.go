@@ -10,7 +10,6 @@ import (
 	"regexp"
 )
 
-
 func (c *Controller) PetPostHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		role := context.Get(r, "role").(string)
@@ -27,7 +26,6 @@ func (c *Controller) PetPostHandler() http.HandlerFunc {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-
 			http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
 			return
 		}
@@ -68,7 +66,12 @@ func (c *Controller) PetGetHandler() http.HandlerFunc {
 
 		switch e := err.(type) {
 		case *utilerr.PetDoesNotExist:
-			petType := c.PetStore.GetPetEnums()
+			petType, err := c.PetStore.GetPetEnums()
+			if err != nil {
+				logger.Error(err, "Error occurred while trying to reed pet enum.\n")
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 			view.GenerateHTML(w, petType, "cabinetPet")
 			return
 		default:

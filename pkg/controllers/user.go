@@ -112,41 +112,9 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 			Path:    "/",
 		})
 
-		//_, err = c.UserStore.GetPet(userID)
-		//if err != nil {
-		//	http.Redirect(w, r, "/petcabinet", http.StatusFound)
-		//	return
-		//}
-		//c.cabinetFilled(userID, w, r)
-
 		http.Redirect(w, r, "/mypage", http.StatusSeeOther)
 		return
 	}
-}
-
-func (c *Controller) cabinetFilled(role string, w http.ResponseWriter, r *http.Request) {
-	/*
-	role := c.UserStore.GetUserRole(id)
-	if role == "pet" {
-		_, err := c.UserStore.GetPet(id)
-		if err != nil {
-			http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
-			return
-		}
-	} else if role == "vet" {
-		_, err := c.UserStore.GetVet(id)
-		if err != nil {
-			http.Redirect(w, r, "/vetcabinet", http.StatusSeeOther)
-			return
-		}
-	} else if role == "" {
-		http.Redirect(w, r, "/role", http.StatusSeeOther)
-		return
-	}
-	http.Redirect(w, r, "/mypage", http.StatusSeeOther)
-	return
-
-	 */
 }
 
 func (c *Controller) LoginGoogleGetHandler() http.HandlerFunc {
@@ -221,6 +189,7 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 
 		if err := json.Unmarshal(contents, &googleUserInfo); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+
 			logger.Error(err, "Error occurred while trying to unmarshal user info.\n")
 			return
 		}
@@ -258,12 +227,11 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 			}
 			http.SetCookie(w, cookie)
 		} else {
-			logger.Error(err.Error(), "; Error occurred while trying to encode cookie.\n", )
+			logger.Error(err.Error(), "; Error occurred while trying to encode cookie.\n")
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		//c.cabinetFilled(userId, w, r)
 		http.Redirect(w, r, "/mypage", http.StatusSeeOther)
 		return
 	}
@@ -369,7 +337,12 @@ func (c *Controller) RoleGetHandler() http.HandlerFunc {
 			return
 		}
 
-		roles := c.UserStore.GetUserEnums()
+		roles, err := c.UserStore.GetUserEnums()
+		if err != nil {
+			logger.Error(err, "Error occurred while trying to user roles enum.\n")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		view.GenerateHTML(w, roles, "role")
 	}
 }

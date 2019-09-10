@@ -21,10 +21,10 @@ type BlogStore struct {
 }
 
 type BlogStorer interface {
-	GetPetBlog(userid int) ([]Blog,error)
-	GetVetBlog(userID int) ([]Blog ,error)
+	GetPetBlog(userid int) ([]Blog, error)
 	CreateBlog(form string, idUser int) error
 	DeleteBlog(blogid string) error
+	GetVetBlog(userID int) ([]Blog, error)
 }
 
 func logFatal(err error) {
@@ -33,10 +33,10 @@ func logFatal(err error) {
 	}
 }
 
-func (b *BlogStore) GetPetBlog(userID int) ([]Blog ,error){
+func (b *BlogStore) GetPetBlog(userID int) ([]Blog, error) {
 	rows, err := b.DB.Query("select blog_id, content, created_time, name from blog,pets where blog.user_id =$1 and pets.user_id=blog.user_id order by created_time desc;", userID)
 	if err != nil {
-		return nil,fmt.Errorf("cannot connect to database: %v", err)
+		return nil, fmt.Errorf("cannot connect to database: %v", err)
 	}
 	tRes := Blog{}
 	var results []Blog
@@ -45,22 +45,22 @@ func (b *BlogStore) GetPetBlog(userID int) ([]Blog ,error){
 		var message, name string
 		var time time.Time
 		err = rows.Scan(&blogid, &message, &time, &name)
+		if err != nil {
+			return nil, fmt.Errorf("cannot insert message to messages in db: %v", err)
+		}
 		tRes.Id = blogid
 		tRes.Name = name
 		tRes.Date = time
 		tRes.Message = message
 		results = append(results, tRes)
-		if err != nil {
-			return nil,fmt.Errorf("cannot insert message to messages in db: %v", err)
-		}
 	}
-	return results,nil
+	return results, nil
 }
 
-func (b *BlogStore) GetVetBlog(userID int) ([]Blog ,error){
+func (b *BlogStore) GetVetBlog(userID int) ([]Blog, error) {
 	rows, err := b.DB.Query("select blog_id, content, created_time, name from blog,vets where blog.user_id =$1 and vets.user_id=blog.user_id order by created_time desc;", userID)
 	if err != nil {
-		return nil,fmt.Errorf("cannot connect to database: %v", err)
+		return nil, fmt.Errorf("cannot connect to database: %v", err)
 	}
 	tRes := Blog{}
 	var results []Blog
@@ -75,14 +75,13 @@ func (b *BlogStore) GetVetBlog(userID int) ([]Blog ,error){
 		tRes.Message = message
 		results = append(results, tRes)
 		if err != nil {
-			return nil,fmt.Errorf("cannot insert message to messages in db: %v", err)
+			return nil, fmt.Errorf("cannot insert message to messages in db: %v", err)
 		}
 	}
-	return results,nil
+	return results, nil
 }
 
-
-func (b *BlogStore) CreateBlog(form string, idUser int) error{
+func (b *BlogStore) CreateBlog(form string, idUser int) error {
 	result, err := b.DB.Exec("insert into blog (content,user_id) values ($1,$2);", form, idUser)
 	if err != nil {
 		return fmt.Errorf("cannot execute database query: %v", err)
@@ -94,7 +93,7 @@ func (b *BlogStore) CreateBlog(form string, idUser int) error{
 	return nil
 }
 
-func (b *BlogStore) DeleteBlog(blogid string) error{
+func (b *BlogStore) DeleteBlog(blogid string) error {
 	result, err := b.DB.Exec("delete from blog where blog_id = $1", blogid)
 	if err != nil {
 		return fmt.Errorf("cannot execute database query: %v", err)

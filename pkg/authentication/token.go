@@ -90,7 +90,7 @@ func AuthenticateMiddleware(storeRefreshToken *models.RefreshTokenStore) (mw fun
 							}
 							http.SetCookie(w, cookie)
 						} else {
-							logger.Error(err.Error(), "; Error occurred while trying to encode cookie.\n", )
+							logger.Error(err.Error(), "; Error occurred while trying to encode cookie.\n")
 							http.Error(w, err.Error(), http.StatusInternalServerError)
 							return
 						}
@@ -216,28 +216,6 @@ func AuthorizeMiddleware(storeUser *models.UserStore) (mw func(http.Handler) htt
 				return
 			}
 			gorillaContext.Set(r, "role", role)
-			/*
-				userId := gorillaContext.Get(r, "id").(int)
-				role, _ := storeUser.GetUserRole(userId)
-				if role == "" {
-					http.Redirect(w, r, "/role", http.StatusSeeOther)
-					return
-					//h.ServeHTTP(w, r)
-				} else if role == "pet" {
-					_, err := storeUser.GetPet(userId)
-					if err != nil {
-						http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
-						return
-					}
-				} else if role == "vet" {
-					_, err := storeUser.GetVet(userId)
-					if err != nil {
-						http.Redirect(w, r, "/vetcabinet", http.StatusSeeOther)
-						return
-					}
-				}
-
-			*/
 			h.ServeHTTP(w, r)
 		})
 	}

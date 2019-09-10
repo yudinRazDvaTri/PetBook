@@ -47,6 +47,7 @@ type ChatStore struct {
 
 type ChatStorer interface {
 	GetMessages(toID, fromID int) ([]Message, error)
+	GetMessagesByDate(toID, fromID int, date time.Time) ([]Message, error)
 	SaveMessage(message *Message) error
 	GetChats(userID int) ([]Chat, error)
 	RemoveChat(user1, user2 int) error
@@ -111,4 +112,20 @@ func (c *ChatStore) RemoveChat(user1, user2 int) error {
 		return fmt.Errorf("there no messages to delete from db: %v", err)
 	}
 	return nil
+}
+
+func (c *ChatStore) GetMessagesByDate(toID, fromID int, date time.Time) ([]Message, error) {
+	rows, err := c.DB.Query(`select * from messages where ( ((to_id=$1 and from_id=$2) or (from_id=$1 and to_id=$2)) and
+	 created_at::date=$3)  
+		order by created_at`, toID, fromID, date)
+	if err != nil {
+		return nil, fmt.Errorf("cannot make querry: %v", err)
+	}
+	defer rows.Close()
+	messages := []Message{}
+	err = sqlx.StructScan(rows, &messages)
+	if err != nil {
+		return nil, fmt.Errorf("cannot scan messages from db: %v", err)
+	}
+	return messages, nil
 }

@@ -7,12 +7,11 @@ import (
 	"net/http"
 )
 
-
-func (c *Controller) GetBlogHandler() http.HandlerFunc{
-	return func (w http.ResponseWriter, r *http.Request){
+func (c *Controller) GetBlogHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		userID := context.Get(r, "id").(int)
-		results,err := c.BlogStore.GetPetBlog(userID)
-		if err !=nil{
+		results, err := c.BlogStore.GetPetBlog(userID)
+		if err != nil {
 			logger.Error(err)
 			return
 		}
@@ -23,12 +22,12 @@ func (c *Controller) GetBlogHandler() http.HandlerFunc{
 
 }
 
-func (c *Controller) CreateBlogHandler() http.HandlerFunc{
+func (c *Controller) CreateBlogHandler() http.HandlerFunc {
 	//if r.Method != http.MethodPost {
 	//	http.Redirect(w, r, "/", http.StatusFound)
 	//	return
 	//}
-	return func (w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		//var err error
 		//if context.Get(r, "id") == nil {
 		//	logger.Error(err)
@@ -42,8 +41,8 @@ func (c *Controller) CreateBlogHandler() http.HandlerFunc{
 	}
 }
 
-func (c *Controller) DeleteBlogHandler() http.HandlerFunc{
-	return func (w http.ResponseWriter, r *http.Request){
+func (c *Controller) DeleteBlogHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		//if r.Method != http.MethodGet {
 		//	http.Redirect(w, r, "/mypage", 301)
 		//	return

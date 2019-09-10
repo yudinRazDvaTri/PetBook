@@ -3,9 +3,7 @@ package models
 import (
 	"database/sql"
 	"fmt"
-
 	"github.com/avast/retry-go"
-	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/utilerr"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -45,9 +43,9 @@ type UserStorer interface {
 	GetPet(userID int) (Pet, error)
 	LoginOauth(email string) (int, error)
 	GetVet(userID int) (Vet, error)
-	GetUserEnums() []string
 	SetUserRole(role string, userID int) error
-	GetUserRole(userID int) (string,error)
+	GetUserEnums() ([]string, error)
+	GetUserRole(userID int) (string, error)
 }
 
 func (c *UserStore) GetUsers() ([]User, error) {
@@ -172,8 +170,8 @@ func (c *UserStore) GetPet(userID int) (Pet, error) {
 			return pet, &utilerr.PetDoesNotExist{Description: "Pet does not exist!"}
 		}
 		return pet, fmt.Errorf("Error occurred while trying to read pet from db: %v.\n", err)
-
 	}
+
 	return pet, nil
 }
 
@@ -221,27 +219,31 @@ func (c *UserStore) GetVet(userID int) (Vet, error) {
 		AND u.id = $1 `, userID).StructScan(&vet)
 
 	if err != nil {
-		return vet, err
+		if err == sql.ErrNoRows {
+			return vet, &utilerr.PetDoesNotExist{Description: "Pet does not exist!"}
+		}
+		return vet, fmt.Errorf("Error occurred while trying to read pet from db: %v.\n", err)
 	}
+
 
 	return vet, nil
 }
 
-func (c *UserStore) GetUserEnums() []string {
+func (c *UserStore) GetUserEnums() ([]string, error) {
 	var userRole []string
 	var role string
 	rows, err := c.DB.Queryx("SELECT unnest(enum_range(NULL::role))::text")
 	if err != nil {
-		logger.Error(err)
+		return nil, fmt.Errorf("can't read user-enums from db: %v", err)
 	}
 	for rows.Next() {
 		err = rows.Scan(&role)
 		if err != nil {
-			logger.Error(err)
+			return nil, fmt.Errorf("can't scan role from db: %v", err)
 		}
 		userRole = append(userRole, role)
 	}
-	return userRole
+	return userRole, nil
 }
 
 func (c *UserStore) SetUserRole(role string, userID int) error {

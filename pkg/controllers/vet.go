@@ -41,6 +41,8 @@ func (c *Controller) VetPostHandler() http.HandlerFunc {
 		err = c.VetStore.RegisterVet(vet)
 		if err != nil {
 			logger.Error(err, "Error occurred while trying to register pet.\n")
+			http.Redirect(w, r, "/vetcabinet", http.StatusSeeOther)
+			return
 		}
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}

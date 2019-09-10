@@ -68,7 +68,7 @@ func main() {
 
 	authorizeRouter.HandleFunc("/petcabinet", controller.PetPostHandler()).Methods("POST")
 	authorizeRouter.HandleFunc("/petcabinet", controller.PetGetHandler()).Methods("GET")
-	authorizeRouter.HandleFunc("/vetcabinet", controller.VetGetHandler()).Methods("POST")
+	authorizeRouter.HandleFunc("/vetcabinet", controller.VetPostHandler()).Methods("POST")
 	authorizeRouter.HandleFunc("/vetcabinet", controller.VetGetHandler()).Methods("GET")
 	authorizeRouter.HandleFunc("/search", controller.ViewSearchHandler()).Queries("section", "{section}").Methods("GET")
 	authorizeRouter.HandleFunc("/search", controller.RedirectSearchHandler()).Methods("GET")
@@ -76,24 +76,16 @@ func main() {
 	authorizeRouter.HandleFunc("/topics", controller.TopicsGetHandler()).Methods("GET")
 	authorizeRouter.HandleFunc("/topics/{topicID}", controller.CommentsGetHandler()).Methods("GET")
 
-	authorizeRouter.HandleFunc("/chats", controller.ChatsGetHandler()).Methods("GET")
-	authorizeRouter.HandleFunc("/chats/{id}/delete", controller.DeleteChatHandler()).Methods("POST")
-	authorizeRouter.HandleFunc("/chats/{id}", controller.HandleChatConnectionGET()).Methods("GET")
-	authorizeRouter.HandleFunc("/ws", controller.HandleChatConnection())
-	go controller.HandleMessages()
-
-	//authenticateRouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
 	authorizeRouter.HandleFunc("/", controller.MyPageGetHandler()).Methods("GET")
 	authorizeRouter.HandleFunc("/mypage", controller.MyPageGetHandler()).Methods("GET")
 
-	authorizeRouter.HandleFunc("/process", controller.CreateBlogHandler()).Methods("POST")
 	authorizeRouter.HandleFunc("/delete", controller.DeleteBlogHandler()).Methods("GET")
-	authorizeRouter.HandleFunc("/upload", controller.UploadLogo()).Methods("POST")
-	authorizeRouter.HandleFunc("/edit", controller.EditPageHandler).Methods("GET")
-	authorizeRouter.HandleFunc("/edit", controller.ProfileUpdateHandler).Methods("POST")
-	authorizeRouter.HandleFunc("/uploadmedia", controller.UploadMedia()).Methods("POST")
-	authorizeRouter.HandleFunc("/{id}", controller.MyPageOtherUsersHandler()).Methods("GET")
-	authorizeRouter.HandleFunc("/deleteimg", controller.DeleteImgHandler()).Methods("Post")
+	authorizeRouter.HandleFunc("/media/logo", controller.UploadLogo()).Methods("POST")
+	authorizeRouter.HandleFunc("/mypage/edit", controller.EditPageHandler()).Methods("GET")
+	authorizeRouter.HandleFunc("/mypage/edit", controller.ProfileUpdateHandler()).Methods("POST")
+	authorizeRouter.HandleFunc("/media/gallery", controller.UploadMedia()).Methods("POST")
+	authorizeRouter.HandleFunc("/users/{id}/", controller.DisplayOtherUsersHandler()).Methods("GET")
+	authorizeRouter.HandleFunc("/media/{id}/delete", controller.DeleteImgHandler()).Methods("Post")
 
 	authorizeRouter.HandleFunc("/mypage/{follow:followers|following}", controller.GetFollowerHandler()).Methods("GET")
 	authorizeRouter.HandleFunc("/mypage/{follow:followers|following}", controller.PostFollowerHandler()).Methods("POST")
@@ -101,7 +93,15 @@ func main() {
 	petOrVetRouter := authorizeRouter.PathPrefix("/").Subrouter()
 	petOrVetRouter.Use(authentication.PetOrVetMiddleware(&storeUser))
 
-	//authenticateRouter.HandleFunc("/mypage", controller.MyPageGetHandler()).Methods("GET")
+	petOrVetRouter.HandleFunc("/process", controller.CreateBlogHandler()).Methods("POST")
+
+	petOrVetRouter.HandleFunc("/chats", controller.ChatsGetHandler()).Methods("GET")
+	petOrVetRouter.HandleFunc("/chats/{id}", controller.DeleteChatHandler()).Methods("POST") //does not work with method DELETE with overriding with js too
+	petOrVetRouter.HandleFunc("/chats/{id}", controller.HandleChatConnectionGET()).Methods("GET")
+	petOrVetRouter.HandleFunc("/chats/{id}/search/{date}", controller.HandleChatSearchConnection()).Methods("GET")
+	petOrVetRouter.HandleFunc("/ws/{id}", controller.HandleChatConnection())
+
+	petOrVetRouter.HandleFunc("/mypage/{follow:followers|following}", controller.PostFollowerHandler()).Methods("POST")
 
 	petOrVetRouter.HandleFunc("/topics", controller.TopicsPostHandler()).Methods("POST")
 	petOrVetRouter.HandleFunc("/topics/{topicID}/comments", controller.CommentPostHandler()).Methods("POST")

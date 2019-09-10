@@ -4,7 +4,6 @@ import (
 	//"github.com/dpgolang/PetBook/pkg/logger"
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"log"
 )
 
 type Pet struct {
@@ -24,9 +23,9 @@ type PetStore struct {
 
 type PetStorer interface {
 	RegisterPet(pet *Pet) error
-	DisplayName(userID int) (name string, err error)
-	GetPetEnums() []string
-	UpdatePet(pet *Pet)
+	DisplayName(userID int, role string) (name string, err error)
+	GetPetEnums() ([]string, error)
+	UpdatePet(pet *Pet) error
 }
 
 // TODO: rewrite to update into
@@ -39,42 +38,67 @@ func (c *PetStore) RegisterPet(pet *Pet) error {
 	return nil
 }
 
-func (c *PetStore) DisplayName(userID int) (name string, err error) {
-	var email, petName string
+func (c *PetStore) DisplayName(userID int, role string) (name string, err error) {
+	var email, petName, vetName string
 	err = c.DB.QueryRow(
 		`SELECT email FROM users WHERE id = $1`, userID).Scan(&email)
 	if err != nil {
-		return "", fmt.Errorf("Error occurred while trying read email of user with $d id: %v.\n", userID, err)
+		return "", fmt.Errorf("Error occurred while trying read email of user with %b id: %v.\n", userID,  err)
 	}
-	err = c.DB.QueryRow(
-		`SELECT name FROM pets WHERE user_id = $1`, userID).Scan(&petName)
-	if err != nil {
-		return "", fmt.Errorf("Error occurred while trying read petName of user with $d id: %v.\n", userID, err)
+
+	if role == "pet" {
+		err = c.DB.QueryRow(
+			`SELECT name FROM pets WHERE user_id = $1`, userID).Scan(&petName)
+		if err != nil {
+			return "", fmt.Errorf("Error occurred while trying read petName of user with %b id: %v.\n",userID, err)
+		}
+		name = email + "/" + petName
+	} else if role == "vet" {
+		err = c.DB.QueryRow(
+			`SELECT name FROM vets WHERE user_id = $1`, userID).Scan(&vetName)
+		if err != nil {
+			return "", fmt.Errorf("Error occurred while trying read vetName of user with %b id: %v.\n", userID, err)
+		}
+		name = email + "/" + vetName
 	}
-	name = email + "/" + petName
 
 	return
 }
-func (p *PetStore) UpdatePet(pet *Pet) {
-	_, err := p.DB.Exec("update pets set name=$1, age=$2,animal_type=$3, breed =$4,weight=$5,gender=$6,description=$7 where user_id = $8",
-		pet.Name, pet.Age, pet.PetType, pet.Breed, pet.Weight, pet.Gender, pet.Description, pet.ID)
+
+func (p *PetStore) UpdatePet(pet *Pet) error {
+	_, err := p.DB.Exec(`INSERT into pets(user_id, age, name, animal_type, breed, weight, gender, description) 
+								values ($1, $2, $3, $4, $5, $6, $7, $8)
+								ON CONFLICT (user_id) DO UPDATE 
+								SET age = $2,
+								name = $3,
+								animal_type = $4,
+								breed = $5,
+								weight = $6,
+								gender = $7,
+								description = $8`, pet.ID, pet.Age, pet.Name, pet.PetType, pet.Breed, pet.Weight, pet.Gender, pet.Description)
+
 	if err != nil {
-		log.Println(err)
+		return fmt.Errorf("Error occurred while trying to update pet table: %v.\n", err)
 	}
+	return nil
+
+
+	return nil
 }
-func (p *PetStore) GetPetEnums() []string {
+
+func (p *PetStore) GetPetEnums() ([]string, error) {
 	var petType []string
 	var ptype string
 	rows, err := p.DB.Queryx("SELECT unnest(enum_range(NULL::kind_of_animal))::text")
 	if err != nil {
-		fmt.Println("Error in getting enums")
+		return nil, fmt.Errorf("cannot connect to database: %v", err)
 	}
 	for rows.Next() {
 		err = rows.Scan(&ptype)
 		if err != nil {
-			logFatal(err)
+			return nil, fmt.Errorf("cannot insert in db: %v", err)
 		}
 		petType = append(petType, ptype)
 	}
-	return petType
+	return petType, nil
 }

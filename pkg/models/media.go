@@ -1,21 +1,21 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
-	"github.com/dpgolang/PetBook/pkg/logger"
+	"github.com/dpgolang/PetBook/pkg/utilerr"
 	"github.com/jmoiron/sqlx"
-	"log"
 	"os"
 	"time"
 )
 
 type Media struct {
-	Id int
-	UserId int
-	LogoPath string
+	Id          int
+	UserId      int
+	LogoPath    string
 	GalleryPath string
-	DocsPath string
-	Time time.Time
+	DocsPath    string
+	Time        time.Time
 }
 
 type MediaStore struct {
@@ -23,77 +23,66 @@ type MediaStore struct {
 }
 
 type MediaStorer interface {
-	AddLogoPathDb(path string,userId int)
-	GetLogo(userId int) string
-	GetExistedLogo(userId int) []string
-	AddMediaPathDb(path string,userId int)
-	GetExistedGallery(userId int) []string
-	DeleteFile(path string)
+	AddLogoPathDb(path string, userId int) error
+	GetLogo(userId int) (string, error)
+	AddMediaPathDb(path string, userId int) error
+	GetExistedGallery(userId int) ([]string, error)
+	DeleteFile(path string) error
 }
 
-func (m *MediaStore) AddLogoPathDb(path string,userId int){
+func (m *MediaStore) AddLogoPathDb(path string, userId int) error {
 	_, err := m.DB.Exec("insert into logos (logo_path,user_id)VALUES ($1,$2)", path, userId)
 	if err != nil {
-		log.Println(err)
+		return fmt.Errorf("cannot execute database query: %v", err)
 	}
+	return nil
 }
-func (m *MediaStore) AddMediaPathDb(path string,userId int){
+func (m *MediaStore) AddMediaPathDb(path string, userId int) error {
 	_, err := m.DB.Exec("insert into gallery (file_path,user_id)VALUES ($1,$2)", path, userId)
 	if err != nil {
-		log.Println(err)
+		return fmt.Errorf("cannot execute database query: %v", err)
 	}
+	return nil
 }
 
-func (m *MediaStore) GetLogo(userId int) string{
+func (m *MediaStore) GetLogo(userId int) (string, error) {
 	var path string
 	err := m.DB.QueryRow("select logo_path from logos where logo_path IS NOT NULL and user_id=$1 Order by created_time DESC LIMIT 1", userId).Scan(&path)
 	if err != nil {
-		log.Println(err)
+		if err == sql.ErrNoRows {
+			return path, &utilerr.LogoDoesNotExist{Description: "User doesn't have a logo."}
+		}
+		return path, fmt.Errorf("cannot connect to database: %v", err)
 	}
-	return path
+	return path, nil
 }
 
-func (m *MediaStore) GetExistedLogo(userId int) []string{
-	rows, err := m.DB.Query("select logo_path from logos where user_id =$1 order by created_time desc;", userId)
-	if err != nil {
-		log.Println(err)
-	}
+func (m *MediaStore) GetExistedGallery(userId int) ([]string, error) {
 	var results []string
-	for rows.Next() {
-		var p string
-		err = rows.Scan(&p)
-		if err != nil {
-			log.Println(err)
-		}
-		results = append(results, p)
-	}
-	return results
-}
-func (m *MediaStore) GetExistedGallery(userId int) []string{
 	rows, err := m.DB.Query("select file_path from gallery where user_id =$1 order by created_time desc;", userId)
 	if err != nil {
-		log.Println(err)
+		return results, fmt.Errorf("cannot connect to database: %v", err)
 	}
-	var results []string
 	for rows.Next() {
 		var p string
 		err = rows.Scan(&p)
 		if err != nil {
-			log.Println(err)
+			return nil, fmt.Errorf("cannot get photo from media in db: %v", err)
 		}
 		results = append(results, p)
 	}
-	return results
+	return results, nil
 }
 
-func (m *MediaStore) DeleteFile(path string) {
-	var err2 = os.Remove(path)
-	if err2 != nil{
-		logger.Error(err2)
-	}
-	_, err := m.DB.Exec("delete from gallery where file_path = $1", path)
+func (m *MediaStore) DeleteFile(path string) error {
+	err := os.Remove(path)
 	if err != nil {
-		fmt.Errorf("cannot execute database query: %v", err)
+		return fmt.Errorf("cannot delete from folder: %v", err)
+	}
+	_, err2 := m.DB.Exec("delete from gallery where file_path = $1", path)
+	if err2 != nil {
+		return fmt.Errorf("cannot execute database query: %v", err2)
 	}
 	fmt.Println("==> done deleting file")
+	return nil
 }

@@ -36,7 +36,7 @@ func (f *ForumStore) NewViewTopic(userName string, topic Topic) (viewTopic ViewT
 func (f *ForumStore) CreateNewTopic(userID int, title, description string) (err error) {
 	_, err = f.DB.Exec(`insert into topics (user_id, title, description) values ($1, $2, $3)`, userID, title, description)
 	if err != nil {
-		err = fmt.Errorf("cannot affect rows in topics table of db: %v", err)
+		err = fmt.Errorf("Cannot affect rows in topics table of db: %v", err)
 	}
 	return
 }
@@ -56,7 +56,8 @@ func (f *ForumStore) GetAllTopics() (topics []Topic, err error) {
 }
 
 func (f *ForumStore) GetTopicComments(topicID int) (comments []Comment, err error) {
-	rows, err := f.DB.Query("select * from comments where topic_id = $1 order by created_time ASC", topicID)
+	rows, err := f.DB.Query("select * from comments where topic_id = $1 order by created_time ASC",
+		topicID)
 	if err != nil {
 		err = fmt.Errorf("Can't read comment-rows from db: %v", err)
 		return
