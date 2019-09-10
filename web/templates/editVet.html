@@ -75,21 +75,21 @@
     </div>
     <div class="col" name="characteristics" style="position: relative;float: right;border: #cccccc solid 0px;">
         <div class="col">
-            <table id="pet">
-                <thead><tr><th>User Login</th><td><input class="form-control" type="text" readonly class="form-control-plaintext" style="background-color: transparent; color: rgba(0, 0, 0, 0.781); border-width: 0px;font-weight: bold" name="name" value="{{.Name}}" /></td><td></tr>
-                <thead><tr><th>Email</th><td><input class="form-control" type="text" readonly class="form-control-plaintext" style="background-color: transparent; color: rgba(0, 0, 0, 0.781); border-width: 0px;font-weight: bold" name="email" value="{{.Email}}" /></td><td></tr>
+{{/*            <table id="pet">*/}}
+{{/*                <thead><tr><th>User Login</th><td><input class="form-control" type="text" readonly class="form-control-plaintext" style="background-color: transparent; color: rgba(0, 0, 0, 0.781); border-width: 0px;font-weight: bold" name="name" value="{{.Name}}" /></td><td></tr>*/}}
+{{/*                <thead><tr><th>Email</th><td><input class="form-control" type="text" readonly class="form-control-plaintext" style="background-color: transparent; color: rgba(0, 0, 0, 0.781); border-width: 0px;font-weight: bold" name="email" value="{{.Email}}" /></td><td></tr>*/}}
 {{/*                <thead><tr><th>Password</th><td><input type="text" name="password" value="{{.Password}}" /></td><td></tr>*/}}
-            </table>
+{{/*            </table>*/}}
 
         </div>
         <div class="col" style="margin: 10px">
             <form method="post">
             <table id="pet">
-                <thead><tr><th>Name</th><td><input class="form-control" type="text" name="name" value="{{.VetName}}" /></td><td></tr>
-                <thead><tr><th>Surname</th><td><input class="form-control" type="text" name="surname" value="{{.Surname}}" /></td><td></tr>
+                <thead><tr><th>Name</th><td><input class="form-control" type="text" name="name" value="{{.Vet.Name}}" /></td><td></tr>
+                <thead><tr><th>Surname</th><td><input class="form-control" type="text" name="surname" value="{{.Vet.Surname}}" /></td><td></tr>
                 <thead><tr><th>Qualification</th><td>
                         <select name="qualification" class="form-control">
-                            <option selected>{{.Qualification}}</option>
+                            <option selected>{{.Vet.Qualification}}</option>
                             <option name="zoologist">zoologist</option>
                             <option name="handler">handler</option>
                             <option name="paramedic">paramedic</option>
@@ -98,14 +98,14 @@
                     </td><td></tr>
                 <thead><tr><th>Category</th><td>
                         <select name="category" class="form-control">
-                            <option selected>{{.Category}}</option>
+                            <option selected>{{.Vet.Category}}</option>
                             <option name="A">A</option>
                             <option name="B">B</option>
                             <option name="C">C</option>
                             <option name="D">D</option>
                         </select>
                     </td><td></tr>
-                <thead><tr><th>Certificates</th><td><input class="form-control" type="text" name="certificates" value="{{.Certificates}}" /></td><td></tr>
+                <thead><tr><th>Certificates</th><td><input class="form-control" type="text" name="certificates" value="{{.Vet.Certificates}}" /></td><td></tr>
             </table>
             <button class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;margin-top:10px;" type="submit" >Apply</button>
             </form>

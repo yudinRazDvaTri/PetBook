@@ -11,27 +11,12 @@ import (
 )
 
 type MypageData struct {
-	Name        string
-	Age         string
-	PetType     string
-	Breed       string
-	Description string
-	Weight      string
-	Gender      string
+	Pet models.Pet
+	Vet models.Vet
 	LogoPath    string
 }
-
 type BlogData struct {
 	BlogData []models.Blog
-}
-
-type MypageDataVet struct {
-	Name          string
-	Category      string
-	Qualification string
-	Surname       string
-	Certificates  string
-	LogoPath      string
 }
 
 func (c *Controller) MyPageGetHandler() http.HandlerFunc {
@@ -64,13 +49,8 @@ func (c *Controller) myPageDisplayPet(userID int, w http.ResponseWriter, r *http
 	}
 	var myPageData MypageData
 	myPageData.LogoPath = path
-	myPageData.Name = pet.Name
-	myPageData.Age = pet.Age
-	myPageData.PetType = pet.PetType
-	myPageData.Weight = pet.Weight
-	myPageData.Description = pet.Description
-	myPageData.Gender = pet.Gender
-	myPageData.Breed = pet.Breed
+	myPageData.Pet = pet
+
 
 	blog, err := c.BlogStore.GetPetBlog(userID)
 	for i := 0; i < len(blog); i++ {
@@ -106,13 +86,9 @@ func (c *Controller) myPageDisplayVet(userID int, w http.ResponseWriter, r *http
 		http.Redirect(w, r, "/vetcabinet", http.StatusFound)
 		return
 	}
-	var myPageData MypageDataVet
+	var myPageData MypageData
 	myPageData.LogoPath = path
-	myPageData.Name = vet.Name
-	myPageData.Surname = vet.Surname
-	myPageData.Category = vet.Category
-	myPageData.Certificates = vet.Certificates
-	myPageData.Qualification = vet.Qualification
+	myPageData.Vet = vet
 
 	blog, err := c.BlogStore.GetVetBlog(userID)
 	for i := 0; i < len(blog); i++ {
