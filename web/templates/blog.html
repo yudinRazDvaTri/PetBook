@@ -35,8 +35,7 @@
             <form action="/blogs"  method="post">
                 <textarea class="form-control" rows="5" type="text" id="message" name="something" placeholder="type something here..." required></textarea>
                 <input class="btn btn-outline-info" style="margin-top: 10px; margin-bottom: 50px;" type="submit" value="Send">
-                <input disabled style="float: right;margin-top: 10px;" class="btn btn-info btn-outline-dark" type="button" value="Upload img">
-                <input disabled style="float: right;margin-right: 5px; margin-top: 10px;" class="btn btn-info btn-outline-dark" type="button" value="YouTube">
+              
 
 {{/*                <div class="input-group mb-3" style="margin-top: 15px; height: 50px">*/}}
 {{/*                    <input type="text" class="form-control" placeholder="Имя получателя" aria-label="Имя получателя" aria-describedby="basic-addon2">*/}}
@@ -81,12 +80,7 @@
                         <div width="15%" style="font-size: 15px">
                             {{.Date | fdate}}
                         </div>
-                        <form >
-                            <textarea disabled style="width: 50%; float: right" class="form-control form-control-sm" rows="2" type="text" id="message" name="something" placeholder="leave ur comment"  ></textarea>
-{{/*                            <input class="btn  btn-outline-info"  type="submit" value="Send">*/}}
-{{/*                            <input disabled style="float: right" class="btn btn-info btn-outline-dark" type="button" value="Upload img">*/}}
-{{/*                            <input disabled style="float: right;margin-right: 5px" class="btn btn-info btn-outline-dark" type="button" value="YouTube">*/}}
-                        </form>
+                  
                     </td>
                     <td width="5%"><a href="/blogs/{{.Id}}?recordid={{.Id}}" class="btn btn-info btn-outline-dark" onclick="return ConfirmDelete();">X</a></td>
                 </tr>
