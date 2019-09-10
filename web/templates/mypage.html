@@ -74,7 +74,7 @@
     <!--  NAVBAR-->
     <body class="background">
     <div class="container">
-        <h1 style="padding: 15px;color: #2b2b2b">▍{{.Name}}</h1>
+        <h1 style="padding: 15px;color: #2b2b2b">▍{{.Pet.Name}}</h1>
         <div class="row">
 
             <!--   PHOTO CARUSEL-->
@@ -118,12 +118,12 @@
             <div class="col-lg-7 col-md-7 col-sm-12 desc">
                 <p>
                 <table style="color: #2b2b2b " id="pet">
-                    <thead><tr><th>Age</th><td>{{.Age}}</td><td></tr>
-                    <thead><tr><th>Pet type</th><td>{{.PetType}}</td><td></tr>
-                    <thead><tr><th>Breed</th><td>{{.Breed}}</td><td></tr>
-                    <thead><tr><th>Gender</th><td>{{.Gender}}</td><td></tr>
-                    <thead><tr><th>Weight</th><td>{{.Weight}}</td><td></tr>
-                    <thead><tr><th>Description</th><td>{{.Description}}</td><td></tr>
+                    <thead><tr><th>Age</th><td>{{.Pet.Age}}</td><td></tr>
+                    <thead><tr><th>Pet type</th><td>{{.Pet.PetType}}</td><td></tr>
+                    <thead><tr><th>Breed</th><td>{{.Pet.Breed}}</td><td></tr>
+                    <thead><tr><th>Gender</th><td>{{.Pet.Gender}}</td><td></tr>
+                    <thead><tr><th>Weight</th><td>{{.Pet.Weight}}</td><td></tr>
+                    <thead><tr><th>Description</th><td>{{.Pet.Description}}</td><td></tr>
                 </table>
                 </p>
                 {{/*                <button class="btn btn-outline-secondary">Edit</button>*/}}

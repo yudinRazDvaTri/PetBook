@@ -9,22 +9,10 @@ import (
 )
 
 type Editstr struct {
-	Name          string
-	Email         string
-	Password      string
-	PetName       string
-	Age           string
-	PetType       string
-	Breed         string
-	Description   string
-	Weight        string
-	Gender        string
+	Pet models.Pet
+	Vet models.Vet
 	LogoPath      string
-	VetName       string
-	Category      string
-	Qualification string
-	Surname       string
-	Certificates  string
+
 }
 
 func (c *Controller) EditPageHandler() http.HandlerFunc {
@@ -43,28 +31,12 @@ func (c *Controller) EditPageHandler() http.HandlerFunc {
 
 		if user.Role == "pet" {
 			pet, _ := c.UserStore.GetPet(id)
-			edit.Name = user.Login
-			edit.Email = user.Email
-			edit.Password = user.Password
-			edit.PetName = pet.Name
-			edit.Age = pet.Age
-			edit.PetType = pet.PetType
-			edit.Breed = pet.Breed
-			edit.Description = pet.Description
-			edit.Weight = pet.Weight
-			edit.Gender = pet.Gender
+			edit.Pet = pet
 			edit.LogoPath = path
 			filename = "edit"
 		} else if user.Role == "vet" {
 			vet, _ := c.UserStore.GetVet(id)
-			edit.Name = user.Login
-			edit.Email = user.Email
-			edit.Password = user.Password
-			edit.VetName = vet.Name
-			edit.Surname = vet.Surname
-			edit.Qualification = vet.Qualification
-			edit.Category = vet.Category
-			edit.Certificates = vet.Certificates
+			edit.Vet = vet
 			edit.LogoPath = path
 			filename = "editVet"
 		}

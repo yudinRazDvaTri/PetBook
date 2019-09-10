@@ -66,7 +66,7 @@ func main() {
 	//authRouter.HandleFunc("/mypage", controller.MyPageGetHandler()).Methods("GET")
 	authRouter.HandleFunc("/petcabinet", controller.PetPostHandler()).Methods("POST")
 	authRouter.HandleFunc("/petcabinet", controller.PetGetHandler()).Methods("GET")
-	authRouter.HandleFunc("/vetcabinet", controller.VetGetHandler()).Methods("POST")
+	authRouter.HandleFunc("/vetcabinet", controller.VetPostHandler()).Methods("POST")
 	authRouter.HandleFunc("/vetcabinet", controller.VetGetHandler()).Methods("GET")
 	authRouter.HandleFunc("/search", controller.ViewSearchHandler()).Queries("section", "{section}").Methods("GET")
 	authRouter.HandleFunc("/search", controller.RedirectSearchHandler()).Methods("GET")
@@ -85,6 +85,7 @@ func main() {
 
 	//authRouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
 	authRouter.HandleFunc("/", controller.MyPageGetHandler()).Methods("GET")
+
 
 	authRouter.HandleFunc("/blogs", controller.CreateBlogHandler()).Methods("POST")
 	authRouter.HandleFunc("/blogs/{id}", controller.DeleteBlogHandler()).Methods("GET")

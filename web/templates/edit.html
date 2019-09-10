@@ -74,21 +74,21 @@
     </div>
     <div class="col" name="characteristics" style="position: relative;float: right;border: #cccccc solid opx;">
         <div class="col">
-            <table id="pet">
-                <thead><tr><th>User Login</th><td><input style="background-color: transparent; color: rgba(0, 0, 0, 0.781); border-width: 0px;font-weight: bold" class="form-control" type="text" readonly class="form-control-plaintext" name="name" value="{{.Name}}" /></td><td></tr>
-                <thead><tr><th>Email</th><td><input class="form-control" style="background-color: transparent; color: rgba(0, 0, 0, 0.781); border-width: 0px;font-weight: bold" type="text" readonly class="form-control-plaintext" name="email" value="{{.Email}}" /></td><td></tr>
+{{/*            <table id="pet">*/}}
+{{/*                <thead><tr><th>User Login</th><td><input style="background-color: transparent; color: rgba(0, 0, 0, 0.781); border-width: 0px;font-weight: bold" class="form-control" type="text" readonly class="form-control-plaintext" name="name" value="{{.Name}}" /></td><td></tr>*/}}
+{{/*                <thead><tr><th>Email</th><td><input class="form-control" style="background-color: transparent; color: rgba(0, 0, 0, 0.781); border-width: 0px;font-weight: bold" type="text" readonly class="form-control-plaintext" name="email" value="{{.Email}}" /></td><td></tr>*/}}
 {{/*                <thead><tr><th>Password</th><td><input type="text" name="password" value="{{.Password}}" /></td><td></tr>*/}}
-            </table>
+{{/*            </table>*/}}
 
         </div>
         <div class="col" style="margin: 10px; ">
             <form method="post" >
             <table id="pet">
-                <thead><tr><th>Name</th><td><input class="form-control" type="text" name="name" value="{{.PetName}}" /></td><td></tr>
-                <thead><tr><th>Age</th><td><input class="form-control" type="number" name="age" value="{{.Age}}" /></td><td></tr>
+                <thead><tr><th>Name</th><td><input class="form-control" type="text" name="name" value="{{.Pet.Name}}" /></td><td></tr>
+                <thead><tr><th>Age</th><td><input class="form-control" type="number" name="age" value="{{.Pet.Age}}" /></td><td></tr>
                 <thead><tr><th>Pet type</th><td>
                         <select name="animal_type" class="form-control">
-                            <option selected>{{.PetType}}</option>
+                            <option selected>{{.Pet.PetType}}</option>
                             <option name="dog">dog</option>
                             <option name="cat">cat</option>
                             <option name="fish">fish</option>
@@ -96,16 +96,16 @@
                             <option name="rodent">rodent</option>
                         </select>
                     </td><td></tr>
-                <thead><tr><th>Breed</th><td><input class="form-control" type="text" name="breed" value="{{.Breed}}" /></td><td></tr>
-                <thead><tr><th>Weight</th><td><input class="form-control" type="number" name="weight" value="{{.Weight}}" /></td><td></tr>
+                <thead><tr><th>Breed</th><td><input class="form-control" type="text" name="breed" value="{{.Pet.Breed}}" /></td><td></tr>
+                <thead><tr><th>Weight</th><td><input class="form-control" type="number" name="weight" value="{{.Pet.Weight}}" /></td><td></tr>
                 <thead><tr><th>Gender</th><td>
                         <select name="gender" class="form-control">
-                            <option selected>{{.Gender}}</option>
+                            <option selected>{{.Pet.Gender}}</option>
                             <option name="male">male</option>
                             <option name="female">female</option>
                         </select>
                     </td><td></tr>
-                <thead><tr><th>Description</th><td><input class="form-control" type="text" name="description" value="{{.Description}}" /></td><td></tr>
+                <thead><tr><th>Description</th><td><input class="form-control" type="text" name="description" value="{{.Pet.Description}}" /></td><td></tr>
             </table>
             <button class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;margin-top:5px;" type="submit" >Apply</button>
             </form>
