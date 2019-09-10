@@ -9,7 +9,6 @@ import (
 	"regexp"
 )
 
-
 func (c *Controller) PetPostHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
@@ -20,7 +19,6 @@ func (c *Controller) PetPostHandler() http.HandlerFunc {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-
 			http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
 			return
 		}
@@ -44,7 +42,11 @@ func (c *Controller) PetPostHandler() http.HandlerFunc {
 
 func (c *Controller) PetGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		petType := c.PetStore.GetPetEnums()
+		petType, err := c.PetStore.GetPetEnums()
+		if err != nil {
+			logger.Error(err, "Error occurred while trying to get in pet cabinet.\n")
+			return
+		}
 		view.GenerateHTML(w, petType, "cabinetPet")
 	}
 }

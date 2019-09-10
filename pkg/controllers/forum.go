@@ -74,7 +74,7 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 		topicID, err := strconv.Atoi(topicIdStr)
 		if err != nil {
 			logger.Error(err)
-			http.Error(w,"inappropriate request", http.StatusBadRequest)
+			http.Error(w, "inappropriate request", http.StatusBadRequest)
 			return
 		}
 
@@ -135,14 +135,14 @@ func (c *Controller) CommentPostHandler() http.HandlerFunc {
 
 		if !ok || len(keys[0]) < 1 {
 			logger.Error("missing parentID for comment in URL")
-			http.Error(w,"missing URL parameter", http.StatusInternalServerError)
+			http.Error(w, "missing URL parameter", http.StatusInternalServerError)
 			return
 		}
 
 		parentID, err := strconv.Atoi(keys[0])
 		if err != nil {
 			logger.Error("parentID from URL is not an integer")
-			http.Error(w,"inappropriate URL parameter", http.StatusInternalServerError)
+			http.Error(w, "inappropriate URL parameter", http.StatusInternalServerError)
 			return
 		}
 

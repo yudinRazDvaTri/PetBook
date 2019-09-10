@@ -4,7 +4,6 @@ import (
 	//"github.com/dpgolang/PetBook/pkg/logger"
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"log"
 )
 
 type Pet struct {
@@ -25,8 +24,8 @@ type PetStore struct {
 type PetStorer interface {
 	RegisterPet(pet *Pet) error
 	DisplayName(userID int) (name string, err error)
-	GetPetEnums() []string
-	UpdatePet(pet *Pet)
+	GetPetEnums() ([]string, error)
+	UpdatePet(pet *Pet) error
 }
 
 // TODO: rewrite to update into
@@ -55,26 +54,28 @@ func (c *PetStore) DisplayName(userID int) (name string, err error) {
 
 	return
 }
-func (p *PetStore) UpdatePet(pet *Pet) {
+
+func (p *PetStore) UpdatePet(pet *Pet) error {
 	_, err := p.DB.Exec("update pets set name=$1, age=$2,animal_type=$3, breed =$4,weight=$5,gender=$6,description=$7 where user_id = $8",
 		pet.Name, pet.Age, pet.PetType, pet.Breed, pet.Weight, pet.Gender, pet.Description, pet.ID)
 	if err != nil {
-		log.Println(err)
+		return fmt.Errorf("cannot affect rows in pets in db: %v", err)
 	}
+	return nil
 }
-func (p *PetStore) GetPetEnums() []string {
+func (p *PetStore) GetPetEnums() ([]string, error) {
 	var petType []string
 	var ptype string
 	rows, err := p.DB.Queryx("SELECT unnest(enum_range(NULL::kind_of_animal))::text")
 	if err != nil {
-		fmt.Println("Error in getting enums")
+		return nil, fmt.Errorf("cannot connect to database: %v", err)
 	}
 	for rows.Next() {
 		err = rows.Scan(&ptype)
 		if err != nil {
-			logFatal(err)
+			return nil, fmt.Errorf("cannot insert in db: %v", err)
 		}
 		petType = append(petType, ptype)
 	}
-	return petType
+	return petType, nil
 }

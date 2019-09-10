@@ -16,6 +16,11 @@
                 return confirm("You sure you would like to delete this chat?");
             }
         </script>
+        <script>
+            var methodOverride = require('method-override')
+            app.use(methodOverride('_method'))
+            var methodOverride = require('method-override')
+        </script>
     </head>
 
     <body>
@@ -23,7 +28,7 @@
     <ul>
         {{ range . }}
             <div class="box">
-             <form method="post" action="chats/{{ .ToID }}/delete" method ="POST" class="inline">
+             <form action="chats/{{ .ToID }}?_method=DELETE" method ="POST" class="inline">
                 <input type="hidden">
                 <button type="submit" class="link-button btn btn-sm btn-outline-info" onclick="return ConfirmDelete();">Delete</button>
             </form>

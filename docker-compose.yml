@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 services:
   db:
     image: "postgres:latest"
@@ -8,3 +8,11 @@ services:
       - ./pgData:/var/lib/postgre/data
     env_file:
       - .env
+
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    restart: always

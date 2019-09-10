@@ -52,7 +52,7 @@
         <div style="position: relative;margin-left:60px; margin-top: 20px;font-family:Trebuchet MS, Arial, Helvetica, sans-serif;font-size: 16px;color: #212529;">
             <form
                     enctype="multipart/form-data"
-                    action="http://localhost:8080/upload"
+                    action="http://localhost:8080/media/logo"
                     method="post"
             >
                 <h6><b>Download logo!</b></h6>
@@ -63,7 +63,7 @@
         <div style="position: relative;margin-left:60px; margin-top: 20px;font-family:Trebuchet MS, Arial, Helvetica, sans-serif;font-size: 16px;color: #212529;">
             <form
                     enctype="multipart/form-data"
-                    action="http://localhost:8080/uploadmedia"
+                    action="http://localhost:8080/media/gallery"
                     method="post"
             >
                 <h6><b>Download photos!</b></h6>
@@ -85,7 +85,7 @@
             <form method="post" >
             <table id="pet">
                 <thead><tr><th>Name</th><td><input class="form-control" type="text" name="name" value="{{.PetName}}" /></td><td></tr>
-                <thead><tr><th>Age</th><td><input class="form-control" type="text" name="age" value="{{.Age}}" /></td><td></tr>
+                <thead><tr><th>Age</th><td><input class="form-control" type="number" name="age" value="{{.Age}}" /></td><td></tr>
                 <thead><tr><th>Pet type</th><td>
                         <select name="animal_type" class="form-control">
                             <option selected>{{.PetType}}</option>
@@ -97,7 +97,7 @@
                         </select>
                     </td><td></tr>
                 <thead><tr><th>Breed</th><td><input class="form-control" type="text" name="breed" value="{{.Breed}}" /></td><td></tr>
-                <thead><tr><th>Weight</th><td><input class="form-control" type="text" name="weight" value="{{.Weight}}" /></td><td></tr>
+                <thead><tr><th>Weight</th><td><input class="form-control" type="number" name="weight" value="{{.Weight}}" /></td><td></tr>
                 <thead><tr><th>Gender</th><td>
                         <select name="gender" class="form-control">
                             <option selected>{{.Gender}}</option>

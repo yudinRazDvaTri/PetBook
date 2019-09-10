@@ -30,7 +30,7 @@
             </div>
         </div>
         <div class="form-group">
-            <form action="/process"  method="post">
+            <form action="/blogs"  method="post">
                 <textarea class="form-control" rows="5" type="text" id="message" name="something" placeholder="type something here..." required></textarea>
                 <input class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;margin-top: 10px; margin-bottom: 50px;" type="submit" value="Send">
                 <input disabled style="background-color:#e0eef7;float: right;margin-top: 10px;" class="btn btn-sm btn-outline-info" type="button" value="Upload img">
@@ -78,12 +78,7 @@
                         <div width="15%" style="font-size: 15px">
                             {{.Date | fdate}}
                         </div>
-                        <form >
-                            <textarea disabled style="width: 50%; float: right" class="form-control form-control-sm" rows="2" type="text" id="message" name="something" placeholder="leave ur comment"  ></textarea>
-{{/*                            <input class="btn  btn-outline-info"  type="submit" value="Send">*/}}
-{{/*                            <input disabled style="float: right" class="btn btn-info btn-outline-dark" type="button" value="Upload img">*/}}
-{{/*                            <input disabled style="float: right;margin-right: 5px" class="btn btn-info btn-outline-dark" type="button" value="YouTube">*/}}
-                        </form>
+                  
                     </td>
                     <td width="5%"><a href="/delete?recordid={{.Id}}" style="background-color:#e0eef7;" class="btn btn-small btn-outline-info" onclick="return ConfirmDelete();">X</a></td>
                 </tr>

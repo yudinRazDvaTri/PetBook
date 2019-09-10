@@ -25,16 +25,18 @@ func (c *Controller) VetPostHandler() http.HandlerFunc {
 			return
 		}
 		vet := &models.Vet{
-			ID:          id,
-			Name:        r.FormValue("nickname"),
-			Qualification:     r.FormValue("qualification"),
+			ID:            id,
+			Name:          r.FormValue("nickname"),
+			Qualification: r.FormValue("qualification"),
 			Surname:       r.FormValue("surname"),
-			Category:         r.FormValue("category"),
-			Certificates:      r.FormValue("certificates"),
+			Category:      r.FormValue("category"),
+			Certificates:  r.FormValue("certificates"),
 		}
 		err = c.VetStore.RegisterVet(vet)
 		if err != nil {
 			logger.Error(err, "Error occurred while trying to register pet.\n")
+			http.Redirect(w, r, "/vetcabinet", http.StatusSeeOther)
+			return
 		}
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
@@ -42,7 +44,7 @@ func (c *Controller) VetPostHandler() http.HandlerFunc {
 
 func (c *Controller) VetGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		vetType,_ := c.VetStore.GetVetEnums()
+		vetType, _ := c.VetStore.GetVetEnums()
 		view.GenerateHTML(w, vetType, "cabinetVet")
 	}
 }

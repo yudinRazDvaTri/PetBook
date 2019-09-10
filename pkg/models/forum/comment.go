@@ -20,8 +20,8 @@ type Comment struct {
 
 // View Alias-Struct to layout comment properly
 type ViewComment struct {
-	UserName  string
-	LikersIDs []int64
+	UserName       string
+	LikersIDs      []int64
 	NestedComments []*ViewComment
 	Comment
 }
@@ -78,7 +78,7 @@ func (f *ForumStore) NewViewComment(userName string, comment Comment) (viewComme
 		return
 	}
 	var emptySlice []*ViewComment
-	viewComment = ViewComment{userName, likerIDs,emptySlice, comment}
+	viewComment = ViewComment{userName, likerIDs, emptySlice, comment}
 	return
 }
 
