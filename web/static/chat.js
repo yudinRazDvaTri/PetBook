@@ -42,9 +42,12 @@ new Vue({
         },
         searchByDate() {
 
-            cancelSearchBtnClass = document.getElementById("cancelSearchBtn").className;
+            var cancelSearchBtnClass = document.getElementById("cancelSearchBtn").className
             var hiddenWordIndex = cancelSearchBtnClass.lastIndexOf(" ");
-            document.getElementById("cancelSearchBtn").className = cancelSearchBtnClass.substring(0, hiddenWordIndex);
+            var cancelSearchBtnClassArr = cancelSearchBtnClass.split(" ")
+            if(cancelSearchBtnClassArr[cancelSearchBtnClassArr.length -1 ] == "hide"){
+               document.getElementById("cancelSearchBtn").className = cancelSearchBtnClass.substring(0, hiddenWordIndex);
+            }
             document.getElementById("sendMessageBtn").className += " hide"
             document.getElementById("messageInputbox").className += " hide"
 
@@ -70,6 +73,7 @@ new Vue({
                             var element = document.getElementById('chat-messages');
                             element.scrollTop = element.scrollHeight - element.clientHeight;
                             }
+                            this.chatContent +='<hr>'
                  }
           } 
           else {

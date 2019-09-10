@@ -16,11 +16,11 @@ main {
     overflow-y: scroll;
 }
 .nav-wrapper {
-  background-color: #FAFAFA  !important;
-
+  background-color: #e0eef7  !important;
+  color:#e0f2f1;
 }
 .page-footer{
-	  background-color: #FAFAFA  !important;
+	  background-color: #e0eef7  !important;
 }
 .nav-wrapper > ul {
   margin-left: 70px;
@@ -44,4 +44,22 @@ input {
 }
 input:focus {
   outline: none;
+}
+#sendMessageBtn {
+  background-color: #e0eef7;
+  color:#546e7a;
+}
+
+#searchByDateBtn {
+  background-color: #e0eef7;
+  color:#546e7a;
+}
+
+#cancelSearchBtn {
+  background-color: #e0eef7;
+  color:#546e7a;
+}
+
+.navbar-text {
+    color:#546e7a;
 }
