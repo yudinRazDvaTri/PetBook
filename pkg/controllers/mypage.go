@@ -76,7 +76,7 @@ func (c *Controller) myPageDisplayPet(userID int, w http.ResponseWriter, r *http
 		logger.Error(err)
 		return
 	}
-	photos, _ := c.MediaStore.GetExistedGallery(userID)
+	photos, err := c.MediaStore.GetExistedGallery(userID)
 	if err != nil {
 		logger.Error(err, "Error occurred while getting user gallery.\n")
 	}
