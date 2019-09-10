@@ -77,11 +77,11 @@ func main() {
 	petRouter.HandleFunc("/topics/{topicID}/comments", controller.CommentPostHandler()).Methods("POST")
 	petRouter.HandleFunc("/topics/{topicID}/comments/{commentID}/ratings", controller.CommentsRatingHandler()).Methods("POST")
 
-	authRouter.HandleFunc("/chats", controller.ChatsGetHandler()).Methods("GET")
-	authRouter.HandleFunc("/chats/{id}/delete", controller.DeleteChatHandler()).Methods("POST")
-	authRouter.HandleFunc("/chats/{id}", controller.HandleChatConnectionGET()).Methods("GET")
-	authRouter.HandleFunc("/ws", controller.HandleChatConnection())
-	go controller.HandleMessages()
+	petRouter.HandleFunc("/chats", controller.ChatsGetHandler()).Methods("GET")
+	petRouter.HandleFunc("/chats/{id}", controller.DeleteChatHandler()).Methods("POST") //does not work with method DELETE with overriding with js too
+	petRouter.HandleFunc("/chats/{id}", controller.HandleChatConnectionGET()).Methods("GET")
+	petRouter.HandleFunc("/chats/{id}/search/{date}", controller.HandleChatSearchConnection()).Methods("GET")
+	petRouter.HandleFunc("/ws/{id}", controller.HandleChatConnection())
 
 	//authRouter.HandleFunc("/search", controller.ViewSearchHandler()).Methods("GET")
 	authRouter.HandleFunc("/", controller.MyPageGetHandler()).Methods("GET")
