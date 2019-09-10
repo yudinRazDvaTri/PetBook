@@ -8,29 +8,29 @@ import (
 )
 
 type Topic struct {
-	TopicID        int       `json:"topic_id" db:"topic_id"`
-	UserID         int       `json:"user_id" db:"user_id"`
-	CreatedTime    time.Time `json:"created_time" db:"created_time"`
-	Title          string    `json:"title" db:"title"`
-	Description    string    `json:"description" db:"description"`
+	TopicID     int       `json:"topic_id" db:"topic_id"`
+	UserID      int       `json:"user_id" db:"user_id"`
+	CreatedTime time.Time `json:"created_time" db:"created_time"`
+	Title       string    `json:"title" db:"title"`
+	Description string    `json:"description" db:"description"`
 }
 
 // View Alias-Struct to layout topic properly
 type ViewTopic struct {
-	UserName string
+	UserName    string
 	CommentsIDs []int64
 	Topic
 }
 
 // ViewTopic Constructor
 func (f *ForumStore) NewViewTopic(userName string, topic Topic) (viewTopic ViewTopic, err error) {
-		commentsIDs, err := f.getCommentsIDs(topic.TopicID)
-		if err != nil {
-			err = fmt.Errorf("Can't read %d topic's commentsIDs from DB: %v", topic.TopicID, err)
-			return
-		}
-		viewTopic = ViewTopic{userName, commentsIDs, topic}
+	commentsIDs, err := f.getCommentsIDs(topic.TopicID)
+	if err != nil {
+		err = fmt.Errorf("Can't read %d topic's commentsIDs from DB: %v", topic.TopicID, err)
 		return
+	}
+	viewTopic = ViewTopic{userName, commentsIDs, topic}
+	return
 }
 
 func (f *ForumStore) CreateNewTopic(userID int, title, description string) (err error) {

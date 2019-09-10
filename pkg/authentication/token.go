@@ -45,7 +45,7 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *mode
 					newToken, err := tokenSource.Token()
 					if err != nil {
 						w.WriteHeader(http.StatusInternalServerError)
-						logger.Error("Error occurred while trying to get Token from TokenSource: %v.\n",err)
+						logger.Error("Error occurred while trying to get Token from TokenSource: %v.\n", err)
 						return
 					}
 
@@ -61,7 +61,7 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *mode
 						contents, err := ioutil.ReadAll(response.Body)
 						if err != nil {
 							w.WriteHeader(http.StatusInternalServerError)
-							logger.Error("Error occurred while trying to read user info bytes: %v.\n",err)
+							logger.Error("Error occurred while trying to read user info bytes: %v.\n", err)
 							return
 						}
 
@@ -69,14 +69,14 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *mode
 
 						if err := json.Unmarshal(contents, &googleUserInfo); err != nil {
 							w.WriteHeader(http.StatusInternalServerError)
-							logger.Error("Error occurred while trying to unmarshal user info: %v.\n",err)
+							logger.Error("Error occurred while trying to unmarshal user info: %v.\n", err)
 							return
 						}
 
 						gob.Register(newToken)
-						value := map[string]interface{} {
+						value := map[string]interface{}{
 							"accessToken": newToken,
-							"userId": value["userId"].(int),
+							"userId":      value["userId"].(int),
 						}
 
 						if encoded, err := SCookie.Encode("oauth", value); err == nil {
@@ -86,11 +86,11 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore, storeUser *mode
 								// Expiration time of cookie which stores oauth information was set twice as much as google oauth token expiration time.
 								// (Google access token expiration time is 3600 seconds)
 								Expires: time.Now().Add(7200 * time.Second),
-								Path:  "/",
+								Path:    "/",
 							}
 							http.SetCookie(w, cookie)
 						} else {
-							logger.Error(err.Error(), "; Error occurred while trying to encode cookie.\n", )
+							logger.Error(err.Error(), "; Error occurred while trying to encode cookie.\n")
 							http.Error(w, err.Error(), http.StatusInternalServerError)
 							return
 						}

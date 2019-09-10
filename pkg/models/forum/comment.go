@@ -16,7 +16,7 @@ type Comment struct {
 
 // View Alias-Struct to layout comment properly
 type ViewComment struct {
-	UserName string
+	UserName  string
 	LikersIDs []int64
 	Comment
 }

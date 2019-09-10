@@ -75,7 +75,7 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 		topicID, err := strconv.Atoi(topicIdStr)
 		if err != nil {
 			logger.Error(err)
-			http.Error(w,"inappropriate request", http.StatusBadRequest)
+			http.Error(w, "inappropriate request", http.StatusBadRequest)
 			return
 		}
 

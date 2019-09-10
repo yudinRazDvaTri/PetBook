@@ -45,7 +45,7 @@ func main() {
 		BlogStore:         &storeBlog,
 		ChatStore:         &storeChat,
 		MediaStore:        &storeMedia,
-		VetStore:         &storeVet,
+		VetStore:          &storeVet,
 	}
 
 	router.HandleFunc("/register", controller.RegisterPostHandler()).Methods("POST")
@@ -87,12 +87,10 @@ func main() {
 	subrouter.HandleFunc("/delete", controller.DeleteBlogHandler()).Methods("GET")
 	subrouter.HandleFunc("/upload", controller.UploadLogo()).Methods("POST")
 	subrouter.HandleFunc("/edit", controller.EditPageHandler).Methods("GET")
-	subrouter.HandleFunc("/edit", controller.ProfileUpdateHandler).Methods("POST")
+	subrouter.HandleFunc("/edit", controller.ProfileUpdateHandler()).Methods("POST")
 	subrouter.HandleFunc("/uploadmedia", controller.UploadMedia()).Methods("POST")
 	subrouter.HandleFunc("/{id}", controller.MyPageOtherUsersHandler()).Methods("GET")
 	subrouter.HandleFunc("/deleteimg", controller.DeleteImgHandler()).Methods("Post")
-
-
 
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
 		http.FileServer(http.Dir("./web/static/"))))

@@ -3,7 +3,6 @@ package models
 import (
 	"database/sql"
 	"fmt"
-	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/utilerr"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -43,8 +42,8 @@ type UserStorer interface {
 	registerOauth(email string) (int, error)
 	LoginOauth(email string) (int, error)
 	GetVet(userID int) (Vet, error)
-	GetUserEnums() []string
-	GetUserRole(userID int) string
+	GetUserEnums() ([]string,error)
+	GetUserRole(userID int) (string, error)
 }
 
 func (c *UserStore) GetUsers() ([]User, error) {
@@ -77,7 +76,7 @@ func (c *UserStore) Register(user *User) error {
 
 	{
 		err = tx.QueryRow("insert into users (email, firstname, lastname, login,pet_or_vet) values ($1,$2,$3, $4,$5) returning id",
-			user.Email, user.Firstname, user.Lastname, user.Login,user.Role).Scan(&user.ID)
+			user.Email, user.Firstname, user.Lastname, user.Login, user.Role).Scan(&user.ID)
 
 		if err != nil {
 			if _, ok := err.(*pq.Error); ok {
@@ -209,29 +208,28 @@ func (c *UserStore) GetVet(userID int) (Vet, error) {
 	return vet, nil
 }
 
-func (c *UserStore) GetUserEnums() []string {
+func (c *UserStore) GetUserEnums() ([]string,error) {
 	var userRole []string
 	var role string
 	rows, err := c.DB.Queryx("SELECT unnest(enum_range(NULL::role))::text")
 	if err != nil {
-		logger.Error(err)
+		return nil,fmt.Errorf("can't read user-enums from db: %v", err)
 	}
 	for rows.Next() {
 		err = rows.Scan(&role)
 		if err != nil {
-			logger.Error(err)
+			return nil,fmt.Errorf("can't scan role from db: %v", err)
 		}
 		userRole = append(userRole, role)
 	}
-	return userRole
+	return userRole, nil
 }
 
-func (c *UserStore) GetUserRole(userID int) string {
+func (c *UserStore) GetUserRole(userID int) (string, error) {
 	var role string
-	err:=c.DB.QueryRowx("select pet_or_vet from users where id=$1",userID).Scan(&role)
+	err := c.DB.QueryRowx("select pet_or_vet from users where id=$1", userID).Scan(&role)
 	if err != nil {
-		logger.Error(err)
+		return role, err
 	}
-	return role
+	return role, nil
 }
-
