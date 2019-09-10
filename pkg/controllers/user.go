@@ -14,6 +14,7 @@ import (
 	"github.com/dpgolang/PetBook/pkg/models/search"
 	"github.com/dpgolang/PetBook/pkg/utilerr"
 	"github.com/dpgolang/PetBook/pkg/view"
+	gorillaContext "github.com/gorilla/context"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
 	"io/ioutil"
@@ -30,9 +31,9 @@ type Controller struct {
 	SearchStore       search.SearchStorer
 	BlogStore         models.BlogStorer
 	ChatStore         models.ChatStorer
-	FollowersStore 	  models.FollowersStorer
+	FollowersStore    models.FollowersStorer
 	MediaStore        models.MediaStorer
-	VetStore  		  models.VetStorer
+	VetStore          models.VetStorer
 }
 
 const (
@@ -116,33 +117,42 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 		//	http.Redirect(w, r, "/petcabinet", http.StatusFound)
 		//	return
 		//}
-		c.cabinetFilled(userID,w,r)
+		//c.cabinetFilled(userID, w, r)
 
-		http.Redirect(w, r, "/", http.StatusFound)
+		http.Redirect(w, r, "/mypage", http.StatusSeeOther)
+		return
 	}
 }
 
-func (c *Controller) cabinetFilled(id int,w http.ResponseWriter, r *http.Request) {
-	role:=c.UserStore.GetUserRole(id)
-	if role=="pet" {
+func (c *Controller) cabinetFilled(role string, w http.ResponseWriter, r *http.Request) {
+	/*
+	role := c.UserStore.GetUserRole(id)
+	if role == "pet" {
 		_, err := c.UserStore.GetPet(id)
 		if err != nil {
 			http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
 			return
 		}
-	}else if role =="vet"{
+	} else if role == "vet" {
 		_, err := c.UserStore.GetVet(id)
 		if err != nil {
-			http.Redirect(w, r, "/vetcabinet", http.StatusFound)
+			http.Redirect(w, r, "/vetcabinet", http.StatusSeeOther)
 			return
 		}
+	} else if role == "" {
+		http.Redirect(w, r, "/role", http.StatusSeeOther)
+		return
 	}
+	http.Redirect(w, r, "/mypage", http.StatusSeeOther)
+	return
+
+	 */
 }
 
 func (c *Controller) LoginGoogleGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		oauthState := generateStateOauthCookie(w)
-		u := authentication.GoogleOauthConfig.AuthCodeURL(oauthState)+"&access_type=offline"
+		u := authentication.GoogleOauthConfig.AuthCodeURL(oauthState) + "&access_type=offline"
 		http.Redirect(w, r, u, http.StatusTemporaryRedirect)
 	}
 }
@@ -232,9 +242,9 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 		}
 
 		gob.Register(googleToken)
-		value := map[string]interface{} {
+		value := map[string]interface{}{
 			"accessToken": googleToken,
-			"userId": userId,
+			"userId":      userId,
 		}
 
 		if encoded, err := authentication.SCookie.Encode("oauth", value); err == nil {
@@ -244,7 +254,7 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 				// Expiration time of cookie which stores oauth information was set twice as much as google oauth token expiration time.
 				// (Google access token expiration time is 3600 seconds)
 				Expires: time.Now().Add(7200 * time.Second),
-				Path:  "/",
+				Path:    "/",
 			}
 			http.SetCookie(w, cookie)
 		} else {
@@ -252,9 +262,10 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-    
-		c.cabinetFilled(userId,w,r)
-		http.Redirect(w, r, "/", http.StatusFound)
+
+		//c.cabinetFilled(userId, w, r)
+		http.Redirect(w, r, "/mypage", http.StatusSeeOther)
+		return
 	}
 }
 
@@ -268,8 +279,7 @@ func getGoogleOauthToken(code string) (*oauth2.Token, error) {
 
 func (c *Controller) RegisterGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		roles:=c.UserStore.GetUserEnums()
-		view.GenerateHTML(w, roles, "register")
+		view.GenerateHTML(w, nil, "register")
 	}
 }
 
@@ -281,7 +291,6 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 		email := r.FormValue("email")
 		password := r.FormValue("password")
 		confirmPassword := r.FormValue("confirmPassword")
-		userType := r.FormValue("user-role")
 		firstName := r.FormValue("firstName")
 		lastName := r.FormValue("lastName")
 
@@ -333,7 +342,6 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 			Firstname: firstName,
 			Lastname:  lastName,
 			Password:  string(hashedPassword),
-			Role:userType,
 		}
 
 		if err := c.UserStore.Register(&user); err != nil {
@@ -353,6 +361,71 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 	}
 }
 
+func (c *Controller) RoleGetHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		role := r.FormValue("user-role")
+		if role != "" {
+			http.Redirect(w, r, "/mypage", http.StatusSeeOther)
+			return
+		}
+
+		roles := c.UserStore.GetUserEnums()
+		view.GenerateHTML(w, roles, "role")
+	}
+}
+
+func (c *Controller) RolePostHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		userId := gorillaContext.Get(r,"id").(int)
+		role := r.FormValue("user-role")
+		if role != "pet" && role != "vet" {
+			http.Redirect(w, r, "/role", http.StatusSeeOther)
+			return
+		}
+
+		if role != "" {
+			if err := c.UserStore.SetUserRole(role, userId); err != nil {
+				logger.Error(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			if role == "pet" {
+				http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
+				return
+			} else if role == "vet" {
+				http.Redirect(w, r, "/vetcabinet", http.StatusSeeOther)
+				return
+			}
+
+			http.Error(w, "Wrong role!", http.StatusNotFound)
+			return
+		}
+
+		/*
+
+
+		roleFromDb, err := c.UserStore.GetUserRole(userId)
+		if err != nil {
+			logger.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if roleFromDb != "" {
+			http.Redirect(w,r, "/mypage", http.StatusSeeOther)
+			return
+		}
+
+		 */
+
+		//c.cabinetFilled(roleFromDb, w, r)
+
+
+	}
+}
+
 // TODO: rewrite case
 func (c *Controller) LogoutGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -363,7 +436,7 @@ func (c *Controller) LogoutGetHandler() http.HandlerFunc {
 			if err = c.RefreshTokenStore.DeleteRefreshToken(refreshTokenString); err != nil {
 				switch e := err.(type) {
 				case *utilerr.TokenDoesNotExist:
-
+					break
 				default:
 					logger.Error(e)
 					http.Error(w, e.Error(), http.StatusInternalServerError)

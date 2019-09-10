@@ -12,6 +12,12 @@ import (
 // TODO: check input values
 func (c *Controller) VetPostHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		role := context.Get(r, "role").(string)
+		if role != "vet" {
+			http.Redirect(w, r, "/mypage", http.StatusMethodNotAllowed)
+			return
+		}
+
 		err := r.ParseForm()
 		id := context.Get(r, "id").(int)
 		if matched, err := regexp.Match(patternOnlyNum, []byte(r.FormValue("age"))); !matched || err != nil {
@@ -25,12 +31,12 @@ func (c *Controller) VetPostHandler() http.HandlerFunc {
 			return
 		}
 		vet := &models.Vet{
-			ID:          id,
-			Name:        r.FormValue("nickname"),
-			Qualification:     r.FormValue("qualification"),
+			ID:            id,
+			Name:          r.FormValue("nickname"),
+			Qualification: r.FormValue("qualification"),
 			Surname:       r.FormValue("surname"),
-			Category:         r.FormValue("category"),
-			Certificates:      r.FormValue("certificates"),
+			Category:      r.FormValue("category"),
+			Certificates:  r.FormValue("certificates"),
 		}
 		err = c.VetStore.RegisterVet(vet)
 		if err != nil {
@@ -42,7 +48,13 @@ func (c *Controller) VetPostHandler() http.HandlerFunc {
 
 func (c *Controller) VetGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		vetType,_ := c.VetStore.GetVetEnums()
+		role := context.Get(r, "role").(string)
+		if role != "vet" {
+			http.Redirect(w, r, "/mypage", http.StatusMethodNotAllowed)
+			return
+		}
+
+		vetType, _ := c.VetStore.GetVetEnums()
 		view.GenerateHTML(w, vetType, "cabinetVet")
 	}
 }

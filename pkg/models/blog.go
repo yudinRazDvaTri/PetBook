@@ -22,9 +22,9 @@ type BlogStore struct {
 
 type BlogStorer interface {
 	GetPetBlog(userid int) ([]Blog,error)
+	GetVetBlog(userID int) ([]Blog ,error)
 	CreateBlog(form string, idUser int) error
 	DeleteBlog(blogid string) error
-	GetVetBlog(userID int) ([]Blog ,error)
 }
 
 func logFatal(err error) {
@@ -56,6 +56,7 @@ func (b *BlogStore) GetPetBlog(userID int) ([]Blog ,error){
 	}
 	return results,nil
 }
+
 func (b *BlogStore) GetVetBlog(userID int) ([]Blog ,error){
 	rows, err := b.DB.Query("select blog_id, content, created_time, name from blog,vets where blog.user_id =$1 and vets.user_id=blog.user_id order by created_time desc;", userID)
 	if err != nil {
@@ -79,8 +80,6 @@ func (b *BlogStore) GetVetBlog(userID int) ([]Blog ,error){
 	}
 	return results,nil
 }
-
-
 
 
 func (b *BlogStore) CreateBlog(form string, idUser int) error{

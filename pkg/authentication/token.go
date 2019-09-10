@@ -31,7 +31,7 @@ type Tokens struct {
 	RefreshExpirationTime time.Time
 }
 
-func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore) (mw func(http.Handler) http.Handler) {
+func AuthenticateMiddleware(storeRefreshToken *models.RefreshTokenStore) (mw func(http.Handler) http.Handler) {
 	mw = func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Checking whether user logs in with the help of third-party service
@@ -45,7 +45,7 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore) (mw func(http.H
 					newToken, err := tokenSource.Token()
 					if err != nil {
 						w.WriteHeader(http.StatusInternalServerError)
-						logger.Error( err, "Error occurred while trying to get Token from TokenSource.\n")
+						logger.Error(err, "Error occurred while trying to get Token from TokenSource.\n")
 						return
 					}
 
@@ -205,14 +205,66 @@ func AuthMiddleware(storeRefreshToken *models.RefreshTokenStore) (mw func(http.H
 	return
 }
 
-func PetMiddleware(storeUser *models.UserStore) (mw func(http.Handler) http.Handler) {
+func AuthorizeMiddleware(storeUser *models.UserStore) (mw func(http.Handler) http.Handler) {
+	mw = func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+			userId := gorillaContext.Get(r, "id").(int)
+			role, _ := storeUser.GetUserRole(userId)
+			if role == "" {
+				http.Redirect(w, r, "/role", http.StatusSeeOther)
+				return
+			}
+			gorillaContext.Set(r, "role", role)
+			/*
+				userId := gorillaContext.Get(r, "id").(int)
+				role, _ := storeUser.GetUserRole(userId)
+				if role == "" {
+					http.Redirect(w, r, "/role", http.StatusSeeOther)
+					return
+					//h.ServeHTTP(w, r)
+				} else if role == "pet" {
+					_, err := storeUser.GetPet(userId)
+					if err != nil {
+						http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
+						return
+					}
+				} else if role == "vet" {
+					_, err := storeUser.GetVet(userId)
+					if err != nil {
+						http.Redirect(w, r, "/vetcabinet", http.StatusSeeOther)
+						return
+					}
+				}
+
+			*/
+			h.ServeHTTP(w, r)
+		})
+	}
+	return
+}
+
+func PetOrVetMiddleware(storeUser *models.UserStore) (mw func(http.Handler) http.Handler) {
 	mw = func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			userId := gorillaContext.Get(r, "id").(int)
+			role := gorillaContext.Get(r, "role").(string)
 
-			_, err := storeUser.GetPet(userId)
-			if err != nil {
-				http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
+			switch role {
+			case "pet":
+				_, err := storeUser.GetPet(userId)
+				if err != nil {
+					http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
+					return
+				}
+			case "vet":
+				_, err := storeUser.GetVet(userId)
+				if err != nil {
+					http.Redirect(w, r, "/vetcabinet", http.StatusSeeOther)
+					return
+				}
+			default:
+				http.Error(w, "Unknown user role.", http.StatusBadRequest)
 				return
 			}
 

@@ -38,13 +38,15 @@ type MypageDataVet struct {
 func (c *Controller) MyPageGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := context.Get(r, "id").(int)
-		role:=c.UserStore.GetUserRole(userID)
+		//role,_:=c.UserStore.GetUserRole(userID)
+		/*
 		if role=="pet"{
 			c.MyPagePetGetHandler(userID,w,r)
 		}else if role=="vet"{
 			c.MyPageVetGetHandler(userID,w,r)
 		}
-
+		 */
+		c.MyPageVetGetHandler(userID,w,r)
 	}
 }
 
@@ -125,7 +127,7 @@ func (c *Controller) MyPageOtherUsersHandler() http.HandlerFunc {
 		vars := mux.Vars(r)
 		petsId := vars["id"]
 		id,err := strconv.Atoi(petsId)
-		role:=c.UserStore.GetUserRole(id)
+		role,_:=c.UserStore.GetUserRole(id)
 		if role=="pet"{
 			c.MyPagePetGetHandler(id,w,r)
 		}else if role=="vet"{
@@ -157,7 +159,7 @@ func (c *Controller) MyPageOtherUsersHandler() http.HandlerFunc {
 //		myPageData.Gender=pet.Gender
 //		myPageData.Breed=pet.Breed
 //
-//		blog,err := c.BlogStore.GetPetBlog(userID)
+//		blog,err := c.BlogStore.GetBlog(userID)
 //		for i := 0; i < len(blog); i++{
 //			blog[i].LogoPath=path
 //		}
@@ -199,7 +201,7 @@ func (c *Controller) MyPageOtherUsersHandler() http.HandlerFunc {
 //		myPageData.Gender=pet.Gender
 //		myPageData.Breed=pet.Breed
 //
-//		blog,err := c.BlogStore.GetPetBlog(petID)
+//		blog,err := c.BlogStore.GetBlog(petID)
 //		for i := 0; i < len(blog); i++{
 //			blog[i].LogoPath=path
 //		}

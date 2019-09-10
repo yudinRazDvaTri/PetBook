@@ -16,6 +16,10 @@ type UniqueTokenError struct {
 	Description string
 }
 
+type PetDoesNotExist struct {
+	Description string
+}
+
 func (e *UniqueTaken) Error() string {
 	return e.Description
 }
@@ -29,5 +33,9 @@ func (e *TokenDoesNotExist) Error() string {
 }
 
 func (e *UniqueTokenError) Error() string {
+	return e.Description
+}
+
+func (e *PetDoesNotExist) Error() string {
 	return e.Description
 }

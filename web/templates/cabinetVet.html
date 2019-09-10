@@ -1,7 +1,7 @@
 {{ define "layout" }}
 
     <!DOCTYPE html>
-    <html >
+    <html>
     <head>
         <meta charset="UTF-8">
         <title>Vet</title>
@@ -10,12 +10,12 @@
     <body>
     <div class="box">
         <form method="POST" action="/vetcabinet">
-            <h1>Pet Registration</h1>
+            <h1>Vet Registration</h1>
             <input type="text" name="nickname" placeholder="Nickname"/>
             <select name="qualification" class="custom-select">
                 <option selected>Qualification</option>
                 {{range .}}
-                    <option >{{.}}</option>
+                    <option>{{.}}</option>
                 {{end}}
             </select>
 
@@ -29,9 +29,16 @@
                 <option name="D">D</option>
             </select>
             <input type="text" name="certificates" placeholder="Certificates"/>
-            <input type="submit" value="Send" />
+            <input type="submit" value="Send"/>
         </form>
+        <div>
+            <a href="/mypage">Skip</a>
+        </div>
+        <div>
+            <a href="/login">Back</a>
+        </div>
     </div>
+
     </body>
     </html>
 
