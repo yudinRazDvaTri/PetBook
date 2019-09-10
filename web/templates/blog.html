@@ -14,9 +14,7 @@
                 return confirm("Do you want to remove this post?");
             }
         </script>
-        <style>
-            .btn-danger {background-color: #2b2b2b;border: #007bff; margin: 50%}
-        </style>
+    
     </head>
     <body>
 
@@ -34,9 +32,9 @@
         <div class="form-group">
             <form action="/process"  method="post">
                 <textarea class="form-control" rows="5" type="text" id="message" name="something" placeholder="type something here..." required></textarea>
-                <input class="btn btn-outline-info" style="margin-top: 10px; margin-bottom: 50px;" type="submit" value="Send">
-                <input disabled style="float: right;margin-top: 10px;" class="btn btn-info btn-outline-dark" type="button" value="Upload img">
-                <input disabled style="float: right;margin-right: 5px; margin-top: 10px;" class="btn btn-info btn-outline-dark" type="button" value="YouTube">
+                <input class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;margin-top: 10px; margin-bottom: 50px;" type="submit" value="Send">
+                <input disabled style="background-color:#e0eef7;float: right;margin-top: 10px;" class="btn btn-sm btn-outline-info" type="button" value="Upload img">
+                <input disabled style="background-color:#e0eef7;float: right;margin-right: 5px; margin-top: 10px;" class="btn btn-info btn-sm btn-outline-info" type="button" value="YouTube">
 
 {{/*                <div class="input-group mb-3" style="margin-top: 15px; height: 50px">*/}}
 {{/*                    <input type="text" class="form-control" placeholder="Имя получателя" aria-label="Имя получателя" aria-describedby="basic-addon2">*/}}
@@ -47,13 +45,12 @@
 
             </form>
         </div>
-        <table class="table table-hover"
-{{/*               style="background: #90EE90;border-radius: 10px"*/}}
-        >
+        <table class="table table-hover" style="margin-bottom: 100px;"
+{{/*               style="background: #90EE90;border-radius: 10px"*/}}>
             <tbody >
 {{/*            VERY IMPT RANGE*/}}
             {{range .}}
-                <tr>
+                <tr >
                     <td width="5%">
                         <div style="margin-left: 5%;margin-top: 20%">
 {{/*                        {{range .LogoPath}}*/}}
@@ -88,7 +85,7 @@
 {{/*                            <input disabled style="float: right;margin-right: 5px" class="btn btn-info btn-outline-dark" type="button" value="YouTube">*/}}
                         </form>
                     </td>
-                    <td width="5%"><a href="/delete?recordid={{.Id}}" class="btn btn-info btn-outline-dark" onclick="return ConfirmDelete();">X</a></td>
+                    <td width="5%"><a href="/delete?recordid={{.Id}}" style="background-color:#e0eef7;" class="btn btn-small btn-outline-info" onclick="return ConfirmDelete();">X</a></td>
                 </tr>
             {{end}}
             </tbody>
@@ -98,35 +95,3 @@
 </body>
 </html>
 {{end}}
-
-{{/*<tbody>*/}}
-{{/*{{range .}}*/}}
-{{/*    <tr>*/}}
-{{/*        <td width="5%">*/}}
-
-{{/*            {{range .LogoPath}}*/}}
-{{/*                <div style="width:50px;height:50px;margin-left:2px">*/}}
-{{/*                    <img style="width:48px;height:48px" src="{{.}}" >*/}}
-{{/*                </div>*/}}
-{{/*            {{end}}*/}}
-
-{{/*            <div>*/}}
-{{/*                {{.Name}}*/}}
-{{/*            </div>*/}}
-{{/*        </td>*/}}
-{{/*        <td width="95%">*/}}
-{{/*            <div*/}}
-{{/*                    style="margin-top: 15px;padding: 8px;border-radius: 5px;border:solid grey 1px;*/}}
-{{/*                                "*/}}
-{{/*            >*/}}
-{{/*                {{ .Message }}*/}}
-{{/*            </div>*/}}
-
-{{/*            <div width="15%" style="font-size: 10px">*/}}
-{{/*                {{.Date | fdate}}*/}}
-{{/*            </div>*/}}
-{{/*        </td>*/}}
-{{/*        <td width="5%"><a href="/delete?recordid={{.Id}}" class="btn btn-danger" onclick="return ConfirmDelete();">X</a></td>*/}}
-{{/*    </tr>*/}}
-{{/*{{end}}*/}}
-{{/*</tbody>*/}}

@@ -31,13 +31,15 @@
             padding-bottom: 12px;
             text-align: center;
         }
-
+        .background{
+            background-color: #f2f2f2;
+        }
         </style>
         <!--STYLE-->
 
         <title>Edit page</title>
     </head>
-    <body>
+    <body class="background">
 <div class="container" style="margin-top: 10px">
     <div class="row">
     <div class="col" name="img"
@@ -55,7 +57,7 @@
             >
                 <h6><b>Download logo!</b></h6>
                 <input id="file" type="file"  name="myFile"/>
-                <input class="btn btn-info btn-outline-dark" type="submit" value="upload" />
+                <input class="btn btn-sm btn-outline-info" style="background-color:#e0eef7; " type="submit" value="upload" />
             </form>
         </div>
         <div style="position: relative;margin-left:60px; margin-bottom: 10px;margin-top: 20px;font-family:Trebuchet MS, Arial, Helvetica, sans-serif;font-size: 16px;color: #212529;">
@@ -67,7 +69,7 @@
             >
                 <h6><b>Download photos!</b></h6>
                 <input id="file" type="file" name="myMedia"/>
-                <input class="btn btn-info btn-outline-dark" type="submit" value="upload" />
+                <input class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" type="submit" value="upload" />
             </form>
         </div>
     </div>
@@ -105,7 +107,7 @@
                     </td><td></tr>
                 <thead><tr><th>Certificates</th><td><input class="form-control" type="text" name="certificates" value="{{.Certificates}}" /></td><td></tr>
             </table>
-            <button class="btn btn-outline-dark btn-info" type="submit" >Apply</button>
+            <button class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;margin-top:10px;" type="submit" >Apply</button>
             </form>
         </div>
     </div>

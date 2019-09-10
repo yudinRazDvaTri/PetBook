@@ -12,29 +12,27 @@
 </head>
 
 <body>
-
-    <div id="search_menu" class="w-50 container mb-3 input-group " style="margin-top:10px;">
+        <div class="btn-group btn-group-sm" style="margin-top:15px;height: 40px;margin-left:50px; ">
+                <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=user"><span>Search by
+                        user</span></a><br>
+                <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=animal"><span>Search by
+                        animal</span></a>
+                <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=forum"><span>Search by
+                        forum</span></a><br>
+            </div>
+    <div id="search_menu" class="w-50 container mb-3 input-group search_menu" style="margin-top:-40px; margin-left:40%">
         <input type="email" placeholder="Pet's name" class="form-control " name="name" id="search">
         <div class="input-group-append">
-            <input type="submit" class="btn btn-info btn-outline-dark" id="search_button" value="Search">
+            <input type="submit" class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" id="search_button" value="Search">
         </div>
     </div>
-    <div class="container">
+    <div class="">
         <div class="row">
-            <div class=" .col-sm-1" style="margin-left:-40px;margin-top: 125px;">
-                <div class="btn-group-vertical">
-                    <a class="btn btn-info btn-outline-dark" href="/search?section=user"><span>Search by
-                            user</span></a><br>
-                    <a class="btn  btn-info btn-outline-dark" href="/search?section=animal"><span>Search by
-                            animal</span></a>
-                    <a class="btn  btn-info btn-outline-dark" href="/search?section=forum"><span>Search by
-                            forum</span></a><br>
-                </div>
-            </div>
-            <div class="col-md-8 ">
+            
+            <div class="col-md-8 " style="margin-top: 50px;margin-left:100px;">
                 <ul>
                     {{ range .Pets }}
-                    {{if .Name}}
+                    
                     <div onclick="redirectOnMyPage({{.UserID}})" class="card mb-3 border-info " style="max-width: 35rem;background-color: #fafafa">
                         <div class="row no-gutters">
                             <div class="col-md-4">
@@ -47,23 +45,26 @@
                                         <h5 class="card-title "  name="name">{{ .Name }}</h5>
                                         <p class="card-text" name="description">{{ .Description }}</p>
                                         <input type="hidden" name="followUserID" value="{{printf "%d" .UserID}}">
-                                        {{ if not (.CanFollow $.UserID $.PetsFollowing)}}
-
-                                            <input type="submit" class="btn btn-info btn-outline-dark" name="follow" value="Unfollow">
-                                        {{else}}
-                                            <input type="submit" class="btn btn-info btn-outline-dark" name="follow" value="Follow">
-                                        {{end}}
+                                        <div class="btn-group btn-group-sm">
+                                                <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/chats/{{.UserID}}">Message</a>
+                                                {{ if not (.CanFollow $.UserID $.PetsFollowing)}}
+        
+                                                <input type="submit" class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" id="buttonUn" name="follow" value="Unfollow">
+                                            {{else}}
+                                                <input type="submit" class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" id="button" name="follow" value="Follow">
+                                            {{end}}
+                                        </div>
                                     </form>
                                 </div>
                             </div>
                         </div>
                         </div>
                         {{else}}
-                            <div class="card mb-3">
+                            <div class="card mb-3" style="max-width: 35rem;background-color: azure; border: 2px solid cadetblue;">
                                 <h2>Nothing to show</h2>
                             </div>
+                        
                         {{end}}
-                        {{ end}}
 
                 </ul>
             </div>
@@ -80,21 +81,21 @@
                     <option name="rodent">rodent</option>
                     <option name="bird">bird</option>
                 </select></label>
-                <label for="breed">Enter animal breed</label>
+                <label for="breed">Enter animal breed:</label>
                 <input type="text" class="form-control" style="width:200px" name="breed" id="breed" class=" ">
                 <label for="weight">Enter pet's weight:</label>
                 <input type="number" id="weight" name="weight" min="0" max="50" step="1" placeholder="weight"
                 class="form-control" style="width:200px">
-                <label for="gender">Choose animal gender</label>
+                <label for="gender">Choose animal gender:</label>
                 <select name="gender" id="gender" style="width: 200px;margin-bottom: 10px" class="form-control ">
                     <option selected>Gender</option>
                     <option name="male">male</option>
                     <option name="female">female</option>
                 </select>
                 <div class="btn-group" role="group" aria-label="Basic example">
-                    <input type="submit" id="apply" value="Apply"  class="btn btn-info btn-outline-dark">
+                    <input type="submit" id="apply" value="Apply"  class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;">
                     <input type="submit" id="reset_parameters" value="Reset parameters" href="/search?section=animal"
-                        class="btn btn-info btn-outline-dark">
+                    class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;">
                 </div>
             </div>
         </div>
