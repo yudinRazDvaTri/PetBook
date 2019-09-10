@@ -27,9 +27,14 @@ func ConnectDB() *sqlx.DB {
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
-	db, err = sqlx.Open("postgres", connStr)
-	if err != nil {
-		logger.FatalError(err, "Error occurred while trying to open connection.\n")
+	// Wait till db is up to continue
+	for {
+		db, err = sqlx.Open("postgres", connStr)
+		if err != nil {
+			logger.Error(err, "Error occurred while trying to open connection.\n")
+			continue
+		}
+		break
 	}
 
 	err = db.Ping()
