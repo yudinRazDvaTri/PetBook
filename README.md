@@ -1,4 +1,7 @@
-Provides to pet-owners an ability to lead a social life of their pets just like people do in social networks.
+What is this about?
+Our team is glad to represent you PetBook – a social network for our beloved pets: cats, dogs, hamsters and even iguanas! However those aren’t real pets – those are pet’s owners, extraordinary disguised by animal avatar. With PetBook you will  make plenty of new friendships, fulfil your feed with pet’s photos and funny captions, create, promote/keep up your own pet blog, discuss any topic on a forum according to your concern/problem. 
+The main purpose of our application is to give an opportunity to all pet owners to communicate not only while going for a walk with their pets but in the worldwide network too.
+
 
 # Have to add .env file with settings like those :
 
