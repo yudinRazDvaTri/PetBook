@@ -1,0 +1,111 @@
+{{ define "layout"}}
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+        <link rel="stylesheet" href="../static/search.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+              crossorigin="anonymous">
+    </head>
+
+    <body>
+
+    <div class="btn-group btn-group-sm" style="margin-top:15px;height: 40px;margin-left:50px; ">
+        <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=user"><span>Search by
+                        user</span></a><br>
+        <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=animal"><span>Search by
+                        animal</span></a>
+        <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=forum"><span>Search by
+                        forum</span></a><br>
+    </div>
+    <div id="search_menu" class="w-50 container mb-3 input-group search_menu" style="margin-top:-40px; margin-left:40%">
+        <input type="email" placeholder="User's email" class="form-control " name="name" id="search">
+        <div class="input-group-append">
+            <input type="submit" class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;"
+                   id="search_button" value="Search">
+        </div>
+    </div>
+
+    <div class="col-md-8 " style="margin-top: 50px;margin-left:100px;">
+
+        <ul>
+            {{ range .Pets }}
+            {{if .Name}}
+            <div onclick="redirectOnMyPage({{.UserID}})" class="card mb-3 border-info "
+                 style="max-width: 35rem;background-color: #fafafa">
+                <div class="row no-gutters">
+                    <div class="col-md-4">
+                        <!-- <img src="..." class="card-img" alt="..."> -->
+                        <p>PHOTO</p>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body ">
+                            <form action="mypage/following" method="POST">
+                                <h5 class="card-title " name="name">{{ .Name }}</h5>
+                                <p class="card-text" name="description">{{ .Description }}</p>
+                                <input type="hidden" name="followUserID" value="{{printf "%d" .UserID}}">
+                                <div class="btn-group btn-group-sm">
+                                    <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;"
+                                       href="/chats/{{.UserID}}">Message</a>
+                                    {{ if not (.CanFollow $.UserID $.PetsFollowing)}}
+
+                                        <input type="submit" class="btn btn-sm btn-outline-info"
+                                               style="background-color:#e0eef7;" id="buttonUn" name="follow"
+                                               value="Unfollow">
+                                    {{else}}
+                                        <input type="submit" class="btn btn-sm btn-outline-info"
+                                               style="background-color:#e0eef7;" id="button" name="follow"
+                                               value="Follow">
+                                    {{end}}
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {{else}}
+                    <div class="card mb-3">
+                        <h2>Nothing to show</h2>
+                    </div>
+                {{end}}
+                {{ end}}
+
+        </ul>
+    </div>
+    <!-- <div class="col-sm"></div> -->
+    </div>
+    </div>
+
+    <script>
+        var url = window.location.href;
+        document.getElementById('search_button').addEventListener("click", function () {
+            let str, newUrl = url;
+            let email = document.getElementById('search').value;
+            let decodeEmail = email.replace(/@/, '%40');
+            let emailWithoutSpaces = decodeEmail.replace(/\s+/g, '+');
+            if (email != "") {
+                if (newUrl.match(/email=\S+/)) {
+                    str = newUrl.replace(/email=\S+/, "email=" + emailWithoutSpaces);
+                    newUrl = str;
+                } else {
+                    newUrl += "&email=" + emailWithoutSpaces;
+                }
+                ;
+            }
+            ;
+            window.location.replace(newUrl);
+
+        });
+
+        function redirectOnMyPage(value) {
+            location.href = "/users/" + value + "/";
+        };
+    </script>
+    </body>
+
+    </html>
+
+{{ end }}

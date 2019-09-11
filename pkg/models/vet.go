@@ -1,0 +1,85 @@
+package models
+
+import (
+	//"github.com/dpgolang/PetBook/pkg/logger"
+	"fmt"
+	"github.com/jmoiron/sqlx"
+)
+
+type Vet struct {
+	ID            int    `db:"user_id"`
+	Name          string `db:"name"`
+	Qualification string `db:"qualification"`
+	Surname       string `db:"surname"`
+	Category      string `db:"category"`
+	Certificates  string `db:"certificates"`
+}
+
+type VetStore struct {
+	DB *sqlx.DB
+}
+
+type VetStorer interface {
+	RegisterVet(vet *Vet) error
+	//DisplayName(userID int) (name string, err error)
+	GetVetEnums() ([]string, error)
+	UpdateVet(vet *Vet) error
+}
+
+func (c *VetStore) RegisterVet(vet *Vet) error {
+	_, err := c.DB.Exec("insert into vets (user_id, name, qualification, surname, category, certificates) values ($1, $2, $3, $4, $5, $6);",
+		vet.ID, vet.Name, vet.Qualification, vet.Surname, vet.Category, vet.Certificates)
+	if err != nil {
+		return fmt.Errorf("cannot affect rows in pets in db: %v", err)
+	}
+	return nil
+}
+
+//func (c *VetStore) DisplayVetName(userID int) (name string, err error) {
+//	var email, vetName string
+//	err = c.DB.QueryRow(
+//		`SELECT email FROM users WHERE id = $1`, userID).Scan(&email)
+//	if err != nil {
+//		return "", fmt.Errorf("Error occurred while trying read email of user with $d id: %v.\n", userID, err)
+//	}
+//	err = c.DB.QueryRow(
+//		`SELECT name FROM pets WHERE user_id = $1`, userID).Scan(&vetName)
+//	if err != nil {
+//		return "", fmt.Errorf("Error occurred while trying read petName of user with $d id: %v.\n", userID, err)
+//	}
+//	name = email + "/" + vetName
+//
+//	return
+//}
+
+func (p *VetStore) UpdateVet(vet *Vet) error {
+	_, err := p.DB.Exec(`INSERT into vets(user_id, name, qualification, surname, category, certificates) 
+								values ($1, $2, $3, $4, $5, $6)
+								ON CONFLICT (user_id) DO UPDATE 
+								SET name = $2,
+								qualification = $3,
+								surname = $4,
+								category = $5,
+								certificates = $6`, vet.ID, vet.Name, vet.Qualification, vet.Surname, vet.Category, vet.Certificates)
+
+	if err != nil {
+		return fmt.Errorf("Error occurred while trying to update vet table: %v.\n", err)
+	}
+	return nil
+}
+func (p *VetStore) GetVetEnums() ([]string, error) {
+	var vetType []string
+	var vtype string
+	rows, err := p.DB.Queryx("SELECT unnest(enum_range(NULL::class))::text")
+	if err != nil {
+		return nil, fmt.Errorf("can't read vet-enums from db: %v", err)
+	}
+	for rows.Next() {
+		err = rows.Scan(&vtype)
+		if err != nil {
+			return nil, fmt.Errorf("can't scan vet enums from db: %v", err)
+		}
+		vetType = append(vetType, vtype)
+	}
+	return vetType, nil
+}

@@ -1,0 +1,5 @@
+development:
+  dialect: postgres
+  datasource: dbname=pet-book sslmode=disable user=postgres password=root port=5434
+  dir: gomigrations/migrations
+

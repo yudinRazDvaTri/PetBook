@@ -1,0 +1,65 @@
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+    
+}
+
+#chat-messages {
+    min-height: 10vh;
+    height: 60vh;
+    width: 100%;
+    overflow-y: scroll;
+}
+.nav-wrapper {
+  background-color: #e0eef7  !important;
+  color:#e0f2f1;
+}
+.page-footer{
+	  background-color: #e0eef7  !important;
+}
+.nav-wrapper > ul {
+  margin-left: 70px;
+}
+}
+#nav-wrapper  {
+  margin-left: 70px;
+}
+.group {
+  position: relative;
+  margin-bottom: 30px;
+}
+
+input {
+  font-size: 16px;
+  padding: 10px;
+  display: block;
+  width: 300px;
+  border: none;
+  border-bottom: 1px solid #ccc;
+}
+input:focus {
+  outline: none;
+}
+#sendMessageBtn {
+  background-color: #e0eef7;
+  color:#546e7a;
+}
+
+#searchByDateBtn {
+  background-color: #e0eef7;
+  color:#546e7a;
+}
+
+#cancelSearchBtn {
+  background-color: #e0eef7;
+  color:#546e7a;
+}
+
+.navbar-text {
+    color:#546e7a;
+}

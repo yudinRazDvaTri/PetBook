@@ -1,0 +1,100 @@
+{{define "layout"}}
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Result product</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        {{/*        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">*/}}
+        {{/*        <link rel="stylesheet" href="../static/blogCLOSED.css">*/}}
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script>
+            function ConfirmDelete() {
+                return confirm("Do you want to remove this post?");
+            }
+        </script>
+
+    </head>
+    <body>
+
+    <div class="container" style="margin-top: 40px">
+        <div class="panel panel-default">
+            <div class="panel-body"
+                    {{/*                 style="background: #98FB98;padding: 5px;"*/}}
+            >
+                <div width="15%" style="font-size: 30px;">
+                    <p class="h2">Blog</p>
+                    {{/*                    <img src="../upload/cat-face_1f431.png" >*/}}
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <form action="/blogs" method="post">
+                <textarea class="form-control" rows="5" type="text" id="message" name="something"
+                          placeholder="type something here..." required></textarea>
+                <input class="btn btn-sm btn-outline-info"
+                       style="background-color:#e0eef7;margin-top: 10px; margin-bottom: 50px;" type="submit"
+                       value="Send">
+                <input disabled style="background-color:#e0eef7;float: right;margin-top: 10px;"
+                       class="btn btn-sm btn-outline-info" type="button" value="Upload img">
+                <input disabled style="background-color:#e0eef7;float: right;margin-right: 5px; margin-top: 10px;"
+                       class="btn btn-info btn-sm btn-outline-info" type="button" value="YouTube">
+
+                {{/*                <div class="input-group mb-3" style="margin-top: 15px; height: 50px">*/}}
+                {{/*                    <input type="text" class="form-control" placeholder="Имя получателя" aria-label="Имя получателя" aria-describedby="basic-addon2">*/}}
+                {{/*                    <div class="input-group-append">*/}}
+                {{/*                        <button class="btn btn-info btn-outline-dark"  type="button">Send</button>*/}}
+                {{/*                    </div>*/}}
+                {{/*                </div>*/}}
+
+            </form>
+        </div>
+        <table class="table table-hover" style="margin-bottom: 100px;"
+                {{/*               style="background: #90EE90;border-radius: 10px"*/}}>
+            <tbody>
+            {{/*            VERY IMPT RANGE*/}}
+            {{range .}}
+                <tr>
+                    <td width="5%">
+                        <div style="margin-left: 5%;margin-top: 20%">
+                            {{/*                        {{range .LogoPath}}*/}}
+                            <div style="width:65px;height:65px;">
+                                {{/*                            <img style="width:48px;height:48px" src="../static/usermedia/1/logo/" >*/}}
+                                {{/*                            <img style="width:48px;height:48px" src="../static/background.jpg" >*/}}
+                                <img style="width:48px;height:48px" src={{.LogoPath}}>
+                            </div>
+                            {{/*                        {{end}}*/}}
+                            {{/*{{range .BlogData}}*/}}
+                            <div style="font-size: 20px;font-family: bold;">
+                                {{.Name}}
+                            </div>
+                        </div>
+                    </td>
+                    <td width="95%" style="font-size: 20px">
+                        <div
+                                style="margin-top: 15px;padding: 8px;border-radius: 5px;border:solid #343a40 1px;
+                                /*background: #98FB98;*/
+                                "
+                        >
+                            {{ .Message }}
+                        </div>
+
+                        <div width="15%" style="font-size: 15px">
+                            {{.Date | fdate}}
+                        </div>
+
+                    </td>
+
+                    <td width="5%"><a href="/blogs/{{.Id}}?recordid={{.Id}}" style="background-color:#e0eef7;"
+                                      class="btn btn-small btn-outline-info" onclick="return ConfirmDelete();">X</a>
+                    </td>
+                </tr>
+            {{end}}
+            </tbody>
+        </table>
+
+    </div>
+    </body>
+    </html>
+{{end}}
