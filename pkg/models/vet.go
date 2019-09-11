@@ -53,10 +53,17 @@ func (c *VetStore) RegisterVet(vet *Vet) error {
 //}
 
 func (p *VetStore) UpdateVet(vet *Vet) error {
-	_, err := p.DB.Exec("update vets set name=$1, qualification=$2,surname=$3, category=$4,certificates=$5 where user_id = $6",
-		vet.Name, vet.Qualification, vet.Surname, vet.Category, vet.Certificates, vet.ID)
+	_, err := p.DB.Exec(`INSERT into vets(user_id, name, qualification, surname, category, certificates) 
+								values ($1, $2, $3, $4, $5, $6)
+								ON CONFLICT (user_id) DO UPDATE 
+								SET name = $2,
+								qualification = $3,
+								surname = $4,
+								category = $5,
+								certificates = $6`, vet.ID, vet.Name, vet.Qualification, vet.Surname, vet.Category, vet.Certificates)
+
 	if err != nil {
-		return fmt.Errorf("cannot affect rows in vets in db: %v", err)
+		return fmt.Errorf("Error occurred while trying to update vet table: %v.\n", err)
 	}
 	return nil
 }

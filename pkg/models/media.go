@@ -1,7 +1,9 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
+	"github.com/dpgolang/PetBook/pkg/utilerr"
 	"github.com/jmoiron/sqlx"
 	"os"
 	"time"
@@ -47,6 +49,9 @@ func (m *MediaStore) GetLogo(userId int) (string, error) {
 	var path string
 	err := m.DB.QueryRow("select logo_path from logos where logo_path IS NOT NULL and user_id=$1 Order by created_time DESC LIMIT 1", userId).Scan(&path)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return path, &utilerr.LogoDoesNotExist{Description: "User doesn't have a logo."}
+		}
 		return path, fmt.Errorf("cannot connect to database: %v", err)
 	}
 	return path, nil

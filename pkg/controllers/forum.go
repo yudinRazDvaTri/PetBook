@@ -26,7 +26,11 @@ func (c *Controller) TopicsGetHandler() http.HandlerFunc {
 		var viewTopics []forum.ViewTopic
 
 		for _, topic := range topics {
-			userName, err := c.PetStore.DisplayName(topic.UserID)
+			role, err := c.UserStore.GetUserRole(topic.UserID)
+			if err != nil {
+				logger.Error("cannot display role correctly: ", err)
+			}
+			userName, err := c.PetStore.DisplayName(topic.UserID, role)
 			if err != nil {
 				logger.Error(err)
 				http.Redirect(w, r, "/topics", http.StatusInternalServerError)
@@ -94,7 +98,12 @@ func (c *Controller) CommentsGetHandler() http.HandlerFunc {
 		var viewComments []forum.ViewComment
 
 		for _, comment := range comments {
-			userName, err := c.PetStore.DisplayName(comment.UserID)
+			role, err := c.UserStore.GetUserRole(comment.UserID)
+			if err != nil {
+				logger.Error("cannot display role correctly: ", err)
+			}
+
+			userName, err := c.PetStore.DisplayName(comment.UserID, role)
 			if err != nil {
 				logger.Error(err)
 				http.Error(w, "can't get comment creator's name", http.StatusInternalServerError)

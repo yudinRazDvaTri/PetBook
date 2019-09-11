@@ -14,6 +14,7 @@ import (
 	"github.com/dpgolang/PetBook/pkg/models/search"
 	"github.com/dpgolang/PetBook/pkg/utilerr"
 	"github.com/dpgolang/PetBook/pkg/view"
+	gorillaContext "github.com/gorilla/context"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
 	"io/ioutil"
@@ -47,6 +48,8 @@ func (c *Controller) LoginGetHandler() http.HandlerFunc {
 		view.GenerateHTML(w, nil, "login")
 	}
 }
+
+// Controller which handles user logging in.
 func (c *Controller) LoginPostHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
@@ -54,12 +57,12 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 		password := r.FormValue("password")
 		var userID int
 		var err error
+
 		if userID, err = c.UserStore.Login(email, password); err != nil {
 			switch e := err.(type) {
 			case *utilerr.WrongCredentials:
 				// TODO: display flash-message
 				fmt.Fprint(w, e.Error())
-				//http.Redirect(w, r, "/login", http.StatusSeeOther)
 				return
 			default:
 				logger.Error(err)
@@ -110,30 +113,9 @@ func (c *Controller) LoginPostHandler() http.HandlerFunc {
 			Expires: time.Unix(0, 0),
 			Path:    "/",
 		})
-		c.cabinetFilled(userID, w, r)
 
-		http.Redirect(w, r, "/", http.StatusFound)
-	}
-}
-
-func (c *Controller) cabinetFilled(id int, w http.ResponseWriter, r *http.Request) {
-	role, err := c.UserStore.GetUserRole(id)
-	if err != nil {
-		logger.Error(err, "Error occurred while getting user enums.\n")
+		http.Redirect(w, r, "/mypage", http.StatusSeeOther)
 		return
-	}
-	if role == "pet" {
-		_, err := c.UserStore.GetPet(id)
-		if err != nil {
-			http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
-			return
-		}
-	} else if role == "vet" {
-		_, err := c.UserStore.GetVet(id)
-		if err != nil {
-			http.Redirect(w, r, "/vetcabinet", http.StatusFound)
-			return
-		}
 	}
 }
 
@@ -145,6 +127,9 @@ func (c *Controller) LoginGoogleGetHandler() http.HandlerFunc {
 	}
 }
 
+// Generating oauth state. State is a token to protect the user from CSRF attacks.
+// You must always provide a non-empty string and validate that it matches the
+// the state query parameter on your redirect callback.
 func generateStateOauthCookie(w http.ResponseWriter) string {
 	var expiration = time.Now().Add(1 * time.Minute)
 
@@ -157,6 +142,8 @@ func generateStateOauthCookie(w http.ResponseWriter) string {
 	return state
 }
 
+// This controller is called when the resource owner follows the RedirectURL,
+// which was set in GoogleOauthConfig.
 func (c *Controller) GoogleCallback() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		oauthState, _ := r.Cookie("oauthstate")
@@ -221,7 +208,6 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 			case *utilerr.UniqueTaken:
 				// TODO: display flash-message
 				fmt.Fprint(w, e.Error())
-				//http.Redirect(w, r, "/login", http.StatusSeeOther)
 				return
 			default:
 				logger.Error(err)
@@ -230,6 +216,7 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 			}
 		}
 
+		// To store custom types in SecureCookie, they must be registered first using gob.Register().
 		gob.Register(googleToken)
 		value := map[string]interface{}{
 			"accessToken": googleToken,
@@ -252,8 +239,8 @@ func (c *Controller) GoogleCallback() http.HandlerFunc {
 			return
 		}
 
-		c.cabinetFilled(userId, w, r)
-		http.Redirect(w, r, "/", http.StatusFound)
+		http.Redirect(w, r, "/mypage", http.StatusSeeOther)
+		return
 	}
 }
 
@@ -267,17 +254,11 @@ func getGoogleOauthToken(code string) (*oauth2.Token, error) {
 
 func (c *Controller) RegisterGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		roles, err := c.UserStore.GetUserEnums()
-		if err != nil {
-			logger.Error(err, "Error occurred while getting user enums.\n")
-			return
-		}
-
-		view.GenerateHTML(w, roles, "register")
+		view.GenerateHTML(w, nil, "register")
 	}
 }
 
-// TODO: reduce repeating code
+// Controller which handles user registration.
 func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
@@ -285,7 +266,6 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 		email := r.FormValue("email")
 		password := r.FormValue("password")
 		confirmPassword := r.FormValue("confirmPassword")
-		userType := r.FormValue("user-role")
 		firstName := r.FormValue("firstName")
 		lastName := r.FormValue("lastName")
 
@@ -337,7 +317,6 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 			Firstname: firstName,
 			Lastname:  lastName,
 			Password:  string(hashedPassword),
-			Role:      userType,
 		}
 
 		if err := c.UserStore.Register(&user); err != nil {
@@ -345,7 +324,6 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 			case *utilerr.UniqueTaken:
 				// TODO: display flash-message
 				fmt.Fprint(w, e.Error())
-				//http.Redirect(w, r, "/login", http.StatusSeeOther)
 				return
 			default:
 				logger.Error(e)
@@ -357,7 +335,73 @@ func (c *Controller) RegisterPostHandler() http.HandlerFunc {
 	}
 }
 
-// TODO: rewrite case
+func (c *Controller) RoleGetHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		role, err := c.UserStore.GetUserRole(gorillaContext.Get(r, "id").(int))
+		if err != nil {
+			logger.Error(err, "Error occurred while trying to user roles enum.\n")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if role != "" {
+			http.Redirect(w, r, "/mypage", http.StatusSeeOther)
+			return
+		}
+
+		roles, err := c.UserStore.GetUserEnums()
+		if err != nil {
+			logger.Error(err, "Error occurred while trying to user roles enum.\n")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		view.GenerateHTML(w, roles, "role")
+	}
+}
+
+func (c *Controller) RolePostHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		userId := gorillaContext.Get(r, "id").(int)
+
+		role, err := c.UserStore.GetUserRole(gorillaContext.Get(r, "id").(int))
+		if err != nil {
+			logger.Error(err, "Error occurred while trying to user roles enum.\n")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if role != "" {
+			http.Redirect(w, r, "/mypage", http.StatusSeeOther)
+			return
+		}
+
+		roleFormValue := r.FormValue("user-role")
+		if roleFormValue != "pet" && roleFormValue != "vet" {
+			http.Redirect(w, r, "/role", http.StatusSeeOther)
+			return
+		}
+
+		if err := c.UserStore.SetUserRole(roleFormValue, userId); err != nil {
+			logger.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if roleFormValue == "pet" {
+			http.Redirect(w, r, "/petcabinet", http.StatusSeeOther)
+			return
+		} else if roleFormValue == "vet" {
+			http.Redirect(w, r, "/vetcabinet", http.StatusSeeOther)
+			return
+		}
+
+		http.Error(w, "Wrong roleFormValue!", http.StatusNotFound)
+		return
+
+	}
+}
+
 func (c *Controller) LogoutGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -367,7 +411,7 @@ func (c *Controller) LogoutGetHandler() http.HandlerFunc {
 			if err = c.RefreshTokenStore.DeleteRefreshToken(refreshTokenString); err != nil {
 				switch e := err.(type) {
 				case *utilerr.TokenDoesNotExist:
-
+					break
 				default:
 					logger.Error(e)
 					http.Error(w, e.Error(), http.StatusInternalServerError)

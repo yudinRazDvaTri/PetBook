@@ -24,7 +24,6 @@ type RefreshTokenStorer interface {
 	DeleteRefreshToken(token string) error
 }
 
-// TODO: implement user-agent and token unique error
 func (c *RefreshTokenStore) UpdateRefreshToken(userId int, token string, lastUpdateAt time.Time, userAgent string) error {
 	_, err := c.DB.Exec(`INSERT INTO refresh_tokens (user_id, token_string, last_update_at, user_agent) values ($1, $2, $3, $4)
 								ON CONFLICT (user_id, user_agent) DO UPDATE

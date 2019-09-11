@@ -1,79 +1,91 @@
 {{ define "layout"}}
 
-<!DOCTYPE html>
-<html lang="en">
+    <!DOCTYPE html>
+    <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link rel="stylesheet" href="../static/search.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+        <link rel="stylesheet" href="../static/search.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+              crossorigin="anonymous">
+    </head>
 
-<body>
-        <div class="btn-group btn-group-sm" style="margin-top:15px;height: 40px;margin-left:50px; ">
-                <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=user"><span>Search by
+    <body>
+    <div class="btn-group btn-group-sm" style="margin-top:15px;height: 40px;margin-left:50px; ">
+        <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=user"><span>Search by
                         user</span></a><br>
-                <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=animal"><span>Search by
+        <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=animal"><span>Search by
                         animal</span></a>
-                <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=forum"><span>Search by
+        <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=forum"><span>Search by
                         forum</span></a><br>
-            </div>
+    </div>
     <div id="search_menu" class="w-50 container mb-3 input-group search_menu" style="margin-top:-40px; margin-left:40%">
         <input type="email" placeholder="Pet's name" class="form-control " name="name" id="search">
         <div class="input-group-append">
-            <input type="submit" class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" id="search_button" value="Search">
+
+            <input type="submit" class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;"
+                   id="search_button" value="Search">
+
         </div>
     </div>
     <div class="">
         <div class="row">
-            
+
             <div class="col-md-8 " style="margin-top: 50px;margin-left:100px;">
                 <ul>
                     {{ range .Pets }}
-                    
-                    <div onclick="redirectOnMyPage({{.UserID}})" class="card mb-3 border-info " style="max-width: 35rem;background-color: #fafafa">
-                        <div class="row no-gutters">
-                            <div class="col-md-4">
-                                <!-- <img src="..." class="card-img" alt="..."> -->
-                                <p>PHOTO</p>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="card-body ">
-                                    <form action="mypage/following" method="POST">
-                                        <h5 class="card-title "  name="name">{{ .Name }}</h5>
-                                        <p class="card-text" name="description">{{ .Description }}</p>
-                                        <input type="hidden" name="followUserID" value="{{printf "%d" .UserID}}">
-                                        <div class="btn-group btn-group-sm">
-                                                <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/chats/{{.UserID}}">Message</a>
+
+                        <div onclick="redirectOnMyPage({{.UserID}})" class="card mb-3 border-info "
+                             style="max-width: 35rem;background-color: #fafafa">
+                            <div class="row no-gutters">
+                                <div class="col-md-4">
+                                    <!-- <img src="..." class="card-img" alt="..."> -->
+                                    <p>PHOTO</p>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body ">
+                                        <form action="mypage/following" method="POST">
+                                            <h5 class="card-title " name="name">{{ .Name }}</h5>
+                                            <p class="card-text" name="description">{{ .Description }}</p>
+                                            <input type="hidden" name="followUserID" value="{{printf "%d" .UserID}}">
+
+                                            <div class="btn-group btn-group-sm">
+                                                <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;"
+                                                   href="/chats/{{.UserID}}">Message</a>
                                                 {{ if not (.CanFollow $.UserID $.PetsFollowing)}}
-        
-                                                <input type="submit" class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" id="buttonUn" name="follow" value="Unfollow">
-                                            {{else}}
-                                                <input type="submit" class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" id="button" name="follow" value="Follow">
-                                            {{end}}
-                                        </div>
-                                    </form>
+
+                                                    <input type="submit" class="btn btn-sm btn-outline-info"
+                                                           style="background-color:#e0eef7;" id="buttonUn" name="follow"
+                                                           value="Unfollow">
+                                                {{else}}
+                                                    <input type="submit" class="btn btn-sm btn-outline-info"
+                                                           style="background-color:#e0eef7;" id="button" name="follow"
+                                                           value="Follow">
+                                                {{end}}
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    {{else}}
+                        <div class="card mb-3"
+                             style="max-width: 35rem;background-color: azure; border: 2px solid cadetblue;">
+                            <h2>Nothing to show</h2>
                         </div>
-                        {{else}}
-                            <div class="card mb-3" style="max-width: 35rem;background-color: azure; border: 2px solid cadetblue;">
-                                <h2>Nothing to show</h2>
-                            </div>
-                        
-                        {{end}}
+
+                    {{end}}
 
                 </ul>
             </div>
             <div class="filters form-group col-md-1">
                 <label for="age">Enter pet's age:</label>
                 <input type="number" id="age" name="age" min="0" max="30" step="1" placeholder="age"
-                style="width: 200px" class="form-control ">
+                       style="width: 200px" class="form-control ">
                 <label for="type">Enter animal type:</label>
-                <select name="animal_type" id="animal_type"style="width: 200px" class="form-control ">
+                <select name="animal_type" id="animal_type" style="width: 200px" class="form-control ">
                     <option selected>Type of animal</option>
                     <option name="dog">dog</option>
                     <option name="cat">cat</option>
@@ -81,21 +93,28 @@
                     <option name="rodent">rodent</option>
                     <option name="bird">bird</option>
                 </select></label>
+
                 <label for="breed">Enter animal breed:</label>
+
                 <input type="text" class="form-control" style="width:200px" name="breed" id="breed" class=" ">
                 <label for="weight">Enter pet's weight:</label>
                 <input type="number" id="weight" name="weight" min="0" max="50" step="1" placeholder="weight"
-                class="form-control" style="width:200px">
+                       class="form-control" style="width:200px">
+
                 <label for="gender">Choose animal gender:</label>
+
                 <select name="gender" id="gender" style="width: 200px;margin-bottom: 10px" class="form-control ">
                     <option selected>Gender</option>
                     <option name="male">male</option>
                     <option name="female">female</option>
                 </select>
                 <div class="btn-group" role="group" aria-label="Basic example">
-                    <input type="submit" id="apply" value="Apply"  class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;">
+
+                    <input type="submit" id="apply" value="Apply" class="btn btn-sm btn-outline-info"
+                           style="background-color:#e0eef7;">
                     <input type="submit" id="reset_parameters" value="Reset parameters" href="/search?section=animal"
-                    class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;">
+                           class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;">
+
                 </div>
             </div>
         </div>
@@ -104,6 +123,7 @@
 
     <script>
         let url = window.location.href;
+
         function getSelectedText(elementId) {
             var elt = document.getElementById(elementId);
 
@@ -123,8 +143,10 @@
                     newUrl = str;
                 } else {
                     newUrl += "&name=" + decodeName;
-                };
-            };
+                }
+                ;
+            }
+            ;
             window.location.replace(newUrl);
         });
 
@@ -138,8 +160,10 @@
                     newUrl = str;
                 } else {
                     newUrl += "&age=" + age;
-                };
-            };
+                }
+                ;
+            }
+            ;
             var animal_type = getSelectedText('animal_type');
             if (animal_type != "Type of animal") {
                 if (newUrl.match(/animal_type=\w+[^&]/)) {
@@ -147,8 +171,10 @@
                     newUrl = str;
                 } else {
                     newUrl += "&animal_type=" + animal_type;
-                };
-            };
+                }
+                ;
+            }
+            ;
             var breed = document.getElementById('breed').value;
             let decodeBreed = breed.replace(/\s+/g, '+');
             if (breed != "" && breed.match(/[A-Za-z]+/g)) {
@@ -157,8 +183,10 @@
                     newUrl = str;
                 } else {
                     newUrl += "&breed=" + decodeBreed;
-                };
-            };
+                }
+                ;
+            }
+            ;
             var weight = document.getElementById('weight').value;
             if (weight != "") {
                 if (newUrl.match(/weight=\d+/)) {
@@ -166,8 +194,10 @@
                     newUrl = str;
                 } else {
                     newUrl += "&weight=" + weight;
-                };
-            };
+                }
+                ;
+            }
+            ;
             var gender = getSelectedText('gender');
             if (gender != "Gender") {
                 if (newUrl.match(/gender=\w+[^&]/)) {
@@ -175,7 +205,8 @@
                     newUrl = str;
                 } else {
                     newUrl += "&gender=" + gender;
-                };
+                }
+                ;
             }
             window.location.replace(newUrl);
         });
@@ -184,13 +215,14 @@
             url = location.protocol + '//' + location.host + location.pathname + '?section=animal'
             window.location.replace(url);
         });
-        function redirectOnMyPage(value){
-            location.href="/"+value;
+
+        function redirectOnMyPage(value) {
+            location.href = "/users/" + value + "/";
         }
 
     </script>
-</body>
+    </body>
 
-</html>
+    </html>
 
 {{ end }}

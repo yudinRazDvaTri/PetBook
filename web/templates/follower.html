@@ -1,29 +1,36 @@
 {{ define "layout"}}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <link rel="stylesheet" href="../static/background.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-</head>
-<style>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+        <link rel="stylesheet" href="../static/background.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+              crossorigin="anonymous">
+    </head>
 
-</style>
-<body class="background">
-<div style="margin-left: 45%">
-    <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;margin-top:5px;" href="/mypage/following">Following</a>
-    <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;margin-top:5px;" href="/mypage/followers">Followers</a>
-    
-</div>
-    
+    <style>
+
+    </style>
+    <body class="background">
+    <div style="margin-left: 45%">
+        <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;margin-top:5px;"
+           href="/mypage/following">Following</a>
+        <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;margin-top:5px;"
+           href="/mypage/followers">Followers</a>
+
+    </div>
+
     <div class="container-fluid " style="margin-top:-50px; height:100px;"></div>
-        <ul>
-            {{if .IsFollowing}}
-            {{ range .PetsFollowing }}
-            <div onclick="redirectOnMyPage({{.UserID}})" class="card container-fluid mb-3" style="max-width: 35rem;background-color: azure; border: 2px solid cadetblue;">
+    <ul>
+        {{if .IsFollowing}}
+        {{ range .PetsFollowing }}
+            <div onclick="redirectOnMyPage({{.UserID}})" class="card container-fluid mb-3"
+                 style="max-width: 35rem;background-color: azure; border: 2px solid cadetblue;">
+
                 <div class="row no-gutters">
                     <div class="col-md-4">
                         <!-- <img src="..." class="card-img" alt="..."> -->
@@ -31,71 +38,90 @@
                     </div>
                     <div class="col-md-8">
                         <div class="card-body ">
-                            <form  method="POST">
+                            <form method="POST">
                                 <h5 class="card-title " name="name">{{ .Name }}</h5>
                                 <p class="card-text" name="description">{{ .Description }}</p>
                                 <input type="hidden" name="followUserID" value="{{printf "%d" .UserID}}">
                                 <div class="btn-group btn-group-sm">
-                                        <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/chats/{{.UserID}}">Message</a>
-                                        {{ if not (.CanFollow $.UserID $.PetsFollowing)}}
+                                    <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;"
+                                       href="/chats/{{.UserID}}">Message</a>
+                                    {{ if not (.CanFollow $.UserID $.PetsFollowing)}}
 
-                                        <input type="submit" class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" id="buttonUn" name="follow" value="Unfollow">
+
+                                        <input type="submit" class="btn btn-sm btn-outline-info"
+                                               style="background-color:#e0eef7;" id="buttonUn" name="follow"
+                                               value="Unfollow">
                                     {{else}}
-                                        <input type="submit" class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" id="button" name="follow" value="Follow">
+                                        <input type="submit" class="btn btn-sm btn-outline-info"
+                                               style="background-color:#e0eef7;" id="button" name="follow"
+                                               value="Follow">
                                     {{end}}
                                 </div>
+
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
-                {{ else }}
-                <div class="card mb-3 container-fluid" style="max-width: 35rem;background-color: azure; border: 2px solid cadetblue;">
-                    <h2 >You are not following anyone</h2>
+        {{ else }}
+            <div class="card mb-3 container-fluid"
+                 style="max-width: 35rem;background-color: azure; border: 2px solid cadetblue;">
+                <h2>You are not following anyone</h2>
+            </div>
+        {{ end}}
+        {{else}}
+        {{ range .PetsFollowers }}
+
+        <div onclick="redirectOnMyPage({{.UserID}})" class="card container-fluid mb-3"
+             style="max-width: 35rem;background-color: azure; border: 2px solid cadetblue;">
+
+            <div class="row no-gutters">
+                <div class="col-md-4">
+                    <!-- <img src="..." class="card-img" alt="..."> -->
+                    <p>PHOTO</p>
                 </div>
-                {{ end}}
-                {{else}}
-                {{ range .PetsFollowers }}
-                <div onclick="redirectOnMyPage({{.UserID}})" class="card container-fluid mb-3" style="max-width: 35rem;background-color: azure; border: 2px solid cadetblue;">
-                    <div class="row no-gutters">
-                        <div class="col-md-4">
-                            <!-- <img src="..." class="card-img" alt="..."> -->
-                            <p>PHOTO</p>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body " style="background-color: #fafafa">
-                                <form  method="POST">
-                                    <h5 class="card-title " name="name">{{ .Name }}</h5>
-                                    <p class="card-text" name="description">{{ .Description }}</p>
-                                    <input type="hidden" name="followUserID" value="{{printf "%d" .UserID}}">
-                                    <div class="btn-group btn-group-sm">
-                                            <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/chats/{{.UserID}}">Message</a>
-                                            {{ if not (.CanFollow $.UserID $.PetsFollowing)}}
+                <div class="col-md-8">
+                    <div class="card-body " style="background-color: #fafafa">
+                        <form method="POST">
+                            <h5 class="card-title " name="name">{{ .Name }}</h5>
+                            <p class="card-text" name="description">{{ .Description }}</p>
+                            <input type="hidden" name="followUserID" value="{{printf "%d" .UserID}}">
+                            <div class="btn-group btn-group-sm">
+                                <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;"
+                                   href="/chats/{{.UserID}}">Message</a>
+                                {{ if not (.CanFollow $.UserID $.PetsFollowing)}}
 
-                                            <input type="submit" class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" id="buttonUn" name="follow" value="Unfollow">
-                                        {{else}}
-                                            <input type="submit" class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" id="button" name="follow" value="Follow">
-                                        {{end}}
-                                    </div>
-                                    
-                                </form>
+
+                                    <input type="submit" class="btn btn-sm btn-outline-info"
+                                           style="background-color:#e0eef7;" id="buttonUn" name="follow"
+                                           value="Unfollow">
+                                {{else}}
+                                    <input type="submit" class="btn btn-sm btn-outline-info"
+                                           style="background-color:#e0eef7;" id="button" name="follow" value="Follow">
+                                {{end}}
                             </div>
-                        </div>
-                    </div>
-                    {{ else }}
-                        <div class="card mb-3 container-fluid" style="max-width: 35rem;background-color: azure; border: 2px solid cadetblue;">
-                            <h2 >You have no followers</h2>
-                        </div>
-                    {{ end}}
 
-                {{ end}}
-        </ul>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {{ else }}
+                <div class="card mb-3 container-fluid"
+                     style="max-width: 35rem;background-color: azure; border: 2px solid cadetblue;">
+                    <h2>You have no followers</h2>
+                </div>
+            {{ end}}
+
+            {{ end}}
+        </div>
+    </ul>
     </div>
-<script>
-function redirectOnMyPage(value){
-            location.href="/"+value;
+    <script>
+        function redirectOnMyPage(value) {
+            location.href = "/users/" + value + "/";
         };
-</script>
-</body>
-</html>
+    </script>
+    </body>
+    </html>
 {{ end }}

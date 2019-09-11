@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/dpgolang/PetBook/pkg/logger"
 	"github.com/dpgolang/PetBook/pkg/models"
+	"github.com/dpgolang/PetBook/pkg/utilerr"
 	"github.com/dpgolang/PetBook/pkg/view"
 	"github.com/gorilla/context"
 	"net/http"
@@ -24,10 +25,21 @@ func (c *Controller) EditPageHandler() http.HandlerFunc {
 			http.Error(w, "can't get user", http.StatusInternalServerError)
 			return
 		}
-		path, _ := c.MediaStore.GetLogo(id)
+
+		path, err := c.MediaStore.GetLogo(id)
+		if err != nil {
+			switch e := err.(type) {
+			case *utilerr.LogoDoesNotExist:
+				break
+			default:
+				logger.Error(e)
+				http.Redirect(w, r, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+
 		var filename string
 		var edit Editstr
-
 
 		if user.Role == "pet" {
 			pet, _ := c.UserStore.GetPet(id)
@@ -40,6 +52,7 @@ func (c *Controller) EditPageHandler() http.HandlerFunc {
 			edit.LogoPath = path
 			filename = "editVet"
 		}
+
 		gallery, err := c.MediaStore.GetExistedGallery(id)
 		if err != nil {
 			logger.Error(err, "Error occurred while getting user gallery.\n")

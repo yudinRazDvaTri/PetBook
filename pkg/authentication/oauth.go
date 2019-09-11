@@ -13,6 +13,7 @@ type GoogleUserInfo struct {
 	Picture       string `json:"picture"`
 }
 
+// Setting up needed information for sending requests to Google servers.
 var GoogleOauthConfig = &oauth2.Config{
 	RedirectURL:  os.Getenv("APP_ADDRESS") + ":" + os.Getenv("APP_PORT") + "/" + os.Getenv("GOOGLE_CALLBACK"),
 	ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),

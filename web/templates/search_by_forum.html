@@ -1,65 +1,73 @@
 {{ define "layout"}}
 
-<!DOCTYPE html>
-<html lang="en">
+    <!DOCTYPE html>
+    <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <title>Forum</title>
-    <link rel="stylesheet" href="../static/search.css">
-    <!-- Bootstrap  -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <!--   BOOTSTRAP-->
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <title>Forum</title>
+        <link rel="stylesheet" href="../static/search.css">
+        <!-- Bootstrap  -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+              crossorigin="anonymous">
+        <!--   BOOTSTRAP-->
+    </head>
 
-<body>
+    <body>
 
-        <div class="btn-group btn-group-sm" style="margin-top:15px;height: 40px;margin-left:50px; ">
-                <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=user"><span>Search by
+
+    <div class="btn-group btn-group-sm" style="margin-top:15px;height: 40px;margin-left:50px; ">
+        <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=user"><span>Search by
                         user</span></a><br>
-                <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=animal"><span>Search by
+        <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=animal"><span>Search by
                         animal</span></a>
-                <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=forum"><span>Search by
+        <a class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" href="/search?section=forum"><span>Search by
                         forum</span></a><br>
-            </div>
-            <div id="search_menu" class="w-50 container mb-3 input-group search_menu" style="margin-top:-40px; margin-left:40%">
-                    <input type="email" placeholder="Forum" class="form-control " name="name" id="search">
-                    <div class="input-group-append">
-                        <input type="submit" class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" id="search_button" value="Search">
-                    </div>
-                </div>
-                    <div class="col-md-8 ">
+    </div>
+    <div id="search_menu" class="w-50 container mb-3 input-group search_menu" style="margin-top:-40px; margin-left:40%">
+        <input type="email" placeholder="Forum" class="form-control " name="name" id="search">
+        <div class="input-group-append">
+            <input type="submit" class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;"
+                   id="search_button" value="Search">
+
+        </div>
+    </div>
+    <div class="col-md-8 ">
         <ul>
             {{ range . }}
 
-                <div class="card mb-3 border-info  " style="background-color:#fafafa;max-width: 60rem; margin-top: 10px;">
-                        <div class="row no-gutters">
-                                <div class="col-md-4">
-                                        <a href="topics/{{ .TopicID }}" style="color:black;font-size:35px;">{{ .Title }}</a>
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body ">
-                                        <h5 class="card-title ">Author: {{ .UserName}}</h5>
-                                        <p class="card-text">{{ .Description }}</p>
-                                        <p class="card-text">Comments: {{ len .CommentsIDs}}</p>
-                                        <p class="card-text"><small>{{ .CreatedTime | fdate}}</small></p>
-                                    </div>
-                                </div>
+                <div class="card mb-3 border-info  "
+                     style="background-color:#fafafa;max-width: 60rem; margin-top: 10px;">
+
+                    <div class="row no-gutters">
+                        <div class="col-md-4">
+                            <a href="topics/{{ .TopicID }}" style="color:black;font-size:35px;">{{ .Title }}</a>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body ">
+                                <h5 class="card-title ">Author: {{ .UserName}}</h5>
+                                <p class="card-text">{{ .Description }}</p>
+                                <p class="card-text">Comments: {{ len .CommentsIDs}}</p>
+                                <p class="card-text">
+                                    <small>{{ .CreatedTime | fdate}}</small>
+                                </p>
                             </div>
-                    
+                        </div>
+                    </div>
+
                 </div>
 
             {{ else }}
-            <div class="card mb-3" style="max-width: 35rem;background-color: azure; border: 2px solid cadetblue;">
+                <div class="card mb-3" style="max-width: 35rem;background-color: azure; border: 2px solid cadetblue;">
                     <h2>Nothing to show</h2>
                 </div>
             {{ end}}
 
         </ul>
     </div>
-</div>
-</div>
+    </div>
+    </div>
 
     <script>
         var url = window.location.href;
@@ -73,13 +81,15 @@
                     newUrl = str;
                 } else {
                     newUrl += "&search=" + decodeSearch;
-                };
-            };
+                }
+                ;
+            }
+            ;
             window.location.replace(newUrl);
         })
     </script>
-</body>
+    </body>
 
-</html>
+    </html>
 
 {{ end }}

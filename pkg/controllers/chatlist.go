@@ -19,7 +19,12 @@ func (c *Controller) ChatsGetHandler() http.HandlerFunc {
 		}
 		var viewChats []models.ChatToView
 		for _, chat := range chats {
-			username, err := c.PetStore.DisplayName(chat.ToID)
+			role, err := c.UserStore.GetUserRole(chat.ToID)
+			if err != nil {
+				logger.Error("cannot display role correctly: ", err)
+			}
+
+			username, err := c.PetStore.DisplayName(chat.ToID, role)
 			if err != nil {
 				logger.Error(err)
 			}

@@ -13,8 +13,8 @@ import (
 
 //Animal subscriber structure
 type FollowerPets struct {
-	Name        string `json:"name" db:"name"'`
-	Description string `json:"description" db:"description"'`
+	Name        string `json:"name" db:"name"`
+	Description string `json:"description" db:"description"`
 	UserID      int    `json:"user_id" db:"user_id"`
 }
 
@@ -153,7 +153,12 @@ func (c *Controller) searchByForum(w http.ResponseWriter, r *http.Request) {
 		var viewTopics []forum.ViewTopic
 
 		for _, topic := range topics {
-			userName, err := c.PetStore.DisplayName(topic.UserID)
+			role, err := c.UserStore.GetUserRole(topic.UserID)
+			if err != nil {
+				logger.Error("cannot display role correctly: ", err)
+			}
+
+			userName, err := c.PetStore.DisplayName(topic.UserID, role)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				logger.Error(err)
@@ -182,7 +187,12 @@ func (c *Controller) searchByForum(w http.ResponseWriter, r *http.Request) {
 	var viewTopics []forum.ViewTopic
 
 	for _, topic := range topics {
-		userName, err := c.PetStore.DisplayName(topic.UserID)
+		role, err := c.UserStore.GetUserRole(topic.UserID)
+		if err != nil {
+			logger.Error("cannot display role correctly: ", err)
+		}
+
+		userName, err := c.PetStore.DisplayName(topic.UserID, role)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			logger.Error(err)

@@ -1,95 +1,118 @@
-<html lang="en"><head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body>{{ define "layout"}}
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body>{{ define "layout"}}
 
-    
-    
-    
-        <meta charset="UTF-8">
-        <title>Topic</title>
-        <!-- Bootstrap  -->
-        <link rel="stylesheet" href="../static/background.css">
-        <script src="comments_files/jquery-3.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-        <script src="comments_files/popper.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-        <script src="comments_files/bootstrap.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-        <!--   BOOTSTRAP-->
-    <style>
-.header-h1 {
-    position: relative;
-    text-align: center;
-    margin-bottom: .5rem;
-  }
-  .header-h1 h1 {
-    position: relative;
-    display: inline-block;
-    background: transparent;
-    margin-bottom: 20px;
-    padding: 0.5rem 1rem;
-    border-bottom: .125rem solid #74c3c9;
-    font-size: 3.25rem;
-    color: #74c3c9;
-  }
-  .header-h1 h1::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: -1.25rem;
-    transform: translateX(-1.25rem);
-    border-top: 1.25rem solid #74c3c9;
-    border-left: 1.25rem solid transparent;
-    border-right: 1.25rem solid transparent;
-  }
-  .header-h1 h1::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: -1.125rem;
-    transform: translateX(-1.25rem);
-    border-top: 1.25rem solid transparent;
-    border-left: 1.25rem solid transparent;
-    border-right: 1.25rem solid transparent;
-  }
-  
-    </style>
-<body >
-    <a href="/topics" class="btn btn-outline-info" style="margin-left:50px; margin-top: 25px; height: 10px;width: 50px;font-size: 30px; text-align: center">⇦</a>
-    <div style="text-align: center">
+
+<meta charset="UTF-8">
+<title>Topic</title>
+<!-- Bootstrap  -->
+<link rel="stylesheet" href="../static/background.css">
+<script src="comments_files/jquery-3.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="comments_files/popper.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="comments_files/bootstrap.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+<!--   BOOTSTRAP-->
+<style>
+    .header-h1 {
+        position: relative;
+        text-align: center;
+        margin-bottom: .5rem;
+    }
+
+    .header-h1 h1 {
+        position: relative;
+        display: inline-block;
+        background: transparent;
+        margin-bottom: 20px;
+        padding: 0.5rem 1rem;
+        border-bottom: .125rem solid #74c3c9;
+        font-size: 3.25rem;
+        color: #74c3c9;
+    }
+
+    .header-h1 h1::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: -1.25rem;
+        transform: translateX(-1.25rem);
+        border-top: 1.25rem solid #74c3c9;
+        border-left: 1.25rem solid transparent;
+        border-right: 1.25rem solid transparent;
+    }
+
+    .header-h1 h1::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: -1.125rem;
+        transform: translateX(-1.25rem);
+        border-top: 1.25rem solid transparent;
+        border-left: 1.25rem solid transparent;
+        border-right: 1.25rem solid transparent;
+    }
+
+</style>
+<body>
+<a href="/topics" class="btn btn-outline-info"
+   style="margin-left:50px; margin-top: 25px; height: 10px;width: 50px;font-size: 30px; text-align: center">⇦</a>
+<div style="text-align: center">
     <div class="page-header header-h1" style="text-align: center;">
         <h1 class="page-header header-h1">{{.Topic.Title}}</h1>
         <h6 style="background-color: azure; border: 2px solid cadetblue;
         border-radius: 25px; width:75%;padding:10px; margin-top: 10px;margin-left: auto;
         margin-right: auto ">{{.Topic.Description}}</h6>
-    </head>
+        </head>
 
-    <body>
-    
+        <body>
+
     </div>
+
     <div class="container" style="margin-top: 10%">
         {{ range .TreeVComments}}
-            <div  style="border-radius: 25px;padding:10px; margin-top: 1px; border: cadetblue 1px solid; width:400px;background-color: azure;">
+            <div style="border-radius: 25px;padding:10px; margin-top: 1px; border: cadetblue 1px solid; width:400px;background-color: azure;">
+
                 <h6>{{ .Content }}</h6>
                 <small>{{ .UserName}}</small>
                 <br>
                 <small>{{ .CreatedTime | fdate}}</small>
                 <br>
                 <small>Rating: {{ len .LikersIDs}}</small>
-                <div class="btn-group btn-group-sm" role="group">
-                {{ if .CanReply $.ContextUserID }}
-                    <button class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;"  onclick="doReply({{.CommentID}}, {{.Content}}, {{.UserName}})">Reply</button>
-                {{ end }}
 
-                <form action="/topics/{{.TopicID}}/comments/{{.CommentID}}/ratings" method="POST">
-                    {{ if .CanLike $.ContextUserID }}
-                        <input type="submit" style="background-color:#e0eef7;" class="btn btn-sm btn-outline-info" value="Like">
+                <div class="btn-group btn-group-sm" role="group">
+                    {{ if .CanReply $.ContextUserID }}
+                        <button class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;"
+                                onclick="doReply({{.CommentID}}, {{.Content}}, {{.UserName}})">Reply
+                        </button>
+
                     {{ end }}
-                </form>
+
+                    <form action="/topics/{{.TopicID}}/comments/{{.CommentID}}/ratings" method="POST">
+                        {{ if .CanLike $.ContextUserID }}
+
+                            <input type="submit" style="background-color:#e0eef7;" class="btn btn-sm btn-outline-info"
+                                   value="Like">
+                        {{ end }}
+                    </form>
+                </div>
             </div>
-            </div>
+
             <br>
             <br>
 
             {{ range .NestedComments }}
 
-                <div style="border-radius: 25px; margin-top: -40px; border: rgb(126, 193, 196) 1px solid; width:250px;background-color: rgb(197, 224, 224);text-align: center" class="offset4" >
+
+                <div style="border-radius: 25px; margin-top: -40px; border: rgb(126, 193, 196) 1px solid; width:250px;background-color: rgb(197, 224, 224);text-align: center"
+                     class="offset4">
+
                     <h6>{{ .Content }}</h6>
                     <small>{{ .UserName}}</small>
                     <br>
@@ -99,7 +122,10 @@
 
                     <form action="/topics/{{.TopicID}}/comments/{{.CommentID}}/ratings" method="POST">
                         {{ if .CanLike $.ContextUserID }}
-                            <input type="submit" class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;" value="Like">
+
+                            <input type="submit" class="btn btn-sm btn-outline-info" style="background-color:#e0eef7;"
+                                   value="Like">
+
                         {{ end }}
                     </form>
                 </div>
@@ -112,18 +138,22 @@
     </div>
 
 
-
-    <div id="comment"  style="margin-left: auto; width:75%; margin-bottom:10px; right:5px; text-align: right">
+    <div id="comment" style="margin-left: auto; width:75%; margin-bottom:10px; right:5px; text-align: right">
         <form action="/topics/{{.Topic.TopicID}}/comments?parentID={{0}}" method="POST">
-            <textarea rows="3" cols="50" style="background-color: azure;" name="content" class="form-control" placeholder="content" required=""></textarea>
+            <textarea rows="3" cols="50" style="background-color: azure;" name="content" class="form-control"
+                      placeholder="content" required=""></textarea>
             <input type="submit" class="btn btn-sm btn-outline-info" style="margin-top: 5px;" value="Comment">
+
         </form>
     </div>
-    
-    <div id="reply" style="margin-left: auto; width:75%; margin-top: -145px; margin-bottom:10px; right:5px; text-align: right" hidden="">
+
+    <div id="reply"
+         style="margin-left: auto; width:75%; margin-top: -145px; margin-bottom:10px; right:5px; text-align: right"
+         hidden="">
         <form name="replyForm" action="/topics/{{.Topic.TopicID}}/comments?parentID=" method="POST">
-            <textarea id="reply-text" rows="3" cols="50"  style="background-color: azure;"  name="content" class="form-control" placeholder="content" required=""></textarea>
-            <input type="submit" class="btn btn-sm btn-outline-info" style="margin-top: 5px;"  value="Reply">
+            <textarea id="reply-text" rows="3" cols="50" style="background-color: azure;" name="content"
+                      class="form-control" placeholder="content" required=""></textarea>
+            <input type="submit" class="btn btn-sm btn-outline-info" style="margin-top: 5px;" value="Reply">
         </form>
     </div>
 
@@ -136,9 +166,8 @@
         }
     </script>
 
-    
 
-    
+    {{ end }}
 
-{{ end }}
-</body></html>
+</body>
+</html>

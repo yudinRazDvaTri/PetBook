@@ -33,12 +33,31 @@ func (c *Controller) HandleChatConnectionGET() http.HandlerFunc {
 			http.Redirect(w, r, "/chats", http.StatusNotFound)
 			return
 		}
-		_, err = c.UserStore.GetPet(toID)
+		toRole, err := c.UserStore.GetUserRole(toID)
 		if err != nil {
 			logger.Error(err)
-			http.Redirect(w, r, "/mypage", http.StatusNotFound)
+			http.Redirect(w, r, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
+		switch toRole {
+		case "pet":
+			_, err = c.UserStore.GetPet(toID)
+			if err != nil {
+				logger.Error(err)
+				http.Redirect(w, r, "/mypage", http.StatusNotFound)
+				return
+			}
+
+		case "vet":
+			_, err = c.UserStore.GetVet(toID)
+			if err != nil {
+				logger.Error(err)
+				http.Redirect(w, r, "/mypage", http.StatusNotFound)
+				return
+			}
+		}
+
 		view.GenerateHTML(w, toID, "chat")
 	}
 }
@@ -79,7 +98,12 @@ func (c *Controller) HandleChatConnection() http.HandlerFunc {
 				Message:   mes.Text,
 				CreatedAt: mes.CreatedAt.Format("02-01-2006 15:04:05"),
 			}
-			msg.Username, err = c.PetStore.DisplayName(msg.FromID)
+			role, err := c.UserStore.GetUserRole(msg.FromID)
+			if err != nil {
+				logger.Error("cannot display role correctly: ", err)
+			}
+
+			msg.Username, err = c.PetStore.DisplayName(msg.FromID, role)
 			if err != nil {
 				logger.Error("cannot display name correctly: ", err)
 			}
@@ -89,18 +113,20 @@ func (c *Controller) HandleChatConnection() http.HandlerFunc {
 			}
 		}
 
-		go c.HandleMessages(ws, client, toID)
+		go c.HandleMessages(r, ws, client, toID)
 	}
 }
 
-func (c *Controller) HandleMessages(ws *websocket.Conn, client models.Client, toID int) {
+func (c *Controller) HandleMessages(r *http.Request, ws *websocket.Conn, client models.Client, toID int) {
 	for {
 		var msg models.MessageToView
 		var err error
-		msg.Username, err = c.PetStore.DisplayName(client.ID)
+		role := context.Get(r, "role").(string)
+		msg.Username, err = c.PetStore.DisplayName(client.ID, role)
 		if err != nil {
 			logger.Error("cannot display name correctly: ", err)
 		}
+
 		msg.FromID = client.ID
 		msg.ToID = toID
 		msg.CreatedAt = time.Now().Format("02-01-2006 15:04:05")
@@ -117,6 +143,7 @@ func (c *Controller) HandleMessages(ws *websocket.Conn, client models.Client, to
 			logger.Error("something gone wrong while parsing message created_at:", err)
 			continue
 		}
+
 		messageForSavingIntoDB := &models.Message{
 			FromID:    msg.FromID,
 			ToID:      msg.ToID,
@@ -127,6 +154,7 @@ func (c *Controller) HandleMessages(ws *websocket.Conn, client models.Client, to
 		if err != nil {
 			logger.Error(err)
 		}
+
 		for client := range clients {
 			if client.ID == msg.FromID || client.ID == msg.ToID {
 				err = client.Connection.WriteJSON(msg)
@@ -160,10 +188,12 @@ func (c *Controller) HandleChatSearchConnection() http.HandlerFunc {
 			http.Redirect(w, r, "/chats/"+strToID, http.StatusNotFound)
 			return
 		}
+
 		messages, err := c.ChatStore.GetMessagesByDate(toID, fromID, date)
 		if err != nil {
 			logger.Error("can't get messages: ", err)
 		}
+
 		messagesToView := []models.MessageToView{}
 		for _, mes := range messages {
 			msg := models.MessageToView{
@@ -172,7 +202,13 @@ func (c *Controller) HandleChatSearchConnection() http.HandlerFunc {
 				Message:   mes.Text,
 				CreatedAt: mes.CreatedAt.Format("02-01-2006 15:04:05"),
 			}
-			msg.Username, err = c.PetStore.DisplayName(msg.FromID)
+
+			role, err := c.UserStore.GetUserRole(msg.FromID)
+			if err != nil {
+				logger.Error("cannot display role correctly: ", err)
+			}
+
+			msg.Username, err = c.PetStore.DisplayName(msg.FromID, role)
 			if err != nil {
 				logger.Error("cannot display name correctly: ", err)
 			}

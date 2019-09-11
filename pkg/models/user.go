@@ -43,6 +43,7 @@ type UserStorer interface {
 	GetPet(userID int) (Pet, error)
 	LoginOauth(email string) (int, error)
 	GetVet(userID int) (Vet, error)
+	SetUserRole(role string, userID int) error
 	GetUserEnums() ([]string, error)
 	GetUserRole(userID int) (string, error)
 }
@@ -76,8 +77,8 @@ func (c *UserStore) Register(user *User) error {
 	}
 
 	{
-		err = tx.QueryRow("insert into users (email, firstname, lastname, login,pet_or_vet) values ($1,$2,$3, $4,$5) returning id",
-			user.Email, user.Firstname, user.Lastname, user.Login, user.Role).Scan(&user.ID)
+		err = tx.QueryRow("insert into users (email, firstname, lastname, login) values ($1,$2,$3, $4) returning id",
+			user.Email, user.Firstname, user.Lastname, user.Login).Scan(&user.ID)
 
 		if err != nil {
 			if _, ok := err.(*pq.Error); ok {
@@ -165,7 +166,10 @@ func (c *UserStore) GetPet(userID int) (Pet, error) {
 		AND u.id = $1 `, userID).StructScan(&pet)
 
 	if err != nil {
-		return pet, err
+		if err == sql.ErrNoRows {
+			return pet, &utilerr.PetDoesNotExist{Description: "Pet does not exist!"}
+		}
+		return pet, fmt.Errorf("Error occurred while trying to read pet from db: %v.\n", err)
 	}
 
 	return pet, nil
@@ -215,8 +219,12 @@ func (c *UserStore) GetVet(userID int) (Vet, error) {
 		AND u.id = $1 `, userID).StructScan(&vet)
 
 	if err != nil {
-		return vet, err
+		if err == sql.ErrNoRows {
+			return vet, &utilerr.VetDoesNotExist{Description: "Vet does not exist!"}
+		}
+		return vet, fmt.Errorf("Error occurred while trying to read pet from db: %v.\n", err)
 	}
+
 
 	return vet, nil
 }
@@ -238,11 +246,24 @@ func (c *UserStore) GetUserEnums() ([]string, error) {
 	return userRole, nil
 }
 
-func (c *UserStore) GetUserRole(userID int) (string, error) {
-	var role string
-	err := c.DB.QueryRowx("select pet_or_vet from users where id=$1", userID).Scan(&role)
+func (c *UserStore) SetUserRole(role string, userID int) error {
+	_, err := c.DB.Exec(`UPDATE users 
+								SET pet_or_vet = $1
+								WHERE id = $2`, role, userID)
 	if err != nil {
-		return role, err
+		return err
 	}
-	return role, nil
+	return nil
+}
+
+func (c *UserStore) GetUserRole(userID int) (string, error) {
+	var role sql.NullString
+
+	err := c.DB.QueryRowx("select pet_or_vet from users where id=$1", userID).Scan(&role)
+
+	if role.Valid {
+		return role.String, nil
+	}
+
+	return role.String, err
 }

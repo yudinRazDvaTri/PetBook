@@ -1,0 +1,29 @@
+{{ define "layout" }}
+
+    <!DOCTYPE html>
+    <html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>َRole - PetBook</title>
+        <link rel="stylesheet" href="../static/registerAndLogin.css">
+    </head>
+    <body>
+
+    <div class="box">
+        <form action="/role" method="POST">
+            <h1>Choose your role</h1>
+            <select name="user-role" class="custom-select" required>
+                <option selected>User role</option>
+                {{range .}}
+                    <option >{{.}}</option>
+                {{end}}
+            </select>
+            <input type="submit" name="" value="Choose">
+        </form>
+        <a href="/login">Back</a>
+    </div>
+
+    </body>
+    </html>
+
+{{ end }}

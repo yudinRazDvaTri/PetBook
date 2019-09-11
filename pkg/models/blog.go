@@ -3,7 +3,6 @@ package models
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"log"
 	"time"
 )
 
@@ -25,12 +24,6 @@ type BlogStorer interface {
 	CreateBlog(form string, idUser int) error
 	DeleteBlog(blogid string) error
 	GetVetBlog(userID int) ([]Blog, error)
-}
-
-func logFatal(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 func (b *BlogStore) GetPetBlog(userID int) ([]Blog, error) {
@@ -56,6 +49,7 @@ func (b *BlogStore) GetPetBlog(userID int) ([]Blog, error) {
 	}
 	return results, nil
 }
+
 func (b *BlogStore) GetVetBlog(userID int) ([]Blog, error) {
 	rows, err := b.DB.Query("select blog_id, content, created_time, name from blog,vets where blog.user_id =$1 and vets.user_id=blog.user_id order by created_time desc;", userID)
 	if err != nil {

@@ -1,7 +1,6 @@
 package models
 
 import (
-	//"github.com/dpgolang/PetBook/pkg/logger"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/jmoiron/sqlx"

@@ -12,6 +12,12 @@ import (
 // TODO: check input values
 func (c *Controller) VetPostHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		role := context.Get(r, "role").(string)
+		if role != "vet" {
+			http.Redirect(w, r, "/mypage", http.StatusMethodNotAllowed)
+			return
+		}
+
 		err := r.ParseForm()
 		id := context.Get(r, "id").(int)
 		if matched, err := regexp.Match(patternOnlyNum, []byte(r.FormValue("age"))); !matched || err != nil {
@@ -44,6 +50,13 @@ func (c *Controller) VetPostHandler() http.HandlerFunc {
 
 func (c *Controller) VetGetHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		role := context.Get(r, "role").(string)
+		if role != "vet" {
+			http.Redirect(w, r, "/mypage", http.StatusMethodNotAllowed)
+			return
+		}
+
 		vetType, _ := c.VetStore.GetVetEnums()
 		view.GenerateHTML(w, vetType, "cabinetVet")
 	}
